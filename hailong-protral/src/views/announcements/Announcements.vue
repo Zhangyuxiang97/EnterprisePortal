@@ -686,19 +686,15 @@ const loadAnnouncements = async () => {
       params.procurementType = searchParams.value.procurementType
     }
     
-    // 传递地区regionCode（数据库存储的是regionCode）
-    if (selectedProvinceCode.value) {
-      params.province = selectedProvinceCode.value
+    // 传递地区名称（数据库存储的是名称字符串）
+    if (searchParams.value.province) {
+      params.province = searchParams.value.province
     }
-    if (selectedCityCode.value) {
-      params.city = selectedCityCode.value
+    if (searchParams.value.city) {
+      params.city = searchParams.value.city
     }
     if (searchParams.value.district) {
-      // 根据区县名称找到区县代码
-      const district = districts.value.find(d => d.regionName === searchParams.value.district)
-      if (district) {
-        params.district = district.regionCode
-      }
+      params.district = searchParams.value.district
     }
     
     if (searchParams.value.keyword) {
