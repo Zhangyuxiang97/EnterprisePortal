@@ -48,14 +48,17 @@
 - 数据来源：国家行政区划代码
 - **数据格式**：市区统一标记为"XX市区"，县单独列出
 
-### 7. 07_announcements_import.sql
-**招标公告历史数据导入**，包含：
-- 从旧网站（henanhailong.com）抓取的历史公告数据
-- 招标公告：1103条
-- 中标公示：1061条
-- 变更公告：211条
-- **总计：2375条**
-- 数据已清洗：HTML清理、区域映射、字段提取
+### 7. 07_announcements_bidding.sql
+**招标公告数据**，1103条
+
+### 8. 08_announcements_result.sql
+**中标公示数据**，1061条
+
+### 9. 09_announcements_correction.sql
+**变更公告数据**，211条
+
+> 数据来源：henanhailong.com，已清洗（HTML清理、区域映射、字段提取）
+> **总计：2375条**
 
 ## 执行顺序
 
@@ -82,8 +85,14 @@ mysql -u root -p hailong_consulting < 05_region_dictionary_districts.sql
 # 6. 执行全国区县完整数据
 mysql -u root -p hailong_consulting < 06_region_dictionary_complete.sql
 
-# 7. 导入历史公告数据
-mysql -u root -p hailong_consulting < 07_announcements_import.sql
+# 7. 导入招标公告
+mysql -u root -p hailong_consulting < 07_announcements_bidding.sql
+
+# 8. 导入中标公示
+mysql -u root -p hailong_consulting < 08_announcements_result.sql
+
+# 9. 导入变更公告
+mysql -u root -p hailong_consulting < 09_announcements_correction.sql
 ```
 
 或者在MySQL客户端中执行：
