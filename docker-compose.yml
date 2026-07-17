@@ -9,6 +9,7 @@ services:
     environment:
       MYSQL_DATABASE: hailong_consulting
       MYSQL_USER: hailong_app
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       TZ: Asia/Shanghai
     volumes:
       - mysql-data:/var/lib/mysql
@@ -47,8 +48,12 @@ services:
         COUNT=$$(mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD -e "SELECT COUNT(*) FROM hailong_consulting.announcements" -s -N 2>/dev/null || echo 0)
         echo "当前公告数量: $$COUNT"
         if [ "$$COUNT" -lt 100 ]; then
-          echo "导入公告数据..."
-          mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/07_announcements_import.sql
+          echo "导入招标公告..."
+          mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/07_announcements_bidding.sql
+          echo "导入中标公告..."
+          mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/08_announcements_result.sql
+          echo "导入变更公告..."
+          mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/09_announcements_correction.sql
           COUNT=$$(mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD -e "SELECT COUNT(*) FROM hailong_consulting.announcements" -s -N 2>/dev/null)
           echo "导入完成，公告数量: $$COUNT"
         else
