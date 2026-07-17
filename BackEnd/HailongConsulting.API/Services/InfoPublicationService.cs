@@ -15,15 +15,18 @@ public class InfoPublicationService : IInfoPublicationService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly ILogger<InfoPublicationService> _logger;
+    private readonly IHtmlContentSanitizer _htmlContentSanitizer;
 
     public InfoPublicationService(
         IUnitOfWork unitOfWork,
         IMapper mapper,
-        ILogger<InfoPublicationService> logger)
+        ILogger<InfoPublicationService> logger,
+        IHtmlContentSanitizer htmlContentSanitizer)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _logger = logger;
+        _htmlContentSanitizer = htmlContentSanitizer;
     }
 
     public async Task<InfoPublicationDto> CreateAsync(CreateInfoPublicationDto createDto)
@@ -31,6 +34,7 @@ public class InfoPublicationService : IInfoPublicationService
         try
         {
             var publication = _mapper.Map<InfoPublication>(createDto);
+            publication.Content = _htmlContentSanitizer.Sanitize(publication.Content);
             publication.CreatedAt = DateTime.UtcNow;
             publication.UpdatedAt = DateTime.UtcNow;
             publication.ViewCount = 0;
@@ -56,12 +60,13 @@ public class InfoPublicationService : IInfoPublicationService
                 return null;
 
             _mapper.Map(updateDto, publication);
+            publication.Content = _htmlContentSanitizer.Sanitize(publication.Content);
             publication.UpdatedAt = DateTime.UtcNow;
 
             _unitOfWork.InfoPublications.Update(publication);
             await _unitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<InfoPublicationDto>(publication);
+            return SanitizeDto(_mapper.Map<InfoPublicationDto>(publication));
         }
         catch (Exception ex)
         {
@@ -77,6 +82,7 @@ public class InfoPublicationService : IInfoPublicationService
             return null;
 
         var dto = _mapper.Map<InfoPublicationDto>(publication);
+        dto = SanitizeDto(dto);
 
         // 加载附件信息（使用JSON反序列化）
         if (!string.IsNullOrEmpty(publication.AttachmentIds))
@@ -112,6 +118,7 @@ public class InfoPublicationService : IInfoPublicationService
             queryDto.PageSize);
 
         var dtos = _mapper.Map<List<InfoPublicationDto>>(items);
+        dtos.ForEach(dto => SanitizeDto(dto));
 
         return new PagedResult<InfoPublicationDto>
         {
@@ -165,6 +172,7 @@ public class InfoPublicationService : IInfoPublicationService
             queryDto.PageSize);
 
         var dtos = _mapper.Map<List<InfoPublicationDto>>(items);
+        dtos.ForEach(dto => SanitizeDto(dto));
 
         return new PagedResult<InfoPublicationDto>
         {
@@ -173,6 +181,12 @@ public class InfoPublicationService : IInfoPublicationService
             PageIndex = queryDto.PageNumber,
             PageSize = queryDto.PageSize
         };
+    }
+
+    private InfoPublicationDto SanitizeDto(InfoPublicationDto dto)
+    {
+        dto.Content = _htmlContentSanitizer.Sanitize(dto.Content);
+        return dto;
     }
 
     #region IInfoPublicationStatisticsExtension 实现

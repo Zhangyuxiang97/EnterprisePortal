@@ -12,19 +12,10 @@ SET CHARACTER SET utf8mb4;
 USE `hailong_consulting`;
 
 -- ============================================
--- 1. 初始化用户表（用于API认证）
--- 密码使用MD5加密
+-- 1. 用户初始化
 -- ============================================
-
--- 管理员账号
--- 用户名：admin，密码：admin123
-INSERT INTO `users` (`username`, `password`, `email`, `phone`, `real_name`, `role`, `status`) VALUES
-('admin', MD5('admin123'), 'admin@hailong.com', '13800138000', '系统管理员', 'admin', 1);
-
--- 测试账号
--- 用户名：test，密码：test123
-INSERT INTO `users` (`username`, `password`, `email`, `phone`, `real_name`, `role`, `status`) VALUES
-('test', MD5('test123'), 'test@hailong.com', '13800138001', '测试用户', 'user', 1);
+-- 不再导入默认管理员或测试账号，避免新部署暴露已知凭据。
+-- API 首次发现用户表为空时，会自动生成管理员账号并将凭据写入 logs/bootstrap/initial-admin-credentials.txt。
 
 -- ============================================
 -- 3. 初始化项目区域字典（省市区三级结构）

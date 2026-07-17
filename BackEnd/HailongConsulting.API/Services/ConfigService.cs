@@ -13,12 +13,18 @@ public class ConfigService : IConfigService
     private readonly IConfigRepository _repository;
     private readonly IMapper _mapper;
     private readonly IAttachmentService _attachmentService;
+    private readonly IHtmlContentSanitizer _htmlContentSanitizer;
 
-    public ConfigService(IConfigRepository repository, IMapper mapper, IAttachmentService attachmentService)
+    public ConfigService(
+        IConfigRepository repository,
+        IMapper mapper,
+        IAttachmentService attachmentService,
+        IHtmlContentSanitizer htmlContentSanitizer)
     {
         _repository = repository;
         _mapper = mapper;
         _attachmentService = attachmentService;
+        _htmlContentSanitizer = htmlContentSanitizer;
     }
 
     #region 轮播图
@@ -73,6 +79,7 @@ public class ConfigService : IConfigService
         if (profile == null) return null;
         
         var dto = _mapper.Map<CompanyProfileDto>(profile);
+        dto.Content = _htmlContentSanitizer.Sanitize(dto.Content);
         
         // 填充图片URL
         if (dto.ImageIds != null && dto.ImageIds.Any())
@@ -87,6 +94,7 @@ public class ConfigService : IConfigService
     public async Task<bool> UpdateCompanyProfileAsync(UpdateCompanyProfileDto dto)
     {
         var profile = _mapper.Map<CompanyProfile>(dto);
+        profile.Content = _htmlContentSanitizer.Sanitize(profile.Content);
         return await _repository.UpdateCompanyProfileAsync(profile);
     }
 
@@ -324,6 +332,7 @@ public class ConfigService : IConfigService
     {
         var scopes = await _repository.GetAllBusinessScopesAsync();
         var dtos = _mapper.Map<IEnumerable<BusinessScopeDto>>(scopes).ToList();
+        dtos.ForEach(dto => SanitizeDto(dto));
         
         // 填充图片URL
         foreach (var dto in dtos)
@@ -347,6 +356,7 @@ public class ConfigService : IConfigService
         if (scope == null) return null;
         
         var dto = _mapper.Map<BusinessScopeDto>(scope);
+        dto = SanitizeDto(dto);
         
         // 填充图片URL
         if (dto.ImageId.HasValue)
@@ -364,6 +374,7 @@ public class ConfigService : IConfigService
     public async Task<BusinessScopeDto> CreateBusinessScopeAsync(CreateBusinessScopeDto dto)
     {
         var scope = _mapper.Map<BusinessScope>(dto);
+        scope.Content = scope.Content == null ? null : _htmlContentSanitizer.Sanitize(scope.Content);
         var created = await _repository.AddBusinessScopeAsync(scope);
         return _mapper.Map<BusinessScopeDto>(created);
     }
@@ -376,13 +387,19 @@ public class ConfigService : IConfigService
         // 只更新非null的字段
         if (dto.Name != null) scope.Name = dto.Name;
         if (dto.Description != null) scope.Description = dto.Description;
-        if (dto.Content != null) scope.Content = dto.Content;
+        if (dto.Content != null) scope.Content = _htmlContentSanitizer.Sanitize(dto.Content);
         if (dto.Features != null) scope.Features = System.Text.Json.JsonSerializer.Serialize(dto.Features);
         if (dto.ImageId.HasValue) scope.ImageId = dto.ImageId;
         if (dto.SortOrder.HasValue) scope.SortOrder = dto.SortOrder.Value;
         if (dto.Status.HasValue) scope.Status = (sbyte)(dto.Status.Value ? 1 : 0);
 
         return await _repository.UpdateBusinessScopeAsync(scope);
+    }
+
+    private BusinessScopeDto SanitizeDto(BusinessScopeDto dto)
+    {
+        dto.Content = dto.Content == null ? null : _htmlContentSanitizer.Sanitize(dto.Content);
+        return dto;
     }
 
     public async Task<bool> DeleteBusinessScopeAsync(int id)

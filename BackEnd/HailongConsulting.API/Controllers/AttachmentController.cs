@@ -48,7 +48,7 @@ public class AttachmentController : ControllerBase
     /// <param name="relatedId">关联ID</param>
     /// <returns>附件信息</returns>
     [HttpPost("upload")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<AttachmentDto>>> UploadAttachment(
         IFormFile file,
         [FromForm] string category = "other",
@@ -80,7 +80,7 @@ public class AttachmentController : ControllerBase
             var attachment = new Attachment
             {
                 FileName = file.FileName ?? "unknown",
-                FilePath = uploadResult.filePath,
+                FilePath = uploadResult.filePath ?? throw new InvalidOperationException("上传服务未返回文件路径"),
                 FileUrl = $"{Request.Scheme}://{Request.Host}{uploadResult.filePath}",
                 FileSize = file.Length,
                 FileType = file.ContentType ?? "application/octet-stream",
@@ -129,7 +129,7 @@ public class AttachmentController : ControllerBase
     /// <param name="relatedId">关联ID</param>
     /// <returns>附件信息列表</returns>
     [HttpPost("upload/batch")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<List<AttachmentDto>>>> UploadAttachments(
         List<IFormFile> files,
         [FromForm] string category = "other",
@@ -327,7 +327,7 @@ public class AttachmentController : ControllerBase
     /// </summary>
     /// <param name="id">附件ID</param>
     [HttpDelete("{id}")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<bool>>> DeleteAttachment(int id)
     {
         try
@@ -351,7 +351,7 @@ public class AttachmentController : ControllerBase
     /// </summary>
     /// <param name="ids">附件ID列表</param>
     [HttpDelete("batch")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<bool>>> DeleteAttachments([FromBody] List<int> ids)
     {
         try

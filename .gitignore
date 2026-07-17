@@ -7,3 +7,7 @@
 *.vc.db
 *.openvs*
 BackEnd/.vs/
+
+# Generated runtime credentials
+.runtime/
+logs/bootstrap/

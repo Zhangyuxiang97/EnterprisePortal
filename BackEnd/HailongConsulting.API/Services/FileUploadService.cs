@@ -34,6 +34,7 @@ namespace HailongConsulting.API.Services
                     return (false, null, errorMessage);
                 }
 
+                category = _fileHelper.NormalizeCategory(category);
                 var uniqueFileName = _fileHelper.GenerateUniqueFileName(file.FileName);
                 var relativePath = _fileHelper.GetRelativePath(category, uniqueFileName);
                 var physicalPath = _fileHelper.GetPhysicalPath(_environment.WebRootPath, relativePath);
@@ -44,7 +45,7 @@ namespace HailongConsulting.API.Services
                     _fileHelper.EnsureDirectoryExists(directory);
                 }
 
-                using (var stream = new FileStream(physicalPath, FileMode.Create))
+                await using (var stream = new FileStream(physicalPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 81920, useAsync: true))
                 {
                     await file.CopyToAsync(stream);
                 }

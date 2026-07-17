@@ -92,11 +92,11 @@ services:
     image: mysql:8.0
     container_name: hailong-mysql
     restart: always
+    env_file:
+      - .runtime/secrets.env
     environment:
-      MYSQL_ROOT_PASSWORD: Hailong@2025
       MYSQL_DATABASE: hailong_consulting
       MYSQL_USER: hailong_app
-      MYSQL_PASSWORD: HailongApp@2025
     volumes:
       - mysql-data:/var/lib/mysql
       - ./SQL:/docker-entrypoint-initdb.d
@@ -112,9 +112,10 @@ services:
       dockerfile: Dockerfile
     container_name: hailong-api
     restart: always
+    env_file:
+      - .runtime/secrets.env
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=hailong_consulting;User=hailong_app;Password=HailongApp@2025;CharSet=utf8mb4;
     ports:
       - "5000:5000"
     depends_on:
@@ -301,11 +302,11 @@ docker-compose ps
 curl http://localhost:5001/api/home/statistics
 
 # 验证数据库初始化
-docker exec -it hailong-mysql mysql -u root -pHailong@2025 -e "USE hailong_consulting; SHOW TABLES;"
+source .runtime/secrets.env && docker exec -it hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "USE hailong_consulting; SHOW TABLES;"
 # 应该看到15张表
 
 # 检查初始数据
-docker exec -it hailong-mysql mysql -u root -pHailong@2025 -e "USE hailong_consulting; SELECT COUNT(*) FROM users;"
+source .runtime/secrets.env && docker exec -it hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "USE hailong_consulting; SELECT COUNT(*) FROM users;"
 # 应该有至少1条记录（admin用户）
 ```
 
@@ -317,9 +318,8 @@ docker exec -it hailong-mysql mysql -u root -pHailong@2025 -e "USE hailong_consu
 - **后台管理**: http://192.168.1.100:8080
 - **API测试**: http://192.168.1.100:5001/api/home/statistics
 
-默认登录：
-- 用户名: `admin`
-- 密码: `admin123`
+初始管理员凭据：首次启动时由应用随机生成，并仅输出到 API 容器日志和
+`logs/bootstrap/initial-admin-credentials.txt`。请在首次登录后立即修改密码并删除该凭据文件。
 
 **注意**：当前为HTTP部署，如需HTTPS请参考下方"HTTPS部署配置"章节。
 
@@ -380,7 +380,7 @@ docker exec -it hailong-mysql bash
 docker exec -it hailong-nginx sh
 
 # 在MySQL容器中执行SQL
-docker exec -it hailong-mysql mysql -u root -pHailong@2025
+source .runtime/secrets.env && docker exec -it hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD"
 ```
 
 ### 数据管理
@@ -393,10 +393,10 @@ docker volume ls
 docker volume inspect protral_mysql-data
 
 # 备份MySQL数据
-docker exec hailong-mysql mysqldump -u root -pHailong@2025 hailong_consulting > backup.sql
+source .runtime/secrets.env && docker exec hailong-mysql mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" hailong_consulting > backup.sql
 
 # 恢复MySQL数据
-docker exec -i hailong-mysql mysql -u root -pHailong@2025 hailong_consulting < backup.sql
+source .runtime/secrets.env && docker exec -i hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD" hailong_consulting < backup.sql
 ```
 
 ### 清理和重建
@@ -471,13 +471,13 @@ docker-compose ps mysql
 docker-compose logs mysql
 
 # 检查数据库是否初始化完成
-docker exec -it hailong-mysql mysql -u root -pHailong@2025 -e "SHOW DATABASES;"
+source .runtime/secrets.env && docker exec -it hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SHOW DATABASES;"
 
 # 进入API容器测试连接
 docker exec -it hailong-api bash
 # 在容器内安装mysql客户端并测试
 apt-get update && apt-get install -y default-mysql-client
-mysql -h mysql -u hailong_app -pHailongApp@2025 hailong_consulting
+mysql -h mysql -u hailong_app -p"$MYSQL_PASSWORD" hailong_consulting
 ```
 
 **解决方案**：
@@ -585,10 +585,10 @@ docker-compose restart nginx
 
 ```bash
 # 备份现有数据
-docker exec hailong-mysql mysqldump -u root -pHailong@2025 hailong_consulting > backup_$(date +%Y%m%d).sql
+source .runtime/secrets.env && docker exec hailong-mysql mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" hailong_consulting > backup_$(date +%Y%m%d).sql
 
 # 执行新的SQL脚本
-docker exec -i hailong-mysql mysql -u root -pHailong@2025 hailong_consulting < update.sql
+source .runtime/secrets.env && docker exec -i hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD" hailong_consulting < update.sql
 
 # 重新初始化数据库（⚠️ 会删除所有数据）
 docker-compose down -v  # 删除数据卷
@@ -602,19 +602,12 @@ docker-compose up -d    # 重新启动，自动执行初始化脚本
 
 ## 🔒 安全建议
 
-### 1. 修改默认密码
+### 1. 轮换运行时密钥
 
 ```bash
-# 修改MySQL root密码
-docker exec -it hailong-mysql mysql -u root -pHailong@2025
-ALTER USER 'root'@'%' IDENTIFIED BY '新密码';
-FLUSH PRIVILEGES;
-
-# 修改应用数据库用户密码
-ALTER USER 'hailong_app'@'%' IDENTIFIED BY '新密码';
-FLUSH PRIVILEGES;
-
-# 同步修改docker-compose.yml和appsettings.json中的密码
+# 停止服务后，受控地更新 .runtime/secrets.env 中的 MySQL/JWT 密钥；
+# MySQL 密码轮换还必须在数据库内执行 ALTER USER，随后再启动服务。
+# 不要把密钥写回 docker-compose.yml、appsettings.json 或文档。
 ```
 
 ### 2. 配置防火墙
@@ -645,7 +638,7 @@ BACKUP_DIR=/backup
 mkdir -p $BACKUP_DIR
 
 # 备份MySQL数据
-docker exec hailong-mysql mysqldump -u root -pHailong@2025 hailong_consulting | gzip > $BACKUP_DIR/mysql_${DATE}.sql.gz
+source /opt/hailong/project/.runtime/secrets.env && docker exec hailong-mysql mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" hailong_consulting | gzip > $BACKUP_DIR/mysql_${DATE}.sql.gz
 
 # 备份上传文件
 docker cp hailong-api:/app/wwwroot/uploads $BACKUP_DIR/uploads_${DATE}

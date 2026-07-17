@@ -47,7 +47,7 @@ public class HomeService : IHomeService
         // 计算代理总额：统计 notice_type 为 result 的 budget_amount 金额总和
         var totalAmount = await _context.Announcements
             .Where(x => x.IsDeleted == 0 && x.NoticeType == "result" && x.BudgetAmount.HasValue)
-            .SumAsync(x => x.BudgetAmount.Value);
+            .SumAsync(x => x.BudgetAmount ?? 0);
 
         // 计算交易类型占比
         var projectTypes = new List<ProjectTypeStatDto>();
@@ -119,7 +119,7 @@ public class HomeService : IHomeService
                 Region = g.Key,
                 Count = g.Count(),
                 Amount = g.Where(x => x.BudgetAmount.HasValue)
-                         .Sum(x => x.BudgetAmount.Value)
+                         .Sum(x => x.BudgetAmount ?? 0)
             })
             .ToListAsync();
 
@@ -132,7 +132,7 @@ public class HomeService : IHomeService
                 Region = g.Key,
                 Count = g.Count(),
                 Amount = g.Where(x => x.BudgetAmount.HasValue)
-                         .Sum(x => x.BudgetAmount.Value)
+                         .Sum(x => x.BudgetAmount ?? 0)
             })
             .ToListAsync();
 
@@ -142,7 +142,7 @@ public class HomeService : IHomeService
             .GroupBy(x => x.Region)
             .Select(g => new RegionRankingDto
             {
-                Region = g.Key,
+                Region = g.Key ?? "未设置地区",
                 ProjectCount = g.Sum(x => x.Count),
                 Amount = g.Sum(x => x.Amount)
             })
@@ -186,8 +186,8 @@ public class HomeService : IHomeService
                 Title = x.Title,
                 NoticeType = x.NoticeType,
                 NoticeTypeName = GetNoticeTypeName(x.NoticeType, x.BusinessType),
-                ProjectRegion = x.ProjectRegion,
-                PublishTime = x.PublishTime,
+                ProjectRegion = x.ProjectRegion ?? string.Empty,
+                PublishTime = x.PublishTime ?? x.CreatedAt,
                 SourceType = "政府采购"
             })
             .Concat(constructionAnnouncements.Select(x => new RecentAnnouncementDto
@@ -196,8 +196,8 @@ public class HomeService : IHomeService
                 Title = x.Title,
                 NoticeType = x.NoticeType,
                 NoticeTypeName = GetNoticeTypeName(x.NoticeType, x.BusinessType),
-                ProjectRegion = x.ProjectRegion,
-                PublishTime = x.PublishTime,
+                ProjectRegion = x.ProjectRegion ?? string.Empty,
+                PublishTime = x.PublishTime ?? x.CreatedAt,
                 SourceType = "建设工程"
             }))
             .OrderByDescending(x => x.PublishTime)

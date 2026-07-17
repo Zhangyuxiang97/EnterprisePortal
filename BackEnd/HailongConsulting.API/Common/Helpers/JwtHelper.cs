@@ -21,7 +21,7 @@ public class JwtHelper
     /// <summary>
     /// 生成JWT Token
     /// </summary>
-    public string GenerateToken(int userId, string username, string role)
+    public string GenerateToken(int userId, string username, string role, int tokenVersion)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -31,6 +31,7 @@ public class JwtHelper
             new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
             new Claim(ClaimTypes.Name, username),
             new Claim(ClaimTypes.Role, role),
+            new Claim("token_version", tokenVersion.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

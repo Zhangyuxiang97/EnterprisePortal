@@ -32,7 +32,7 @@ public class InfoPublicationController : ControllerBase
     /// </summary>
     /// <param name="dto">信息发布创建DTO</param>
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<InfoPublicationDto>>> CreateInfoPublication([FromBody] CreateInfoPublicationDto dto)
     {
         try
@@ -53,7 +53,7 @@ public class InfoPublicationController : ControllerBase
     /// <param name="id">信息发布ID</param>
     /// <param name="dto">信息发布更新DTO</param>
     [HttpPut("{id}")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<InfoPublicationDto>>> UpdateInfoPublication(int id, [FromBody] UpdateInfoPublicationDto dto)
     {
         try
@@ -123,7 +123,7 @@ public class InfoPublicationController : ControllerBase
     /// </summary>
     /// <param name="id">信息发布ID</param>
     [HttpDelete("{id}")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<bool>>> DeleteInfoPublication(int id)
     {
         try

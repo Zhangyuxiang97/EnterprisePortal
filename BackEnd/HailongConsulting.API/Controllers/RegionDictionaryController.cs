@@ -174,7 +174,7 @@ public class RegionDictionaryController : ControllerBase
     /// 创建区域
     /// </summary>
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> CreateRegion([FromBody] CreateRegionDictionaryDto dto)
     {
         try
@@ -198,7 +198,7 @@ public class RegionDictionaryController : ControllerBase
     /// 更新区域
     /// </summary>
     [HttpPut("{id}")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> UpdateRegion(int id, [FromBody] UpdateRegionDictionaryDto dto)
     {
         try
@@ -222,13 +222,13 @@ public class RegionDictionaryController : ControllerBase
     /// 删除区域
     /// </summary>
     [HttpDelete("{id}")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> DeleteRegion(int id)
     {
         try
         {
             await _regionService.DeleteRegionAsync(id);
-            return Ok(ApiResponse<object>.SuccessResult(null, "删除成功"));
+            return Ok(ApiResponse<object?>.SuccessResult(null, "删除成功"));
         }
         catch (KeyNotFoundException ex)
         {
@@ -251,7 +251,7 @@ public class RegionDictionaryController : ControllerBase
     /// 批量导入区域数据
     /// </summary>
     [HttpPost("import")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> ImportRegions([FromBody] List<CreateRegionDictionaryDto> regions)
     {
         try

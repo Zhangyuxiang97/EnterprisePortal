@@ -12,7 +12,7 @@ namespace HailongConsulting.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/statistics")]
-[Authorize]
+[Authorize(Roles = "admin")]
 public class StatisticsController : ControllerBase
 {
     private readonly IVisitStatisticService _visitStatisticService;

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Threading.RateLimiting;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,6 +51,11 @@ builder.Services.AddControllers()
 
 // 配置数据库
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException("缺少 ConnectionStrings:DefaultConnection。请使用部署脚本生成的运行时密钥文件或显式配置连接字符串。");
+}
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), mySqlOptions =>
@@ -74,7 +80,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // 配置JWT认证
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
+var jwtKey = jwtSettings["Key"];
+if (string.IsNullOrWhiteSpace(jwtKey) || Encoding.UTF8.GetByteCount(jwtKey) < 32)
+{
+    throw new InvalidOperationException("缺少或不安全的 Jwt:Key。请使用部署脚本生成至少 32 字节的随机密钥。");
+}
+
+var key = Encoding.UTF8.GetBytes(jwtKey);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -96,9 +108,44 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = async context =>
+        {
+            var userIdValue = context.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var tokenVersionValue = context.Principal?.FindFirst("token_version")?.Value;
+            if (!int.TryParse(userIdValue, out var userId) || !int.TryParse(tokenVersionValue, out var tokenVersion))
+            {
+                context.Fail("访问令牌缺少有效的用户状态声明。");
+                return;
+            }
+
+            var dbContext = context.HttpContext.RequestServices.GetRequiredService<ApplicationDbContext>();
+            var user = await dbContext.Users.AsNoTracking().FirstOrDefaultAsync(item => item.Id == userId);
+            if (user == null || user.Status == 0 || user.IsDeleted != 0 || user.TokenVersion != tokenVersion)
+            {
+                context.Fail("访问令牌已失效。");
+            }
+        }
+    };
 });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("auth", context => RateLimitPartition.GetFixedWindowLimiter(
+        partitionKey: $"{context.Connection.RemoteIpAddress}:{context.Request.Path}",
+        factory: _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 5,
+            Window = TimeSpan.FromMinutes(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit = 0,
+            AutoReplenishment = true
+        }));
+});
 
 // 配置CORS
 builder.Services.AddCors(options =>
@@ -112,11 +159,12 @@ builder.Services.AddCors(options =>
 });
 
 // 配置AutoMapper
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(_ => { }, AppDomain.CurrentDomain.GetAssemblies());
 
 // 注册服务
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IHtmlContentSanitizer, HtmlContentSanitizer>();
 builder.Services.AddScoped<FileHelper>();
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 builder.Services.AddScoped<IConfigRepository, ConfigRepository>();
@@ -203,6 +251,9 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+await app.Services.ApplyDatabaseMigrationsAsync();
+await app.Services.BootstrapInitialAdminAsync(app.Configuration);
+
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
@@ -227,6 +278,8 @@ app.UseStaticFiles();
 
 // 使用CORS
 app.UseCors("AllowAll");
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -11,7 +11,7 @@ namespace HailongConsulting.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Roles = "admin")]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;

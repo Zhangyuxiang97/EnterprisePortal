@@ -5,11 +5,11 @@ services:
     container_name: hailong-mysql
     restart: always
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
+    env_file:
+      - .runtime/secrets.env
     environment:
-      MYSQL_ROOT_PASSWORD: Hailong@2025
       MYSQL_DATABASE: hailong_consulting
       MYSQL_USER: hailong_app
-      MYSQL_PASSWORD: HailongApp@2025
       TZ: Asia/Shanghai
     volumes:
       - mysql-data:/var/lib/mysql
@@ -31,11 +31,11 @@ services:
       dockerfile: Dockerfile
     container_name: hailong-api
     restart: always
+    env_file:
+      - .runtime/secrets.env
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5000
-      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=hailong_consulting;User=hailong_app;Password=HailongApp@2025;CharSet=utf8mb4;
-      - Jwt__Key=your-super-secret-jwt-key-at-least-32-characters-long-for-production-use
       - Jwt__Issuer=HailongConsulting.API
       - Jwt__Audience=HailongConsulting.Client
       - Jwt__ExpireHours=24

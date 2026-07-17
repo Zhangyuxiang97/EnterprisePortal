@@ -48,7 +48,7 @@ public class GlobalSearchRepository : IGlobalSearchRepository
             // 区域过滤
             if (request.Region != null && request.Region.Any())
             {
-                govQuery = govQuery.Where(x => request.Region.Contains(x.ProjectRegion));
+                govQuery = govQuery.Where(x => request.Region.Contains(x.ProjectRegion ?? string.Empty));
             }
 
             // 时间范围过滤
@@ -82,7 +82,7 @@ public class GlobalSearchRepository : IGlobalSearchRepository
                 Category = "gov_procurement",
                 Type = x.NoticeType,
                 Tenderer = x.Bidder,
-                Region = x.ProjectRegion,
+                Region = x.ProjectRegion ?? string.Empty,
                 PublishDate = x.PublishTime,
                 ViewCount = (int)x.ViewCount
             }));
@@ -112,7 +112,7 @@ public class GlobalSearchRepository : IGlobalSearchRepository
             // 区域过滤
             if (request.Region != null && request.Region.Any())
             {
-                constructionQuery = constructionQuery.Where(x => request.Region.Contains(x.ProjectRegion));
+                constructionQuery = constructionQuery.Where(x => request.Region.Contains(x.ProjectRegion ?? string.Empty));
             }
 
             // 时间范围过滤
@@ -146,7 +146,7 @@ public class GlobalSearchRepository : IGlobalSearchRepository
                 Category = "construction",
                 Type = x.NoticeType,
                 Tenderer = x.Bidder,
-                Region = x.ProjectRegion,
+                Region = x.ProjectRegion ?? string.Empty,
                 PublishDate = x.PublishTime,
                 ViewCount = (int)x.ViewCount
             }));

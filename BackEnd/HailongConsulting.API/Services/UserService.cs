@@ -1,9 +1,11 @@
 using AutoMapper;
 using HailongConsulting.API.Common;
 using HailongConsulting.API.Common.Helpers;
+using HailongConsulting.API.Data;
 using HailongConsulting.API.Models.DTOs;
 using HailongConsulting.API.Models.Entities;
 using HailongConsulting.API.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace HailongConsulting.API.Services;
 
@@ -13,17 +15,20 @@ namespace HailongConsulting.API.Services;
 public class UserService : IUserService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ApplicationDbContext _dbContext;
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
     private readonly ILogger<UserService> _logger;
 
     public UserService(
         IUnitOfWork unitOfWork,
+        ApplicationDbContext dbContext,
         IUserRepository userRepository,
         IMapper mapper,
         ILogger<UserService> logger)
     {
         _unitOfWork = unitOfWork;
+        _dbContext = dbContext;
         _userRepository = userRepository;
         _mapper = mapper;
         _logger = logger;
@@ -127,7 +132,13 @@ public class UserService : IUserService
         user.RealName = dto.RealName;
         user.Role = dto.Role;
         user.Status = dto.Status;
+        user.TokenVersion++;
         user.UpdatedAt = DateTime.Now;
+
+        if (user.Status == 0)
+        {
+            await RevokeActiveSessionsAsync(user.Id);
+        }
 
         _userRepository.Update(user);
         await _unitOfWork.SaveChangesAsync();
@@ -149,7 +160,9 @@ public class UserService : IUserService
         }
 
         user.IsDeleted = 1;
+        user.TokenVersion++;
         user.UpdatedAt = DateTime.Now;
+        await RevokeActiveSessionsAsync(user.Id);
 
         _userRepository.Update(user);
         await _unitOfWork.SaveChangesAsync();
@@ -171,7 +184,9 @@ public class UserService : IUserService
         }
 
         user.Password = PasswordHelper.HashPassword(dto.NewPassword);
+        user.TokenVersion++;
         user.UpdatedAt = DateTime.Now;
+        await RevokeActiveSessionsAsync(user.Id);
 
         _userRepository.Update(user);
         await _unitOfWork.SaveChangesAsync();
@@ -193,7 +208,13 @@ public class UserService : IUserService
         }
 
         user.Status = (sbyte)(user.Status == 1 ? 0 : 1);
+        user.TokenVersion++;
         user.UpdatedAt = DateTime.Now;
+
+        if (user.Status == 0)
+        {
+            await RevokeActiveSessionsAsync(user.Id);
+        }
 
         _userRepository.Update(user);
         await _unitOfWork.SaveChangesAsync();
@@ -201,5 +222,16 @@ public class UserService : IUserService
         _logger.LogInformation("User status toggled: {Username}, Status: {Status}", user.Username, user.Status);
 
         return true;
+    }
+
+    private async Task RevokeActiveSessionsAsync(int userId)
+    {
+        var activeTokens = await _dbContext.UserRefreshTokens
+            .Where(token => token.UserId == userId && token.RevokedAt == null)
+            .ToListAsync();
+        foreach (var token in activeTokens)
+        {
+            token.RevokedAt = DateTime.UtcNow;
+        }
     }
 }

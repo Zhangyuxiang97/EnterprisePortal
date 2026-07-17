@@ -15,6 +15,7 @@ public class ApplicationDbContext : DbContext
 
     // 用户权限管理模块
     public DbSet<User> Users { get; set; }
+    public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
 
     // 附件管理模块
     public DbSet<Attachment> Attachments { get; set; }
@@ -53,9 +54,17 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.Username).IsUnique();
             entity.HasIndex(e => e.Email);
             entity.HasIndex(e => e.RefreshToken);
+            entity.HasIndex(e => e.LockoutUntil);
             entity.HasIndex(e => e.Role);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.IsDeleted);
+        });
+
+        modelBuilder.Entity<UserRefreshToken>(entity =>
+        {
+            entity.HasIndex(e => e.TokenHash).IsUnique();
+            entity.HasIndex(e => new { e.UserId, e.RevokedAt });
+            entity.HasIndex(e => e.ExpiresAt);
         });
 
         // Attachment配置

@@ -165,20 +165,16 @@ sudo ./deploy-ubuntu22-docker.sh
 
 #### 第3步：按提示输入配置
 
-脚本会提示输入以下配置信息（可直接回车使用默认值）：
+脚本只询问项目路径；首次运行会自动生成并打印一次随机密钥，随后复用 `.runtime/secrets.env`：
 
 ```
-请输入MySQL root密码 (默认: Hailong@2025): [回车使用默认]
-请输入MySQL应用密码 (默认: HailongApp@2025): [回车使用默认]
-请输入JWT密钥 (至少32字符，默认自动生成): [回车自动生成]
 项目文件路径 (默认: /opt/hailong/project): [回车使用默认]
 确认开始部署? (y/n): y
 ```
 
 **推荐配置**：
-- 首次部署建议使用默认配置
-- JWT密钥会自动生成，安全可靠
-- 生产环境建议修改默认密码
+- 首次部署会生成随机密钥并保存到权限为 600 的 `.runtime/secrets.env`
+- 后续重跑脚本会复用该文件，避免数据库与应用配置失配
 
 #### 第4步：等待部署完成
 
@@ -279,7 +275,7 @@ hailong-nginx     nginx:alpine                            Up (healthy)
 
 ```bash
 # 检查MySQL
-docker exec hailong-mysql mysqladmin ping -h localhost -pHailong@2025
+source .runtime/secrets.env && docker exec hailong-mysql mysqladmin ping -h localhost -p"$MYSQL_ROOT_PASSWORD"
 
 # 检查API
 curl http://localhost:5001/api/home/statistics
@@ -307,7 +303,7 @@ docker compose logs -f
 
 ```bash
 # 进入MySQL容器
-docker exec -it hailong-mysql mysql -u root -pHailong@2025
+source .runtime/secrets.env && docker exec -it hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD"
 
 # 在MySQL中执行
 USE hailong_consulting;
@@ -338,9 +334,8 @@ http://192.168.222.100
 http://192.168.222.100:8080
 ```
 
-**默认登录信息：**
-- 用户名：`admin`
-- 密码：`admin123`
+**初始管理员信息：** 首次启动时由应用随机生成。请查看
+`/var/www/hailong-api/logs/bootstrap/initial-admin-credentials.txt`，首次登录后立即修改密码并删除该文件。
 
 **⚠️ 重要：首次登录后请立即修改密码！**
 
@@ -448,7 +443,7 @@ docker volume ls
 cd /opt/hailong/project
 
 # 2. 备份数据库（重要！）
-docker exec hailong-mysql mysqldump -u root -pHailong@2025 hailong_consulting > backup_$(date +%Y%m%d_%H%M%S).sql
+source .runtime/secrets.env && docker exec hailong-mysql mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" hailong_consulting > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # 3. 拉取最新代码
 sudo git reset --hard HEAD
@@ -559,7 +554,7 @@ docker compose ps
 
 1. **数据备份**：更新前务必备份数据库
    ```bash
-   docker exec hailong-mysql mysqldump -u root -pHailong@2025 hailong_consulting > backup_$(date +%Y%m%d_%H%M%S).sql
+   source .runtime/secrets.env && docker exec hailong-mysql mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" hailong_consulting > backup_$(date +%Y%m%d_%H%M%S).sql
    ```
 
 2. **查看变更**：更新前查看代码变更
@@ -588,7 +583,7 @@ git log --oneline
 git reset --hard <commit-id>
 
 # 3. 恢复数据库（如果需要）
-docker exec -i hailong-mysql mysql -u root -pHailong@2025 hailong_consulting < backup_20260122_120000.sql
+source .runtime/secrets.env && docker exec -i hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD" hailong_consulting < backup_20260122_120000.sql
 
 # 4. 重新部署
 docker compose down
@@ -722,10 +717,10 @@ ls -la SQL/
 docker compose logs mysql
 
 # 3. 手动初始化数据库
-docker exec -i hailong-mysql mysql -u root -pHailong@2025 hailong_consulting < SQL/init.sql
+source .runtime/secrets.env && docker exec -i hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD" hailong_consulting < SQL/init.sql
 
 # 4. 验证表结构
-docker exec -it hailong-mysql mysql -u root -pHailong@2025 -e "USE hailong_consulting; SHOW TABLES;"
+source .runtime/secrets.env && docker exec -it hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "USE hailong_consulting; SHOW TABLES;"
 ```
 
 ### 问题5：API无法连接数据库
@@ -739,7 +734,7 @@ docker exec -it hailong-mysql mysql -u root -pHailong@2025 -e "USE hailong_consu
 docker compose ps
 
 # 2. 测试数据库连接
-docker exec hailong-mysql mysqladmin ping -h localhost -pHailong@2025
+source .runtime/secrets.env && docker exec hailong-mysql mysqladmin ping -h localhost -p"$MYSQL_ROOT_PASSWORD"
 
 # 3. 检查网络连接
 docker network ls
@@ -994,7 +989,7 @@ sudo chmod -R 755 /opt/hailong/project
 **修改MySQL密码**：
 ```bash
 # 进入MySQL容器
-docker exec -it hailong-mysql mysql -u root -pHailong@2025
+source .runtime/secrets.env && docker exec -it hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD"
 
 # 修改root密码
 ALTER USER 'root'@'%' IDENTIFIED BY '新密码';
@@ -1051,7 +1046,7 @@ DATE=$(date +%Y%m%d_%H%M%S)
 mkdir -p $BACKUP_DIR
 
 # 备份数据库
-docker exec hailong-mysql mysqldump -u root -pHailong@2025 hailong_consulting > $BACKUP_DIR/db_$DATE.sql
+source /opt/hailong/project/.runtime/secrets.env && docker exec hailong-mysql mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" hailong_consulting > $BACKUP_DIR/db_$DATE.sql
 
 # 备份上传文件
 docker cp hailong-api:/app/wwwroot/uploads $BACKUP_DIR/uploads_$DATE
@@ -1164,13 +1159,13 @@ docker compose logs > logs_$(date +%Y%m%d).txt
 
 ```bash
 # 备份数据库
-docker exec hailong-mysql mysqldump -u root -pHailong@2025 hailong_consulting > backup.sql
+source .runtime/secrets.env && docker exec hailong-mysql mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" hailong_consulting > backup.sql
 
 # 恢复数据库
-docker exec -i hailong-mysql mysql -u root -pHailong@2025 hailong_consulting < backup.sql
+source .runtime/secrets.env && docker exec -i hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD" hailong_consulting < backup.sql
 
 # 查看数据库大小
-docker exec hailong-mysql mysql -u root -pHailong@2025 -e "SELECT table_schema AS 'Database', ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS 'Size (MB)' FROM information_schema.tables WHERE table_schema='hailong_consulting';"
+source .runtime/secrets.env && docker exec hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SELECT table_schema AS 'Database', ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS 'Size (MB)' FROM information_schema.tables WHERE table_schema='hailong_consulting';"
 ```
 
 ### 清理维护
@@ -1569,8 +1564,8 @@ docker compose restart nginx
 - [ ] 前端门户可以访问（http://服务器IP）
 - [ ] 后台管理可以访问（http://服务器IP:8080）
 - [ ] API接口正常（http://服务器IP:5001/api/home/statistics）
-- [ ] 可以使用admin/admin123登录后台
-- [ ] 已修改默认密码
+- [ ] 已从初始管理员凭据文件获取随机密码并成功登录后台
+- [ ] 已修改初始密码并删除凭据文件
 - [ ] 防火墙已配置
 - [ ] 备份脚本已设置
 - [ ] 日志正常输出
@@ -1583,7 +1578,7 @@ docker compose restart nginx
 
 ```bash
 # 进入MySQL容器
-docker exec -it hailong-mysql mysql -u root -pHailong@2025
+source .runtime/secrets.env && docker exec -it hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD"
 
 # 优化配置
 SET GLOBAL max_connections = 500;

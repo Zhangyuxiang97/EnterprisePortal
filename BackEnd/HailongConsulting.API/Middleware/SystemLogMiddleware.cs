@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Security.Claims;
-using System.Text;
 using HailongConsulting.API.Models.DTOs;
 using HailongConsulting.API.Services;
 
@@ -43,60 +42,31 @@ public class SystemLogMiddleware
         }
 
         var stopwatch = Stopwatch.StartNew();
-        var originalBodyStream = context.Response.Body;
-        
-        // 保存请求信息用于日志记录
-        string requestBody = string.Empty;
-        string responseBodyText = string.Empty;
-        int statusCode = 200;
-        bool hasError = false;
+        var statusCode = StatusCodes.Status500InternalServerError;
         Exception? caughtException = null;
 
         try
         {
-            // 读取请求体
-            requestBody = await ReadRequestBodyAsync(context.Request);
-
-            // 使用内存流捕获响应
-            using var responseBody = new MemoryStream();
-            context.Response.Body = responseBody;
-
-            // 执行请求
             await _next(context);
-
-            stopwatch.Stop();
             statusCode = context.Response.StatusCode;
-
-            // 读取响应体
-            responseBodyText = await ReadResponseBodyAsync(responseBody);
-
-            // 复制响应到原始流
-            responseBody.Seek(0, SeekOrigin.Begin);
-            await responseBody.CopyToAsync(originalBodyStream);
         }
         catch (Exception ex)
         {
-            stopwatch.Stop();
-            hasError = true;
             caughtException = ex;
-            statusCode = 500;
-            _logger.LogError(ex, "Error in SystemLogMiddleware");
             throw;
         }
         finally
         {
-            context.Response.Body = originalBodyStream;
-            
-            // 在 finally 块中记录日志，确保无论成功还是失败都会记录
+            stopwatch.Stop();
             try
             {
-                if (hasError && caughtException != null)
+                if (caughtException != null)
                 {
                     await LogErrorToDatabase(context, caughtException, stopwatch.ElapsedMilliseconds, systemLogService);
                 }
                 else
                 {
-                    await LogToDatabase(context, requestBody, responseBodyText, statusCode, stopwatch.ElapsedMilliseconds, systemLogService);
+                    await LogToDatabase(context, statusCode, stopwatch.ElapsedMilliseconds, systemLogService);
                 }
             }
             catch (Exception logEx)
@@ -137,43 +107,8 @@ public class SystemLogMiddleware
         return true;
     }
 
-    private async Task<string> ReadRequestBodyAsync(HttpRequest request)
-    {
-        if (request.ContentLength == null || request.ContentLength == 0)
-        {
-            return string.Empty;
-        }
-
-        request.EnableBuffering();
-        
-        using var reader = new StreamReader(
-            request.Body,
-            encoding: Encoding.UTF8,
-            detectEncodingFromByteOrderMarks: false,
-            bufferSize: 1024,
-            leaveOpen: true);
-
-        var body = await reader.ReadToEndAsync();
-        request.Body.Position = 0;
-
-        // 限制长度，避免存储过大的数据
-        return body.Length > 5000 ? body.Substring(0, 5000) + "..." : body;
-    }
-
-    private async Task<string> ReadResponseBodyAsync(MemoryStream responseBody)
-    {
-        responseBody.Seek(0, SeekOrigin.Begin);
-        var text = await new StreamReader(responseBody).ReadToEndAsync();
-        responseBody.Seek(0, SeekOrigin.Begin);
-
-        // 限制长度
-        return text.Length > 5000 ? text.Substring(0, 5000) + "..." : text;
-    }
-
     private async Task LogToDatabase(
         HttpContext context, 
-        string requestBody, 
-        string responseBody,
         int statusCode,
         long elapsedMilliseconds,
         ISystemLogService systemLogService)
@@ -194,8 +129,8 @@ public class SystemLogMiddleware
             Description = $"{context.Request.Method} {context.Request.Path} - {statusCode} ({elapsedMilliseconds}ms)",
             IpAddress = GetClientIpAddress(context),
             UserAgent = context.Request.Headers["User-Agent"].ToString(),
-            RequestData = string.IsNullOrEmpty(requestBody) ? null : requestBody,
-            ResponseData = statusCode >= 400 ? responseBody : null, // 只记录错误响应
+            RequestData = null,
+            ResponseData = null,
             Status = statusCode < 400 ? "Success" : "Failed"
         };
 
@@ -218,11 +153,11 @@ public class SystemLogMiddleware
             Username = username,
             Action = "ERROR",
             Module = GetModuleFromPath(context.Request.Path),
-            Description = $"Exception: {exception.Message}",
+            Description = "Unhandled exception",
             IpAddress = GetClientIpAddress(context),
             UserAgent = context.Request.Headers["User-Agent"].ToString(),
-            RequestData = $"Path: {context.Request.Path}, Method: {context.Request.Method}",
-            ResponseData = exception.StackTrace,
+            RequestData = null,
+            ResponseData = null,
             Status = "Error"
         };
 

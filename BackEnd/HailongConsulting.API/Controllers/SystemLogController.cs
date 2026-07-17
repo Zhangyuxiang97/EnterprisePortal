@@ -11,7 +11,7 @@ namespace HailongConsulting.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Roles = "admin")]
 public class SystemLogController : ControllerBase
 {
     private readonly ISystemLogService _systemLogService;
@@ -61,24 +61,6 @@ public class SystemLogController : ControllerBase
         {
             _logger.LogError(ex, "Failed to get system log by id: {Id}", id);
             return StatusCode(500, ApiResponse<SystemLogDto>.FailResult("获取系统日志失败"));
-        }
-    }
-
-    /// <summary>
-    /// 创建系统日志
-    /// </summary>
-    [HttpPost]
-    public async Task<ActionResult<ApiResponse<SystemLogDto>>> Create([FromBody] CreateSystemLogDto dto)
-    {
-        try
-        {
-            var log = await _systemLogService.CreateAsync(dto);
-            return Ok(ApiResponse<SystemLogDto>.SuccessResult(log, "系统日志创建成功"));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to create system log");
-            return StatusCode(500, ApiResponse<SystemLogDto>.FailResult("创建系统日志失败"));
         }
     }
 

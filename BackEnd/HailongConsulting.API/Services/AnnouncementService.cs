@@ -15,15 +15,18 @@ public class AnnouncementService : IAnnouncementService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly ILogger<AnnouncementService> _logger;
+    private readonly IHtmlContentSanitizer _htmlContentSanitizer;
 
     public AnnouncementService(
         IUnitOfWork unitOfWork,
         IMapper mapper,
-        ILogger<AnnouncementService> logger)
+        ILogger<AnnouncementService> logger,
+        IHtmlContentSanitizer htmlContentSanitizer)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _logger = logger;
+        _htmlContentSanitizer = htmlContentSanitizer;
     }
 
     public async Task<AnnouncementDto> CreateAsync(CreateAnnouncementDto createDto)
@@ -31,6 +34,7 @@ public class AnnouncementService : IAnnouncementService
         try
         {
             var announcement = _mapper.Map<Announcement>(createDto);
+            announcement.Content = _htmlContentSanitizer.Sanitize(announcement.Content);
             announcement.CreatedAt = DateTime.UtcNow;
             announcement.UpdatedAt = DateTime.UtcNow;
             announcement.ViewCount = 0;
@@ -84,12 +88,13 @@ public class AnnouncementService : IAnnouncementService
             }
 
             _mapper.Map(updateDto, announcement);
+            announcement.Content = _htmlContentSanitizer.Sanitize(announcement.Content);
             announcement.UpdatedAt = DateTime.UtcNow;
 
             _unitOfWork.Announcements.Update(announcement);
             await _unitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<AnnouncementDto>(announcement);
+            return SanitizeDto(_mapper.Map<AnnouncementDto>(announcement));
         }
         catch (Exception ex)
         {
@@ -105,6 +110,7 @@ public class AnnouncementService : IAnnouncementService
             return null;
 
         var dto = _mapper.Map<AnnouncementDto>(announcement);
+        dto = SanitizeDto(dto);
 
         // 将区域编码转换为名称
         if (!string.IsNullOrEmpty(announcement.Province))
@@ -165,6 +171,7 @@ public class AnnouncementService : IAnnouncementService
             queryDto.EndDate);
 
         var dtos = _mapper.Map<List<AnnouncementDto>>(items);
+        dtos.ForEach(dto => SanitizeDto(dto));
 
         // 批量转换区域编码为名称
         var regionCodes = new HashSet<string>();
@@ -190,17 +197,20 @@ public class AnnouncementService : IAnnouncementService
         var itemsList = items.ToList();
         for (int i = 0; i < dtos.Count; i++)
         {
-            if (!string.IsNullOrEmpty(itemsList[i].Province) && regions.ContainsKey(itemsList[i].Province))
+            var provinceCode = itemsList[i].Province;
+            if (!string.IsNullOrEmpty(provinceCode) && regions.TryGetValue(provinceCode, out var provinceName))
             {
-                dtos[i].Province = regions[itemsList[i].Province];
+                dtos[i].Province = provinceName;
             }
-            if (!string.IsNullOrEmpty(itemsList[i].City) && regions.ContainsKey(itemsList[i].City))
+            var cityCode = itemsList[i].City;
+            if (!string.IsNullOrEmpty(cityCode) && regions.TryGetValue(cityCode, out var cityName))
             {
-                dtos[i].City = regions[itemsList[i].City];
+                dtos[i].City = cityName;
             }
-            if (!string.IsNullOrEmpty(itemsList[i].District) && regions.ContainsKey(itemsList[i].District))
+            var districtCode = itemsList[i].District;
+            if (!string.IsNullOrEmpty(districtCode) && regions.TryGetValue(districtCode, out var districtName))
             {
-                dtos[i].District = regions[itemsList[i].District];
+                dtos[i].District = districtName;
             }
         }
 
@@ -211,6 +221,12 @@ public class AnnouncementService : IAnnouncementService
             PageIndex = queryDto.PageNumber,
             PageSize = queryDto.PageSize
         };
+    }
+
+    private AnnouncementDto SanitizeDto(AnnouncementDto dto)
+    {
+        dto.Content = _htmlContentSanitizer.Sanitize(dto.Content);
+        return dto;
     }
 
     public async Task<bool> DeleteAsync(int id)

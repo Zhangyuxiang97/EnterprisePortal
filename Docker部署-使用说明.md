@@ -53,12 +53,9 @@ chmod +x deploy-centos7-docker.sh
 
 #### 3. 按提示输入配置
 
-脚本会询问以下信息（可直接回车使用默认值）：
+脚本只询问项目路径；首次运行会自动生成并打印一次随机密钥，随后复用 `.runtime/secrets.env`：
 
 ```
-请输入MySQL root密码 (默认: Hailong@2025): [回车]
-请输入MySQL应用密码 (默认: HailongApp@2025): [回车]
-请输入JWT密钥 (至少32字符，默认自动生成): [回车]
 项目文件路径 (默认: /opt/hailong/project): [回车]
 确认开始部署? (y/n): y
 ```
@@ -298,15 +295,11 @@ docker exec hailong-nginx ls -la /usr/share/nginx/html/portal
 
 ## 🔐 安全建议
 
-### 1. 修改默认密码
+### 1. 轮换运行时密钥
 
 ```bash
-# 修改MySQL密码
-docker exec -it hailong-mysql mysql -u root -p
-ALTER USER 'root'@'%' IDENTIFIED BY '新密码';
-FLUSH PRIVILEGES;
-
-# 同步修改docker-compose.yml中的密码
+# 密钥位于 .runtime/secrets.env（权限 600）。轮换 MySQL 密码时，
+# 需先在数据库执行 ALTER USER，再同步更新该文件并重启相关服务。
 ```
 
 ### 2. 限制MySQL端口访问

@@ -2,7 +2,7 @@
 
 ## 文件说明
 
-**重要提示：** 所有 SQL 文件已按执行顺序编号（01-05），MySQL Docker 容器会按字母顺序自动执行。
+**重要提示：** 所有 SQL 文件已按执行顺序编号（01-07），MySQL Docker 容器会按字母顺序自动执行。
 
 ### 1. 01_hailong_consulting_schema.sql
 **数据库结构文件**，包含：
@@ -41,9 +41,25 @@
 - **数据特点**：市辖区合并为"XX市区"，县单独列出
 - 覆盖全国重点城市约200+个区县
 
+### 6. 06_region_dictionary_complete.sql
+**全国区县完整数据**，包含：
+- 21个省份的完整区县数据（河北、山西、内蒙古、辽宁、吉林、黑龙江、江苏、浙江、安徽、湖北、湖南、广东、四川+重庆、贵州、云南、西藏、陕西、甘肃、青海、宁夏、新疆）
+- 共计1678条区县记录
+- 数据来源：国家行政区划代码
+- **数据格式**：市区统一标记为"XX市区"，县单独列出
+
+### 7. 07_announcements_import.sql
+**招标公告历史数据导入**，包含：
+- 从旧网站（henanhailong.com）抓取的历史公告数据
+- 招标公告：1103条
+- 中标公示：1061条
+- 变更公告：211条
+- **总计：2375条**
+- 数据已清洗：HTML清理、区域映射、字段提取
+
 ## 执行顺序
 
-**Docker 部署：** 文件已按执行顺序编号（01-05），MySQL 容器启动时会自动按顺序执行，无需手动操作。
+**Docker 部署：** 文件已按执行顺序编号（01-07），MySQL 容器启动时会自动按顺序执行，无需手动操作。
 
 **手动执行顺序：**
 
@@ -62,6 +78,12 @@ mysql -u root -p hailong_consulting < 04_region_dictionary_supplement_part2.sql
 
 # 5. 执行区县数据补充文件
 mysql -u root -p hailong_consulting < 05_region_dictionary_districts.sql
+
+# 6. 执行全国区县完整数据
+mysql -u root -p hailong_consulting < 06_region_dictionary_complete.sql
+
+# 7. 导入历史公告数据
+mysql -u root -p hailong_consulting < 07_announcements_import.sql
 ```
 
 或者在MySQL客户端中执行：
@@ -72,6 +94,8 @@ SOURCE /path/to/02_hailong_consulting_init_data.sql;
 SOURCE /path/to/03_region_dictionary_supplement.sql;
 SOURCE /path/to/04_region_dictionary_supplement_part2.sql;
 SOURCE /path/to/05_region_dictionary_districts.sql;
+SOURCE /path/to/06_region_dictionary_complete.sql;
+SOURCE /path/to/07_announcements_import.sql;
 ```
 
 ## 数据覆盖范围
@@ -96,10 +120,15 @@ SOURCE /path/to/05_region_dictionary_districts.sql;
 
 ### 区县级行政区
 - **河南省**：所有区县（完整数据）
-- **直辖市**：北京、天津、上海、重庆的所有区县
-- **主要城市**：各省重点城市的区县数据
+- **全国21省份**：完整区县数据（1678条）
 - **数据特点**：市辖区合并为"市区"，县单独列出
-- 共计约400+个区县数据
+- 共计约1800+个区县数据
+
+### 历史公告数据
+- 招标公告：1103条
+- 中标公示：1061条
+- 变更公告：211条
+- 总计：2375条
 
 ## 数据统计
 
@@ -119,24 +148,13 @@ WHERE is_deleted = 0
 GROUP BY region_level 
 ORDER BY region_level;
 
--- 查看所有省级行政区
+-- 查看公告数据统计
 SELECT 
-    region_code AS '代码',
-    region_name AS '名称',
-    (SELECT COUNT(*) FROM region_dictionary rd2 
-     WHERE rd2.parent_code = rd1.region_code AND rd2.is_deleted = 0) AS '下辖城市数'
-FROM region_dictionary rd1
-WHERE is_deleted = 0 AND region_level = 1 
-ORDER BY sort_order;
-
--- 查看某个省份的所有城市（以河南省为例）
-SELECT 
-    region_code AS '代码',
-    region_name AS '名称',
-    sort_order AS '排序'
-FROM region_dictionary 
-WHERE parent_code = '410000' AND is_deleted = 0
-ORDER BY sort_order;
+    notice_type AS '公告类型',
+    COUNT(*) AS '数量'
+FROM announcements
+WHERE is_deleted = 0
+GROUP BY notice_type;
 ```
 
 ## 注意事项
@@ -144,8 +162,9 @@ ORDER BY sort_order;
 1. **执行前确认**：确保已经创建了数据库表结构
 2. **字符编码**：确保数据库和表使用UTF-8编码
 3. **数据冲突**：如果已有数据，可能会出现主键冲突，建议在空数据库中执行
-4. **区县数据**：目前只有河南省包含完整的区县级数据，其他省份如需要可以继续补充
+4. **区县数据**：全国21省份已包含完整区县级数据
 5. **数据更新**：行政区划可能会有调整，使用时请注意数据的时效性
+6. **历史数据**：07_announcements_import.sql 包含从旧网站抓取的历史公告，数据来源为 henanhailong.com
 
 ## 数据格式说明
 
@@ -168,19 +187,6 @@ ORDER BY sort_order;
    ('320581', '常熟市', 3, '320500', 2),     -- 县级市
    ```
 
-### 扩展其他城市区县
-
-如需补充其他城市的区县数据，请遵循以下格式：
-
-```sql
--- 示例：添加某市的区县数据
-INSERT INTO `region_dictionary` (`region_code`, `region_name`, `region_level`, `parent_code`, `sort_order`) VALUES
--- 市辖区合并为市区
-('350301', '莆田市区', 3, '350300', 1),
--- 县单独列出
-('350322', '仙游县', 3, '350300', 2);
-```
-
 ## 技术支持
 
 如有问题，请参考：
@@ -190,4 +196,4 @@ INSERT INTO `region_dictionary` (`region_code`, `region_name`, `region_level`, `
 
 ---
 
-**最后更新时间**：2025-12-31
+**最后更新时间**：2026-07-16

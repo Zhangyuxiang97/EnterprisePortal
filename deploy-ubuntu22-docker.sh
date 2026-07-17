@@ -51,26 +51,12 @@ echo "  - .NET 8.0 API 容器"
 echo "  - Nginx 容器（前端+反向代理）"
 echo ""
 
-# 询问用户配置
-read -p "请输入MySQL root密码 (默认: Hailong@2025): " MYSQL_ROOT_PASSWORD
-MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-Hailong@2025}
-
-read -p "请输入MySQL应用密码 (默认: HailongApp@2025): " MYSQL_APP_PASSWORD
-MYSQL_APP_PASSWORD=${MYSQL_APP_PASSWORD:-HailongApp@2025}
-
-read -p "请输入JWT密钥 (至少32字符，默认自动生成): " JWT_SECRET
-if [ -z "$JWT_SECRET" ]; then
-    JWT_SECRET=$(openssl rand -base64 32)
-fi
-
 read -p "项目文件路径 (默认: /opt/hailong/project): " PROJECT_PATH
 PROJECT_PATH=${PROJECT_PATH:-/opt/hailong/project}
 
 echo ""
 print_info "配置信息："
-echo "  MySQL Root密码: $MYSQL_ROOT_PASSWORD"
-echo "  MySQL应用密码: $MYSQL_APP_PASSWORD"
-echo "  JWT密钥: ${JWT_SECRET:0:20}..."
+echo "  MySQL/JWT 凭据: 将随机生成并写入受限文件"
 echo "  项目路径: $PROJECT_PATH"
 echo ""
 
@@ -107,6 +93,41 @@ for file in "${REQUIRED_FILES[@]}"; do
 done
 
 print_info "所有必需文件检查通过"
+
+# 密钥仅在首次部署生成；以后重跑脚本会复用同一份文件，避免与已有 MySQL 数据卷失配。
+RUNTIME_SECRETS_DIR="$PROJECT_PATH/.runtime"
+RUNTIME_SECRETS_FILE="$RUNTIME_SECRETS_DIR/secrets.env"
+SECRETS_CREATED=false
+mkdir -p "$RUNTIME_SECRETS_DIR"
+chmod 700 "$RUNTIME_SECRETS_DIR"
+
+if [ -f "$RUNTIME_SECRETS_FILE" ]; then
+    MYSQL_ROOT_PASSWORD=$(sed -n 's/^MYSQL_ROOT_PASSWORD=//p' "$RUNTIME_SECRETS_FILE")
+    MYSQL_APP_PASSWORD=$(sed -n 's/^MYSQL_PASSWORD=//p' "$RUNTIME_SECRETS_FILE")
+    JWT_SECRET=$(sed -n 's/^Jwt__Key=//p' "$RUNTIME_SECRETS_FILE")
+    if [ -z "$MYSQL_ROOT_PASSWORD" ] || [ -z "$MYSQL_APP_PASSWORD" ] || [ -z "$JWT_SECRET" ]; then
+        print_error "运行时密钥文件格式不完整: $RUNTIME_SECRETS_FILE"
+        exit 1
+    fi
+    print_info "已复用运行时密钥文件: $RUNTIME_SECRETS_FILE"
+else
+    MYSQL_ROOT_PASSWORD=$(openssl rand -base64 32)
+    MYSQL_APP_PASSWORD=$(openssl rand -base64 32)
+    JWT_SECRET=$(openssl rand -base64 48)
+    cat > "$RUNTIME_SECRETS_FILE" <<EOF
+MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+MYSQL_PASSWORD=$MYSQL_APP_PASSWORD
+ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=hailong_consulting;User=hailong_app;Password=$MYSQL_APP_PASSWORD;CharSet=utf8mb4;
+Jwt__Key=$JWT_SECRET
+EOF
+    chmod 600 "$RUNTIME_SECRETS_FILE"
+    SECRETS_CREATED=true
+    print_warn "已首次生成运行时密钥，请立即安全保存以下内容；此信息不会在后续部署时再次打印。"
+    echo "  MySQL Root密码: $MYSQL_ROOT_PASSWORD"
+    echo "  MySQL应用密码: $MYSQL_APP_PASSWORD"
+    echo "  JWT密钥: $JWT_SECRET"
+    echo "  密钥文件: $RUNTIME_SECRETS_FILE"
+fi
 
 ###############################################################################
 # 第二步：安装Docker（最新版本）
@@ -213,6 +234,16 @@ DOCKER_CONFIG
     print_info "Docker镜像加速器配置完成"
 fi
 
+if [ "$SECRETS_CREATED" = true ] && docker ps -a --format '{{.Names}}' | grep -qx 'hailong-mysql'; then
+    GENERATED_SECRETS_BACKUP="$RUNTIME_SECRETS_FILE.generated.$(date +%Y%m%d_%H%M%S)"
+    mv "$RUNTIME_SECRETS_FILE" "$GENERATED_SECRETS_BACKUP"
+    print_error "检测到已有 hailong-mysql 容器，但未找到可复用的运行时密钥文件。"
+    print_error "已停止部署，避免新生成的密码与已有数据库不匹配。"
+    print_info "请从现有安全记录恢复真实凭据到 $RUNTIME_SECRETS_FILE 后重试。"
+    print_info "本次未使用的随机密钥已移动到: $GENERATED_SECRETS_BACKUP"
+    exit 1
+fi
+
 ###############################################################################
 # 第三步：检测Docker Compose命令
 ###############################################################################
@@ -284,11 +315,11 @@ services:
     container_name: hailong-mysql
     restart: always
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
+    env_file:
+      - .runtime/secrets.env
     environment:
-      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
       MYSQL_DATABASE: hailong_consulting
       MYSQL_USER: hailong_app
-      MYSQL_PASSWORD: $MYSQL_APP_PASSWORD
       TZ: Asia/Shanghai
     volumes:
       - mysql-data:/var/lib/mysql
@@ -298,7 +329,7 @@ services:
     networks:
       - hailong-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p$MYSQL_ROOT_PASSWORD"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -310,11 +341,11 @@ services:
       dockerfile: Dockerfile
     container_name: hailong-api
     restart: always
+    env_file:
+      - .runtime/secrets.env
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5000
-      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=hailong_consulting;User=hailong_app;Password=$MYSQL_APP_PASSWORD;CharSet=utf8mb4;
-      - Jwt__Key=$JWT_SECRET
       - Jwt__Issuer=HailongConsulting.API
       - Jwt__Audience=HailongConsulting.Client
       - Jwt__ExpireHours=24
@@ -520,9 +551,8 @@ echo "  - 前端门户:     http://$SERVER_IP"
 echo "  - 后台管理:     http://$SERVER_IP:8080"
 echo "  - API接口:      http://$SERVER_IP:5001"
 echo ""
-echo "默认登录信息："
-echo "  - 用户名: admin"
-echo "  - 密码: admin123"
+echo "初始管理员信息："
+echo "  - 首次启动后请查看 API 容器日志，或容器内 logs/bootstrap/initial-admin-credentials.txt"
 echo ""
 echo "Docker容器："
 echo "  - hailong-mysql  (MySQL 8.0)"
@@ -538,9 +568,8 @@ echo "  - 启动服务:      $COMPOSE_CMD up -d"
 echo ""
 echo "数据库信息："
 echo "  - 数据库名: hailong_consulting"
-echo "  - Root密码: $MYSQL_ROOT_PASSWORD"
 echo "  - 应用用户: hailong_app"
-echo "  - 应用密码: $MYSQL_APP_PASSWORD"
+echo "  - 密钥文件: $RUNTIME_SECRETS_FILE"
 echo ""
 echo "项目路径: $PROJECT_PATH"
 echo ""
@@ -548,7 +577,7 @@ echo "=========================================="
 echo ""
 
 print_info "请在浏览器中访问上述地址进行测试"
-print_warn "首次登录后请立即修改默认密码！"
+print_warn "首次登录后请立即修改系统自动生成的管理员密码。"
 
 # 保存配置信息
 cat > /root/hailong-docker-deploy-info.txt <<EOF
@@ -568,12 +597,12 @@ Docker容器:
 - hailong-nginx  (Nginx)
 
 数据库信息:
-- MySQL Root密码: $MYSQL_ROOT_PASSWORD
-- MySQL应用密码: $MYSQL_APP_PASSWORD
 - 数据库名: hailong_consulting
 - 用户名: hailong_app
+- 密钥文件: $RUNTIME_SECRETS_FILE
 
-JWT密钥: $JWT_SECRET
+初始管理员凭据:
+- 查看 API 容器日志，或容器内 logs/bootstrap/initial-admin-credentials.txt
 
 项目路径: $PROJECT_PATH
 
@@ -587,7 +616,7 @@ $COMPOSE_CMD down            # 停止所有服务
 $COMPOSE_CMD up -d           # 启动所有服务
 
 备份命令:
-docker exec hailong-mysql mysqldump -u root -p$MYSQL_ROOT_PASSWORD hailong_consulting > backup.sql
+source $RUNTIME_SECRETS_FILE && docker exec hailong-mysql mysqldump -u root -p\$MYSQL_ROOT_PASSWORD hailong_consulting > backup.sql
 EOF
 
 print_info "部署信息已保存到: /root/hailong-docker-deploy-info.txt"

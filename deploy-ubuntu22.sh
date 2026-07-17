@@ -45,26 +45,12 @@ print_step "欢迎使用海隆咨询官网一键部署脚本 (Ubuntu 22.04)"
 echo "服务器IP: $SERVER_IP"
 echo ""
 
-# 询问用户配置
-read -p "请输入MySQL root密码 (默认: Hailong@2025): " MYSQL_ROOT_PASSWORD
-MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-Hailong@2025}
-
-read -p "请输入MySQL应用密码 (默认: HailongApp@2025): " MYSQL_APP_PASSWORD
-MYSQL_APP_PASSWORD=${MYSQL_APP_PASSWORD:-HailongApp@2025}
-
-read -p "请输入JWT密钥 (至少32字符，默认自动生成): " JWT_SECRET
-if [ -z "$JWT_SECRET" ]; then
-    JWT_SECRET=$(openssl rand -base64 32)
-fi
-
 read -p "项目文件路径 (默认: /opt/hailong/project): " PROJECT_PATH
 PROJECT_PATH=${PROJECT_PATH:-/opt/hailong/project}
 
 echo ""
 print_info "配置信息："
-echo "  MySQL Root密码: $MYSQL_ROOT_PASSWORD"
-echo "  MySQL应用密码: $MYSQL_APP_PASSWORD"
-echo "  JWT密钥: ${JWT_SECRET:0:20}..."
+echo "  MySQL/JWT 凭据: 将随机生成并写入受限文件"
 echo "  项目路径: $PROJECT_PATH"
 echo ""
 
@@ -72,6 +58,57 @@ read -p "确认开始部署? (y/n): " CONFIRM
 if [ "$CONFIRM" != "y" ]; then
     print_warn "部署已取消"
     exit 0
+fi
+
+if [ ! -d "$PROJECT_PATH" ]; then
+    print_error "项目路径不存在: $PROJECT_PATH"
+    print_info "请先将项目文件上传到服务器"
+    exit 1
+fi
+
+# 密钥仅在首次部署生成；以后重跑脚本会复用同一份文件，避免已有数据库和应用配置失配。
+RUNTIME_SECRETS_DIR="$PROJECT_PATH/.runtime"
+RUNTIME_SECRETS_FILE="$RUNTIME_SECRETS_DIR/secrets.env"
+SECRETS_CREATED=false
+mkdir -p "$RUNTIME_SECRETS_DIR"
+chmod 700 "$RUNTIME_SECRETS_DIR"
+
+if [ -f "$RUNTIME_SECRETS_FILE" ]; then
+    MYSQL_ROOT_PASSWORD=$(sed -n 's/^MYSQL_ROOT_PASSWORD=//p' "$RUNTIME_SECRETS_FILE")
+    MYSQL_APP_PASSWORD=$(sed -n 's/^MYSQL_PASSWORD=//p' "$RUNTIME_SECRETS_FILE")
+    JWT_SECRET=$(sed -n 's/^Jwt__Key=//p' "$RUNTIME_SECRETS_FILE")
+    if [ -z "$MYSQL_ROOT_PASSWORD" ] || [ -z "$MYSQL_APP_PASSWORD" ] || [ -z "$JWT_SECRET" ]; then
+        print_error "运行时密钥文件格式不完整: $RUNTIME_SECRETS_FILE"
+        exit 1
+    fi
+    print_info "已复用运行时密钥文件: $RUNTIME_SECRETS_FILE"
+else
+    MYSQL_ROOT_PASSWORD=$(openssl rand -base64 32)
+    MYSQL_APP_PASSWORD=$(openssl rand -base64 32)
+    JWT_SECRET=$(openssl rand -base64 48)
+    cat > "$RUNTIME_SECRETS_FILE" <<EOF
+MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+MYSQL_PASSWORD=$MYSQL_APP_PASSWORD
+ConnectionStrings__DefaultConnection=Server=localhost;Port=3306;Database=hailong_consulting;User=hailong_app;Password=$MYSQL_APP_PASSWORD;CharSet=utf8mb4;
+Jwt__Key=$JWT_SECRET
+EOF
+    chmod 600 "$RUNTIME_SECRETS_FILE"
+    SECRETS_CREATED=true
+    print_warn "已首次生成运行时密钥，请立即安全保存以下内容；此信息不会在后续部署时再次打印。"
+    echo "  MySQL Root密码: $MYSQL_ROOT_PASSWORD"
+    echo "  MySQL应用密码: $MYSQL_APP_PASSWORD"
+    echo "  JWT密钥: $JWT_SECRET"
+    echo "  密钥文件: $RUNTIME_SECRETS_FILE"
+fi
+
+if [ "$SECRETS_CREATED" = true ] && command -v mysql &> /dev/null && systemctl is-active --quiet mysql; then
+    GENERATED_SECRETS_BACKUP="$RUNTIME_SECRETS_FILE.generated.$(date +%Y%m%d_%H%M%S)"
+    mv "$RUNTIME_SECRETS_FILE" "$GENERATED_SECRETS_BACKUP"
+    print_error "检测到已有 MySQL 服务，但未找到可复用的运行时密钥文件。"
+    print_error "已停止部署，避免新生成的密码与已有数据库不匹配。"
+    print_info "请从现有安全记录恢复真实凭据到 $RUNTIME_SECRETS_FILE 后重试。"
+    print_info "本次未使用的随机密钥已移动到: $GENERATED_SECRETS_BACKUP"
+    exit 1
 fi
 
 ###############################################################################
@@ -497,14 +534,13 @@ echo "  - 前端门户:     http://$SERVER_IP"
 echo "  - 后台管理:     http://$SERVER_IP:8080"
 echo "  - API接口:      http://$SERVER_IP:5001"
 echo ""
-echo "默认登录信息："
-echo "  - 用户名: admin"
-echo "  - 密码: admin123"
+echo "初始管理员信息："
+echo "  - 文件: /var/www/hailong-api/logs/bootstrap/initial-admin-credentials.txt"
 echo ""
 echo "数据库信息："
 echo "  - 数据库名: hailong_consulting"
 echo "  - 用户名: hailong_app"
-echo "  - 密码: $MYSQL_APP_PASSWORD"
+echo "  - 密钥文件: $RUNTIME_SECRETS_FILE"
 echo ""
 echo "常用命令："
 echo "  - 查看API状态:  systemctl status hailong-api"
@@ -516,7 +552,7 @@ echo "=========================================="
 echo ""
 
 print_info "请在浏览器中访问上述地址进行测试"
-print_warn "首次登录后请立即修改默认密码！"
+print_warn "首次登录后请立即修改系统自动生成的管理员密码。"
 
 # 保存配置信息
 cat > /root/hailong-deploy-info.txt <<EOF
@@ -530,12 +566,12 @@ cat > /root/hailong-deploy-info.txt <<EOF
 - API接口: http://$SERVER_IP:5001
 
 数据库信息:
-- MySQL Root密码: $MYSQL_ROOT_PASSWORD
-- MySQL应用密码: $MYSQL_APP_PASSWORD
 - 数据库名: hailong_consulting
 - 用户名: hailong_app
+- 密钥文件: $RUNTIME_SECRETS_FILE
 
-JWT密钥: $JWT_SECRET
+初始管理员凭据:
+- /var/www/hailong-api/logs/bootstrap/initial-admin-credentials.txt
 
 项目路径: $PROJECT_PATH
 部署路径: /var/www/hailong-api

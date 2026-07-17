@@ -4,6 +4,7 @@ using HailongConsulting.API.Models.DTOs;
 using HailongConsulting.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace HailongConsulting.API.Controllers;
 
@@ -30,6 +31,7 @@ public class AuthController : ControllerBase
     /// <returns>登录响应，包含JWT Token和RefreshToken</returns>
     [HttpPost("login")]
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     public async Task<ActionResult<ApiResponse<LoginResponseDto>>> Login([FromBody] LoginRequestDto request)
     {
         if (!ModelState.IsValid)
@@ -55,6 +57,7 @@ public class AuthController : ControllerBase
     /// <returns>新的Token和RefreshToken</returns>
     [HttpPost("refresh")]
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     public async Task<ActionResult<ApiResponse<LoginResponseDto>>> RefreshToken([FromBody] RefreshTokenRequestDto request)
     {
         if (!ModelState.IsValid)
@@ -154,6 +157,7 @@ public class AuthController : ControllerBase
     /// <returns>Token是否有效</returns>
     [HttpPost("validate-token")]
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     public async Task<ActionResult<ApiResponse<bool>>> ValidateToken([FromBody] TokenDto dto)
     {
         var isValid = await _authService.ValidateTokenAsync(dto.Token);

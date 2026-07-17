@@ -77,6 +77,24 @@ public class User
     public DateTime? RefreshTokenExpiry { get; set; }
 
     /// <summary>
+    /// 连续登录失败次数。达到阈值后会暂时锁定账号。
+    /// </summary>
+    [Column("failed_login_count")]
+    public int FailedLoginCount { get; set; }
+
+    /// <summary>
+    /// 账号锁定截止时间（UTC）。
+    /// </summary>
+    [Column("lockout_until")]
+    public DateTime? LockoutUntil { get; set; }
+
+    /// <summary>
+    /// 访问令牌版本。密码、角色或账号状态发生安全相关变更时递增，使已签发 JWT 立即失效。
+    /// </summary>
+    [Column("token_version")]
+    public int TokenVersion { get; set; }
+
+    /// <summary>
     /// 状态：0-禁用，1-启用
     /// </summary>
     [Column("status")]

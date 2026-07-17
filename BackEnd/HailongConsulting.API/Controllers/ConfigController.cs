@@ -159,7 +159,7 @@ public class ConfigController : ControllerBase
     /// 更新企业简介
     /// </summary>
     [HttpPut("company-intro")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<bool>>> UpdateCompanyProfile([FromBody] UpdateCompanyProfileDto dto)
     {
         try
@@ -222,7 +222,7 @@ public class ConfigController : ControllerBase
     /// 创建重要业绩
     /// </summary>
     [HttpPost("achievements")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<MajorAchievementDto>>> CreateAchievement([FromBody] CreateMajorAchievementDto dto)
     {
         try
@@ -241,7 +241,7 @@ public class ConfigController : ControllerBase
     /// 更新重要业绩
     /// </summary>
     [HttpPut("achievements/{id}")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<bool>>> UpdateAchievement(int id, [FromBody] UpdateMajorAchievementDto dto)
     {
         try
@@ -264,7 +264,7 @@ public class ConfigController : ControllerBase
     /// 删除重要业绩
     /// </summary>
     [HttpDelete("achievements/{id}")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<bool>>> DeleteAchievement(int id)
     {
         try
@@ -331,7 +331,7 @@ public class ConfigController : ControllerBase
     /// 创建企业荣誉
     /// </summary>
     [HttpPost("honors")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<CompanyHonorDto>>> CreateHonor([FromBody] CreateCompanyHonorDto dto)
     {
         try
@@ -350,7 +350,7 @@ public class ConfigController : ControllerBase
     /// 更新企业荣誉
     /// </summary>
     [HttpPut("honors/{id}")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<bool>>> UpdateHonor(int id, [FromBody] UpdateCompanyHonorDto dto)
     {
         try
@@ -373,7 +373,7 @@ public class ConfigController : ControllerBase
     /// 删除企业荣誉
     /// </summary>
     [HttpDelete("honors/{id}")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<bool>>> DeleteHonor(int id)
     {
         try
@@ -592,7 +592,7 @@ public class ConfigController : ControllerBase
     /// 创建业务范围
     /// </summary>
     [HttpPost("business-scope")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<BusinessScopeDto>>> CreateBusinessScope([FromBody] CreateBusinessScopeDto dto)
     {
         try
@@ -611,7 +611,7 @@ public class ConfigController : ControllerBase
     /// 更新业务范围
     /// </summary>
     [HttpPut("business-scope/{id}")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<bool>>> UpdateBusinessScope(int id, [FromBody] UpdateBusinessScopeDto dto)
     {
         try
@@ -634,7 +634,7 @@ public class ConfigController : ControllerBase
     /// 删除业务范围
     /// </summary>
     [HttpDelete("business-scope/{id}")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<bool>>> DeleteBusinessScope(int id)
     {
         try
@@ -701,7 +701,7 @@ public class ConfigController : ControllerBase
     /// 创建企业资质
     /// </summary>
     [HttpPost("qualifications")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<CompanyQualificationDto>>> CreateQualification([FromBody] CreateCompanyQualificationDto dto)
     {
         try
@@ -720,7 +720,7 @@ public class ConfigController : ControllerBase
     /// 更新企业资质
     /// </summary>
     [HttpPut("qualifications/{id}")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<bool>>> UpdateQualification(int id, [FromBody] UpdateCompanyQualificationDto dto)
     {
         try
@@ -743,7 +743,7 @@ public class ConfigController : ControllerBase
     /// 删除企业资质
     /// </summary>
     [HttpDelete("qualifications/{id}")]
-    [Authorize]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<ApiResponse<bool>>> DeleteQualification(int id)
     {
         try
