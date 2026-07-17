@@ -16,10 +16,48 @@ services:
     networks:
       - hailong-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    logging:
+      driver: local
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  # 初始化公告数据容器
+  init-announcements:
+    image: mysql:8.0
+    container_name: hailong-init-announcements
+    depends_on:
+      mysql:
+        condition: service_healthy
+    env_file:
+      - .runtime/secrets.env
+    volumes:
+      - ./SQL:/sql:ro
+    entrypoint: >
+      sh -c '
+        echo "等待 MySQL 就绪..."
+        until mysqladmin ping -h mysql -u root -p$$MYSQL_ROOT_PASSWORD --silent; do
+          sleep 2
+        done
+        echo "检查公告数据..."
+        COUNT=$$(mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD -e "SELECT COUNT(*) FROM hailong_consulting.announcements" -s -N 2>/dev/null || echo 0)
+        echo "当前公告数量: $$COUNT"
+        if [ "$$COUNT" -lt 100 ]; then
+          echo "导入公告数据..."
+          mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/07_announcements_import.sql
+          COUNT=$$(mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD -e "SELECT COUNT(*) FROM hailong_consulting.announcements" -s -N 2>/dev/null)
+          echo "导入完成，公告数量: $$COUNT"
+        else
+          echo "公告数据已存在，跳过导入"
+        fi
+        echo "初始化完成"
+      '
+    networks:
+      - hailong-network
     logging:
       driver: local
       options:
@@ -71,7 +109,7 @@ services:
     container_name: hailong-nginx
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8082:80"
       - "5001:5001"
       - "8080:8080"
     volumes:
