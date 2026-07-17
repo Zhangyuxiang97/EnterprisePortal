@@ -14,3 +14,5 @@ logs/bootstrap/
 
 # 数据文件（太大不提交）
 
+scripts/node_modules/
+scripts/data/
