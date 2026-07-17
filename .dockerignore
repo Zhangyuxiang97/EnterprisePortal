@@ -1,0 +1,10 @@
+.git
+.vs
+.claude
+.runtime
+**/node_modules
+**/dist
+**/bin
+**/obj
+logs
+scripts

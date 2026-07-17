@@ -5,9 +5,11 @@ using HailongConsulting.API.Middleware;
 using HailongConsulting.API.Repositories;
 using HailongConsulting.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Net;
 using System.Threading.RateLimiting;
 using Serilog;
 
@@ -34,6 +36,9 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.File(
         path: "logs/log-.txt",
         rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 30,
+        fileSizeLimitBytes: 10 * 1024 * 1024,
+        rollOnFileSizeLimit: true,
         outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
     .CreateLogger();
 
@@ -131,6 +136,24 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+
+    var trustedProxy = builder.Configuration["ReverseProxy:TrustedProxy"];
+    if (!string.IsNullOrWhiteSpace(trustedProxy))
+    {
+        if (!IPAddress.TryParse(trustedProxy, out var trustedProxyAddress))
+        {
+            throw new InvalidOperationException("ReverseProxy:TrustedProxy 必须是有效的 IP 地址。");
+        }
+
+        options.KnownNetworks.Clear();
+        options.KnownProxies.Clear();
+        options.KnownProxies.Add(trustedProxyAddress);
+    }
+});
 
 builder.Services.AddRateLimiter(options =>
 {
@@ -271,7 +294,12 @@ app.UseExceptionHandling();
 // 使用Serilog请求日志
 app.UseSerilogRequestLogging();
 
-app.UseHttpsRedirection();
+app.UseForwardedHeaders();
+
+if (app.Configuration.GetValue<bool>("ReverseProxy:HttpsRedirectEnabled"))
+{
+    app.UseHttpsRedirection();
+}
 
 // 启用静态文件服务（用于访问上传的附件）
 app.UseStaticFiles();

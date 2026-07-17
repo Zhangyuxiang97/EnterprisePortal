@@ -1,9 +1,8 @@
 services:
-  # MySQL数据库服务
   mysql:
     image: mysql:8.0
     container_name: hailong-mysql
-    restart: always
+    restart: unless-stopped
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
     env_file:
       - .runtime/secrets.env
@@ -14,8 +13,6 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       - ./SQL:/docker-entrypoint-initdb.d:ro
-    ports:
-      - "3306:3306"
     networks:
       - hailong-network
     healthcheck:
@@ -23,28 +20,32 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    logging:
+      driver: local
+      options:
+        max-size: 10m
+        max-file: "3"
 
-  # 后端API服务
   api:
     build:
       context: ./BackEnd/HailongConsulting.API
       dockerfile: Dockerfile
     container_name: hailong-api
-    restart: always
+    restart: unless-stopped
     env_file:
       - .runtime/secrets.env
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:5000
-      - Jwt__Issuer=HailongConsulting.API
-      - Jwt__Audience=HailongConsulting.Client
-      - Jwt__ExpireHours=24
-      - TZ=Asia/Shanghai
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5000
+      Jwt__Issuer: HailongConsulting.API
+      Jwt__Audience: HailongConsulting.Client
+      Jwt__ExpireHours: 24
+      ReverseProxy__TrustedProxy: 172.30.0.10
+      ReverseProxy__HttpsRedirectEnabled: "false"
+      TZ: Asia/Shanghai
     volumes:
       - api-uploads:/app/wwwroot/uploads
       - api-logs:/app/logs
-    ports:
-      - "5000:5000"
     depends_on:
       mysql:
         condition: service_healthy
@@ -56,38 +57,50 @@ services:
       timeout: 10s
       retries: 5
       start_period: 40s
+    logging:
+      driver: local
+      options:
+        max-size: 10m
+        max-file: "3"
 
-  # Nginx服务（前端+反向代理）
   nginx:
-    image: nginx:alpine
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    image: hailong-nginx:local
     container_name: hailong-nginx
-    restart: always
+    restart: unless-stopped
     ports:
       - "80:80"
       - "5001:5001"
       - "8080:8080"
     volumes:
-      - ./nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./hailong-admin/dist:/usr/share/nginx/html/admin:ro
-      - ./hailong-protral/dist:/usr/share/nginx/html/portal:ro
       - api-uploads:/usr/share/nginx/html/uploads:ro
     depends_on:
       api:
         condition: service_healthy
     networks:
-      - hailong-network
+      hailong-network:
+        ipv4_address: 172.30.0.10
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
-
+    logging:
+      driver: local
+      options:
+        max-size: 10m
+        max-file: "3"
 
 networks:
   hailong-network:
     driver: bridge
     name: hailong-network
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
 
 volumes:
   mysql-data:
