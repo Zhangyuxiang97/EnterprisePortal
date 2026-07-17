@@ -13,8 +13,4 @@ BackEnd/.vs/
 logs/bootstrap/
 
 # 数据文件（太大不提交）
-scripts/data/*.json
 
-# 大文件不提交
-SQL/07_announcements_import.sql
-scripts/data/
