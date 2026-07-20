@@ -1,20 +1,28 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-hailong-dark via-hailong-primary to-hailong-secondary">
+  <div class="min-h-screen bg-slate-50/50">
     <!-- 导航栏 -->
     <Header />
 
-    <!-- 页面内容 -->
-    <div class="pt-32 pb-16">
-      <div class="container-wide max-w-4xl mx-auto">
-        <!-- 标题部分 -->
-        <div class="text-center mb-12">
-          <h1 class="text-5xl font-bold mb-6 font-tech bg-gradient-to-r from-white via-hailong-cyan to-white bg-clip-text text-transparent animate-fade-in">
-            加入海隆专家库
-          </h1>
-        </div>
+    <!-- 页面头部 Hero Banner -->
+    <div class="relative pt-32 pb-20 text-center text-white overflow-hidden bg-gradient-to-br from-hailong-dark via-slate-900 to-indigo-950">
+      <div class="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
+      <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-hailong-primary/10 rounded-full blur-[120px] pointer-events-none animate-float"></div>
+      
+      <div class="relative z-10 max-w-4xl mx-auto px-6">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 font-tech tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-200 bg-clip-text text-transparent">
+          专家库
+        </h1>
+        <p class="text-base md:text-lg text-slate-300 font-medium max-w-2xl mx-auto">
+          诚邀各领域专家加入海隆咨询专家库，携手共创专业工程咨询生态
+        </p>
+      </div>
+    </div>
 
+    <!-- 主要内容区域 -->
+    <div class="py-10">
+      <div class="container-wide max-w-4xl mx-auto">
         <!-- 主要内容卡片 -->
-        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200 animate-fade-in">
+        <div class="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.02)] overflow-hidden border border-slate-100 animate-fade-in">
           <div class="p-8 md:p-12">
             <!-- 二维码和公告内容区域 -->
             <div class="mb-8">
@@ -288,5 +296,11 @@ onUnmounted(() => {
 
 .prose p {
   margin-bottom: 0;
+}
+
+.bg-grid-pattern {
+  background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 </style>

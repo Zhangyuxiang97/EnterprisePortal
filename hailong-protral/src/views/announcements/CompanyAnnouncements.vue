@@ -25,7 +25,7 @@
           <!-- 搜索区域 -->
           <div class="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-100 p-6 mb-6">
             <div class="flex gap-3">
-              <div class="relative flex-1">
+              <div class="relative flex-1 group">
                 <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
@@ -33,21 +33,26 @@
                   v-model="keyword"
                   type="text"
                   placeholder="请输入您想检索的新闻标题关键字"
-                  class="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-hailong-primary/20 focus:border-hailong-primary outline-none transition-all text-sm hover:border-slate-300 bg-slate-50/50 focus:bg-white"
+                  class="w-full pl-12 pr-10 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-hailong-primary/20 focus:border-hailong-primary outline-none transition-all text-sm hover:border-slate-300 bg-slate-50/50 focus:bg-white"
                   @keyup.enter="handleSearch"
                 />
+                <!-- 一键清除按钮 -->
+                <button
+                  v-if="keyword"
+                  @click="clearKeyword"
+                  class="absolute right-3.5 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
+                  title="清除关键字"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
               <button
                 @click="handleSearch"
                 class="px-8 py-3 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white rounded-xl hover:shadow-lg transition-all font-bold text-sm hover:-translate-y-0.5"
               >
                 搜索
-              </button>
-              <button
-                @click="handleReset"
-                class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-all font-bold text-sm"
-              >
-                重置
               </button>
             </div>
           </div>
@@ -312,11 +317,10 @@ const handleSearch = () => {
   updateUrlQuery()
 }
 
-// 重置
-const handleReset = () => {
+// 清除关键字
+const clearKeyword = () => {
   keyword.value = ''
-  currentPage.value = 1
-  updateUrlQuery()
+  handleSearch()
 }
 
 // 页码变化

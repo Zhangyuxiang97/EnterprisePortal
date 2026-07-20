@@ -45,7 +45,7 @@
             <!-- 关键字主搜索栏 -->
             <div class="mb-5">
               <div class="flex gap-3">
-                <div class="relative flex-1">
+                <div class="relative flex-1 group">
                   <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
@@ -53,9 +53,20 @@
                     v-model="searchParams.keyword"
                     type="text"
                     placeholder="请输入项目名称、招标单位、采购代理机构等关键字"
-                    class="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-hailong-primary/20 focus:border-hailong-primary outline-none transition-all text-sm hover:border-slate-300 bg-slate-50/50 focus:bg-white"
+                    class="w-full pl-12 pr-10 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-hailong-primary/20 focus:border-hailong-primary outline-none transition-all text-sm hover:border-slate-300 bg-slate-50/50 focus:bg-white"
                     @keyup.enter="handleSearch"
                   />
+                  <!-- 一键清除按钮 -->
+                  <button
+                    v-if="searchParams.keyword"
+                    @click="clearKeyword"
+                    class="absolute right-3.5 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
+                    title="清除关键字"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
                 <button
                   @click="handleSearch"
@@ -100,7 +111,7 @@
                     <button
                       v-for="type in procurementTypes"
                       :key="type.value"
-                      @click="searchParams.procurementType = type.value"
+                      @click="handleProcurementTypeChange(type.value)"
                       :class="[
                         'px-4 py-1.5 rounded-lg text-xs font-bold transition-all border',
                         searchParams.procurementType === type.value
@@ -121,7 +132,7 @@
                   <button
                     v-for="type in currentAnnouncementTypes"
                     :key="type.value"
-                    @click="searchParams.noticeType = type.value"
+                    @click="handleNoticeTypeChange(type.value)"
                     :class="[
                       'px-4 py-1.5 rounded-lg text-xs font-bold transition-all border',
                       searchParams.noticeType === type.value
@@ -177,6 +188,7 @@
                   <div class="relative" v-if="searchParams.city">
                     <select
                       v-model="searchParams.district"
+                      @change="onDistrictChange"
                       class="pl-4 pr-9 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold bg-white hover:border-hailong-primary outline-none transition-all cursor-pointer appearance-none min-w-[110px]"
                     >
                       <option value="">全部区县</option>
@@ -610,6 +622,8 @@ const onProvinceChange = async () => {
   } else {
     selectedProvinceCode.value = ''
   }
+  currentPage.value = 1
+  updateUrlQuery()
 }
 
 // 城市变化处理
@@ -626,6 +640,34 @@ const onCityChange = async () => {
   } else {
     selectedCityCode.value = ''
   }
+  currentPage.value = 1
+  updateUrlQuery()
+}
+
+// 区县变化处理
+const onDistrictChange = () => {
+  currentPage.value = 1
+  updateUrlQuery()
+}
+
+// 清除关键字
+const clearKeyword = () => {
+  searchParams.value.keyword = ''
+  handleSearch()
+}
+
+// 绑定公告类型切换事件
+const handleNoticeTypeChange = (value) => {
+  searchParams.value.noticeType = value
+  currentPage.value = 1
+  updateUrlQuery()
+}
+
+// 绑定采购类型切换事件
+const handleProcurementTypeChange = (value) => {
+  searchParams.value.procurementType = value
+  currentPage.value = 1
+  updateUrlQuery()
 }
 
 // 动态同步筛选条件至 URL Query
