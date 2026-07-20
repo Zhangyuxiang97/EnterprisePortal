@@ -241,21 +241,24 @@
       </div>
 
       <!-- 结果统计 -->
-      <div class="mb-4 text-sm text-gray-600">
-        共找到 <span class="text-hailong-primary font-semibold">{{ total }}</span> 条公告
+      <div class="mb-4 text-xs md:text-sm text-slate-500 font-medium">
+        共找到 <span class="text-hailong-primary font-bold">{{ total }}</span> 条招投标公告
       </div>
 
       <!-- 公告列表 -->
-      <div v-if="loading" class="text-center py-20">
+      <div v-if="loading" class="text-center py-32 bg-white rounded-2xl shadow-sm border border-slate-100">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-hailong-primary border-t-transparent"></div>
-        <p class="mt-4 text-gray-500">加载中...</p>
+        <p class="mt-4 text-slate-400 text-sm">正在获取公告列表...</p>
       </div>
 
-      <div v-else-if="announcements.length === 0" class="text-center py-20">
-        <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        <p class="text-gray-500">暂无公告信息</p>
+      <div v-else-if="announcements.length === 0" class="text-center py-24 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-100">
+        <div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <p class="text-slate-500 font-bold mb-1">暂无相关公告信息</p>
+        <p class="text-slate-400 text-xs">可以尝试更换其他条件进行检索</p>
       </div>
 
       <div v-else class="space-y-4">
@@ -264,21 +267,21 @@
           :key="announcement.id"
           @click="handleViewDetail(announcement.hashId || announcement.id)"
           :class="[
-            'bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all cursor-pointer border-l-4',
-            announcement.businessType === 'GOV_PROCUREMENT' ? 'border-hailong-primary' :
-            announcement.businessType === 'CONSTRUCTION' ? 'border-hailong-secondary' : 'border-hailong-primary'
+            'group bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100/80 transition-all duration-300 cursor-pointer border-l-4 flex flex-col gap-4',
+            announcement.businessType === 'GOV_PROCUREMENT' ? 'border-l-hailong-primary' :
+            announcement.businessType === 'CONSTRUCTION' ? 'border-l-hailong-secondary' : 'border-l-hailong-primary'
           ]"
         >
           <!-- 业务类型和采购类型标签 -->
-          <div class="flex items-center gap-2 mb-3">
+          <div class="flex items-center gap-2">
             <span
               :class="[
-                'px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap',
+                'px-2.5 py-0.5 rounded-md text-[10px] font-bold whitespace-nowrap shadow-sm',
                 announcement.businessType === 'GOV_PROCUREMENT'
-                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
                   : announcement.businessType === 'CONSTRUCTION'
-                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
-                  : 'bg-gray-500 text-white'
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
+                  : 'bg-slate-500 text-white'
               ]"
             >
               {{ announcement.businessType === 'GOV_PROCUREMENT' ? '政府采购' :
@@ -288,10 +291,7 @@
             <!-- 采购类型 - 仅政府采购显示 -->
             <span
               v-if="announcement.businessType === 'GOV_PROCUREMENT' && announcement.procurementType"
-              :class="[
-                'px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap',
-                'bg-blue-50 text-blue-700 border border-blue-200'
-              ]"
+              class="px-2.5 py-0.5 rounded-md text-[10px] font-bold whitespace-nowrap bg-blue-50/50 text-blue-600 border border-blue-100/50 shadow-sm"
             >
               {{ announcement.procurementType === 'goods' ? '货物' :
                  announcement.procurementType === 'service' ? '服务' :
@@ -301,120 +301,107 @@
             <!-- 公告类型 - 优化样式 -->
             <span
               :class="[
-                'ml-auto px-4 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap flex items-center gap-1.5 shadow-sm',
+                'ml-auto px-2.5 py-0.5 rounded-md text-[10px] font-bold whitespace-nowrap flex items-center gap-1 shadow-sm border',
                 announcement.noticeType === 'bidding'
-                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white'
+                  ? 'bg-blue-50 text-blue-600 border-blue-100/50'
                   : announcement.noticeType === 'result'
-                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+                  ? 'bg-emerald-50 text-emerald-600 border-emerald-100/50'
                   : announcement.noticeType === 'correction'
-                  ? 'bg-gradient-to-r from-orange-500 to-amber-600 text-white'
-                  : 'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
+                  ? 'bg-orange-50 text-orange-600 border-orange-100/50'
+                  : 'bg-slate-50 text-slate-600 border-slate-200'
               ]"
             >
-              <svg v-if="announcement.noticeType === 'bidding'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
-                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
-              </svg>
-              <svg v-else-if="announcement.noticeType === 'result'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              <svg v-else-if="announcement.noticeType === 'correction'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-              </svg>
-              <svg v-else class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-              </svg>
               {{ announcement.noticeTypeName }}
             </span>
           </div>
 
           <!-- 标题 -->
-          <h3 class="text-lg font-bold text-gray-900 mb-4 hover:text-hailong-primary transition-colors line-clamp-2">
+          <h3 class="text-base md:text-lg font-bold text-slate-800 leading-snug group-hover:text-hailong-primary transition-colors line-clamp-2">
             {{ announcement.title }}
           </h3>
 
-          <!-- 中标人信息 - 显眼位置 -->
-          <div v-if="announcement.winner" class="mb-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 rounded-lg">
+          <!-- 中标人信息 -->
+          <div v-if="announcement.winner" class="p-3 bg-gradient-to-r from-emerald-50/50 to-teal-50/30 border-l-4 border-emerald-500 rounded-lg shadow-sm">
             <div class="flex items-center gap-2">
-              <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
               </svg>
-              <span class="text-sm text-gray-600 font-medium">中标人：</span>
-              <span class="text-base text-gray-900 font-bold">{{ announcement.winner }}</span>
+              <span class="text-xs text-slate-500 font-semibold">中标人：</span>
+              <span class="text-sm text-slate-800 font-bold">{{ announcement.winner }}</span>
             </div>
           </div>
 
           <!-- 其他详细信息 -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-            <div v-if="announcement.bidder" class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs md:text-sm text-slate-500">
+            <div v-if="announcement.bidder" class="flex items-center gap-1.5 min-w-0">
+              <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
-              <span class="text-gray-500">招标人：</span>
-              <span class="text-gray-700 font-medium truncate">{{ announcement.bidder }}</span>
+              <span class="text-slate-400 whitespace-nowrap">招标人：</span>
+              <span class="text-slate-600 font-medium truncate">{{ announcement.bidder }}</span>
             </div>
-            <div v-if="announcement.projectRegion" class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div v-if="announcement.projectRegion" class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <span class="text-gray-500">项目区域：</span>
-              <span class="text-gray-700 font-medium">{{ announcement.projectRegion }}</span>
+              <span class="text-slate-400 whitespace-nowrap">项目区域：</span>
+              <span class="text-slate-600 font-medium">{{ announcement.projectRegion }}</span>
             </div>
-            <div v-if="announcement.publishTime" class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div v-if="announcement.publishTime" class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <span class="text-gray-500">发布时间：</span>
-              <span class="text-gray-700 font-medium">{{ formatDate(announcement.publishTime) }}</span>
+              <span class="text-slate-400 whitespace-nowrap">发布时间：</span>
+              <span class="text-slate-600 font-medium">{{ formatDate(announcement.publishTime) }}</span>
             </div>
           </div>
 
           <!-- 底部信息 -->
-          <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-            <div class="flex items-center gap-4 text-xs text-gray-500">
+          <div class="flex items-center justify-between pt-3 border-t border-slate-100/60 text-xs text-slate-400">
+            <div class="flex items-center gap-4">
               <span class="flex items-center gap-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
                 {{ announcement.viewCount || 0 }} 次浏览
               </span>
             </div>
-            <span class="text-hailong-primary text-sm font-medium hover:underline">
-              查看详情 →
+            <span class="text-hailong-primary text-sm font-bold flex items-center gap-1 group-hover:translate-x-1 transition-all">
+              查看详情 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </span>
           </div>
         </div>
       </div>
 
-      <!-- 分页组件 -->
-      <div v-if="total > 0" class="mt-8 flex items-center justify-center gap-2">
+      <!-- 精细圆角分页器 -->
+      <div v-if="total > 0" class="mt-12 flex items-center justify-center gap-2">
         <button
           @click="handlePageChange(currentPage - 1)"
           :disabled="currentPage === 1"
           :class="[
-            'px-4 py-2 rounded-lg border transition-all',
+            'px-4 py-2 rounded-xl border text-sm font-semibold transition-all duration-200',
             currentPage === 1
-              ? 'border-gray-200 text-gray-400 cursor-not-allowed'
-              : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+              ? 'border-slate-100 text-slate-300 cursor-not-allowed bg-slate-50/50'
+              : 'border-slate-200 text-slate-600 bg-white hover:bg-slate-50 hover:border-slate-300'
           ]"
         >
           上一页
         </button>
 
-        <div class="flex gap-1">
+        <div class="flex gap-1.5">
           <button
             v-for="page in displayPages"
             :key="page"
             @click="page !== '...' && handlePageChange(page)"
             :class="[
-              'px-4 py-2 rounded-lg transition-all',
+              'w-10 h-10 rounded-xl text-sm font-bold transition-all duration-200 flex items-center justify-center',
               page === currentPage
-                ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white'
+                ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-md shadow-blue-500/15'
                 : page === '...'
-                ? 'text-gray-400 cursor-default'
-                : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
+                ? 'text-slate-400 cursor-default'
+                : 'text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300'
             ]"
           >
             {{ page }}
@@ -425,10 +412,10 @@
           @click="handlePageChange(currentPage + 1)"
           :disabled="currentPage === totalPages"
           :class="[
-            'px-4 py-2 rounded-lg border transition-all',
+            'px-4 py-2 rounded-xl border text-sm font-semibold transition-all duration-200',
             currentPage === totalPages
-              ? 'border-gray-200 text-gray-400 cursor-not-allowed'
-              : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+              ? 'border-slate-100 text-slate-300 cursor-not-allowed bg-slate-50/50'
+              : 'border-slate-200 text-slate-600 bg-white hover:bg-slate-50 hover:border-slate-300'
           ]"
         >
           下一页
@@ -440,7 +427,7 @@
 
     <!-- 内容区域 - 详情 -->
     <div v-else class="py-16 bg-white">
-      <AnnouncementDetail :hashId="selectedHashId" :embedded="true" @back="selectedHashId = null" />
+      <AnnouncementDetail :hashId="selectedHashId" :embedded="true" @back="handleBackToList" />
     </div>
 
     <Footer />
