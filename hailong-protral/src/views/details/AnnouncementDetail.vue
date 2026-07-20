@@ -443,7 +443,11 @@ const currentAttachment = ref({})
 
 // 返回上一页
 const goBack = () => {
-  router.back()
+  if (window.history.length <= 1) {
+    router.push('/announcements')
+  } else {
+    router.back()
+  }
 }
 
 // 获取步骤占比

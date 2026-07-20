@@ -106,7 +106,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getSiteConfig, getContactInfo } from '@/utils/config'
 import Header from '@/components/Header.vue'
@@ -174,4 +174,18 @@ const handleQualificationClick = (id) => {
   sessionStorage.setItem('homeScrollPosition', savedScrollPosition.toString())
   router.push(`/detail/qualification/${id}`)
 }
+
+// 恢复滚动条位置
+onMounted(() => {
+  const savedScrollPosition = sessionStorage.getItem('homeScrollPosition')
+  if (savedScrollPosition) {
+    setTimeout(() => {
+      window.scrollTo({
+        top: parseInt(savedScrollPosition),
+        behavior: 'instant'
+      })
+      sessionStorage.removeItem('homeScrollPosition')
+    }, 100)
+  }
+})
 </script>

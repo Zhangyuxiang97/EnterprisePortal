@@ -47,7 +47,7 @@
                 <span class="text-xs text-slate-400 font-semibold">{{ formatDate(announcement.publishTime) }}</span>
               </div>
               
-              <h4 class="text-base font-bold text-slate-800 group-hover:text-hailong-primary transition-colors mb-4 line-clamp-2 leading-snug">
+              <h4 class="text-base font-bold text-slate-800 group-hover:text-hailong-primary transition-colors mb-4 line-clamp-2 leading-snug h-11">
                 {{ announcement.title }}
               </h4>
               
@@ -104,7 +104,7 @@
                 <span class="text-xs text-slate-400 font-semibold">{{ formatDate(announcement.publishTime) }}</span>
               </div>
               
-              <h4 class="text-base font-bold text-slate-800 group-hover:text-hailong-primary transition-colors mb-4 line-clamp-2 leading-snug">
+              <h4 class="text-base font-bold text-slate-800 group-hover:text-hailong-primary transition-colors mb-4 line-clamp-2 leading-snug h-11">
                 {{ announcement.title }}
               </h4>
               

@@ -451,7 +451,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
@@ -628,12 +628,32 @@ const onCityChange = async () => {
   }
 }
 
+// 动态同步筛选条件至 URL Query
+const updateUrlQuery = () => {
+  const query = {}
+  if (searchParams.value.businessType) query.tab = searchParams.value.businessType
+  if (searchParams.value.noticeType) query.noticeType = searchParams.value.noticeType
+  if (searchParams.value.procurementType) query.procurementType = searchParams.value.procurementType
+  if (searchParams.value.keyword) query.keyword = searchParams.value.keyword
+  if (searchParams.value.province) query.province = searchParams.value.province
+  if (searchParams.value.city) query.city = searchParams.value.city
+  if (searchParams.value.district) query.district = searchParams.value.district
+  if (searchParams.value.timeRange) query.timeRange = searchParams.value.timeRange
+  if (currentPage.value > 1) query.page = currentPage.value
+
+  router.replace({ query }).catch(err => {
+    if (err.name !== 'NavigationDuplicated') console.error(err)
+  })
+}
+
 // 业务类型变化处理
 const handleBusinessTypeChange = (value) => {
   searchParams.value.businessType = value
   if (value !== 'GOV_PROCUREMENT') {
     searchParams.value.procurementType = ''
   }
+  currentPage.value = 1
+  updateUrlQuery()
 }
 
 // 时间范围选择
@@ -669,11 +689,15 @@ const selectTimeRange = (value) => {
       searchParams.value.startDate = ''
       searchParams.value.endDate = ''
   }
+  currentPage.value = 1
+  updateUrlQuery()
 }
 
 // 自定义日期变化
 const onCustomDateChange = () => {
   searchParams.value.timeRange = 'custom'
+  currentPage.value = 1
+  updateUrlQuery()
 }
 
 // 加载公告列表
@@ -728,7 +752,7 @@ const loadAnnouncements = async () => {
 // 搜索
 const handleSearch = () => {
   currentPage.value = 1
-  loadAnnouncements()
+  updateUrlQuery()
 }
 
 // 重置
@@ -751,7 +775,7 @@ const handleReset = () => {
   selectedProvinceCode.value = ''
   selectedCityCode.value = ''
   currentPage.value = 1
-  loadAnnouncements()
+  updateUrlQuery()
 }
 
 // 查看详情
@@ -762,64 +786,106 @@ const handleViewDetail = (id) => {
 // 分页变化
 const handlePageChange = (page) => {
   currentPage.value = page
-  loadAnnouncements()
+  updateUrlQuery()
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-// 计算总页数
-const totalPages = computed(() => {
-  return Math.ceil(total.value / pageSize.value)
-})
+// 监听路由 Query 变化并重新加载数据
+watch(
+  () => route.query,
+  async (newQuery) => {
+    // 仅在当前处于公告列表页路由时才响应变更（规避离开路由时的干扰）
+    if (route.name !== 'Announcements') return
 
-// 计算显示的页码
-const displayPages = computed(() => {
-  const pages = []
-  const total = totalPages.value
-  const current = currentPage.value
-  
-  if (total <= 7) {
-    for (let i = 1; i <= total; i++) {
-      pages.push(i)
-    }
-  } else {
-    if (current <= 4) {
-      for (let i = 1; i <= 5; i++) {
-        pages.push(i)
-      }
-      pages.push('...')
-      pages.push(total)
-    } else if (current >= total - 3) {
-      pages.push(1)
-      pages.push('...')
-      for (let i = total - 4; i <= total; i++) {
-        pages.push(i)
+    searchParams.value.businessType = newQuery.tab || ''
+    searchParams.value.noticeType = newQuery.noticeType || ''
+    searchParams.value.procurementType = newQuery.procurementType || ''
+    searchParams.value.keyword = newQuery.keyword || ''
+    searchParams.value.province = newQuery.province || ''
+    searchParams.value.city = newQuery.city || ''
+    searchParams.value.district = newQuery.district || ''
+    searchParams.value.timeRange = newQuery.timeRange || ''
+    
+    // 如果存在省市区名称，反推 region code 并加载联动子菜单数据
+    if (searchParams.value.province && provinces.value.length > 0) {
+      const province = provinces.value.find(p => p.regionName === searchParams.value.province)
+      if (province) {
+        selectedProvinceCode.value = province.regionCode
+        await loadCities(province.regionCode)
+        if (searchParams.value.city) {
+          const city = cities.value.find(c => c.regionName === searchParams.value.city)
+          if (city) {
+            selectedCityCode.value = city.regionCode
+            await loadDistricts(city.regionCode)
+          }
+        }
       }
     } else {
-      pages.push(1)
-      pages.push('...')
-      for (let i = current - 1; i <= current + 1; i++) {
-        pages.push(i)
-      }
-      pages.push('...')
-      pages.push(total)
+      selectedProvinceCode.value = ''
+      selectedCityCode.value = ''
+      cities.value = []
+      districts.value = []
     }
-  }
-  return pages
+    
+    currentPage.value = parseInt(newQuery.page) || 1
+    await loadAnnouncements()
+  },
+  { deep: true }
+)
+
+// 离开路由前将 query 暂存至 sessionStorage，用于无参数返回时进行自动恢复
+import { onBeforeRouteLeave } from 'vue-router'
+onBeforeRouteLeave((to, from) => {
+  sessionStorage.setItem('announcements_query', JSON.stringify(route.query))
 })
 
-// 获取公告类型标签
-const getNoticeTypeLabel = (type) => {
-  const typeMap = {
-    'bidding': '招标采购',
-    'correction': '更正澄清',
-    'result': '中标公示'
-  }
-  return typeMap[type] || type
-}
-
-// 初始化
+// 初始化挂载
 onMounted(async () => {
   await loadProvinces()
+  
+  let query = route.query
+  // 若 URL query 为空，尝试从 sessionStorage 恢复缓存的条件
+  if (Object.keys(query).length === 0) {
+    const savedQueryStr = sessionStorage.getItem('announcements_query')
+    if (savedQueryStr) {
+      try {
+        const savedQuery = JSON.parse(savedQueryStr)
+        if (Object.keys(savedQuery).length > 0) {
+          router.replace({ query: savedQuery })
+          return // 让 watch(route.query) 去接管数据加载流程
+        }
+      } catch (e) {
+        console.error('解析缓存筛选条件失败:', e)
+      }
+    }
+  }
+
+  // 若无缓存或直接进入，手动初始化字段
+  searchParams.value.businessType = query.tab || ''
+  searchParams.value.noticeType = query.noticeType || ''
+  searchParams.value.procurementType = query.procurementType || ''
+  searchParams.value.keyword = query.keyword || ''
+  searchParams.value.province = query.province || ''
+  searchParams.value.city = query.city || ''
+  searchParams.value.district = query.district || ''
+  searchParams.value.timeRange = query.timeRange || ''
+  
+  if (searchParams.value.province && provinces.value.length > 0) {
+    const province = provinces.value.find(p => p.regionName === searchParams.value.province)
+    if (province) {
+      selectedProvinceCode.value = province.regionCode
+      await loadCities(province.regionCode)
+      if (searchParams.value.city) {
+        const city = cities.value.find(c => c.regionName === searchParams.value.city)
+        if (city) {
+          selectedCityCode.value = city.regionCode
+          await loadDistricts(city.regionCode)
+        }
+      }
+    }
+  }
+  
+  currentPage.value = parseInt(query.page) || 1
   await loadAnnouncements()
 })
 </script>

@@ -204,16 +204,16 @@
     <Footer />
   </div>
 </template>
-
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import { getCompanyNewsList } from '@/api/infoPublication'
 import { formatDate } from '@/utils/date'
 
 const router = useRouter()
+const route = useRoute()
 
 // 搜索关键字
 const keyword = ref('')
@@ -295,23 +295,34 @@ const loadItems = async () => {
   }
 }
 
+// 动态同步筛选条件至 URL Query
+const updateUrlQuery = () => {
+  const query = {}
+  if (keyword.value) query.keyword = keyword.value
+  if (currentPage.value > 1) query.page = currentPage.value
+
+  router.replace({ query }).catch(err => {
+    if (err.name !== 'NavigationDuplicated') console.error(err)
+  })
+}
+
 // 搜索
-const handleSearch = async () => {
+const handleSearch = () => {
   currentPage.value = 1
-  await loadItems()
+  updateUrlQuery()
 }
 
 // 重置
 const handleReset = () => {
   keyword.value = ''
-  handleSearch()
+  currentPage.value = 1
+  updateUrlQuery()
 }
 
 // 页码变化
 const handlePageChange = (page) => {
-  if (page < 1 || page > totalPages.value) return
   currentPage.value = page
-  loadItems()
+  updateUrlQuery()
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
@@ -331,9 +342,46 @@ const handleViewDetail = (id) => {
   router.push(`/detail/company-announcement/${id}`)
 }
 
+// 监听路由 Query 变化并重新加载数据
+watch(
+  () => route.query,
+  async (newQuery) => {
+    if (route.name !== 'CompanyAnnouncements') return
+    keyword.value = newQuery.keyword || ''
+    currentPage.value = parseInt(newQuery.page) || 1
+    await loadItems()
+  },
+  { deep: true }
+)
+
+// 离开路由前将 query 暂存至 sessionStorage
+import { onBeforeRouteLeave } from 'vue-router'
+onBeforeRouteLeave((to, from) => {
+  sessionStorage.setItem('company_announcements_query', JSON.stringify(route.query))
+})
+
 // 组件挂载时加载数据
-onMounted(() => {
-  loadItems()
+onMounted(async () => {
+  let query = route.query
+  // 若 URL query 为空，尝试从 sessionStorage 恢复缓存的条件
+  if (Object.keys(query).length === 0) {
+    const savedQueryStr = sessionStorage.getItem('company_announcements_query')
+    if (savedQueryStr) {
+      try {
+        const savedQuery = JSON.parse(savedQueryStr)
+        if (Object.keys(savedQuery).length > 0) {
+          router.replace({ query: savedQuery })
+          return // 让 watch(route.query) 去接管数据加载流程
+        }
+      } catch (e) {
+        console.error('解析新闻筛选缓存失败:', e)
+      }
+    }
+  }
+
+  keyword.value = query.keyword || ''
+  currentPage.value = parseInt(query.page) || 1
+  await loadItems()
 })
 </script>
 
