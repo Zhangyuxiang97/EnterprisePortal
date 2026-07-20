@@ -185,6 +185,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddAutoMapper(_ => { }, AppDomain.CurrentDomain.GetAssemblies());
 
 // 注册服务
+builder.Services.AddSingleton<IHashIdService, HashIdService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IHtmlContentSanitizer, HtmlContentSanitizer>();

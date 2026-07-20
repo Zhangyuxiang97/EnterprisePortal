@@ -11,7 +11,7 @@ export const authApi = {
    */
   login(data) {
     return request({
-      url: '/api/auth/login',
+      url: '/auth/login',
       method: 'POST',
       data
     })
@@ -24,7 +24,7 @@ export const authApi = {
    */
   refreshToken(refreshToken) {
     return request({
-      url: '/api/auth/refresh',
+      url: '/auth/refresh',
       method: 'POST',
       data: { refreshToken }
     })
@@ -36,7 +36,7 @@ export const authApi = {
    */
   getCurrentUser() {
     return request({
-      url: '/api/auth/me',
+      url: '/auth/me',
       method: 'GET'
     })
   },
@@ -48,7 +48,7 @@ export const authApi = {
    */
   changePassword(data) {
     return request({
-      url: '/api/auth/change-password',
+      url: '/auth/change-password',
       method: 'POST',
       data
     })

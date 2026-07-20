@@ -17,7 +17,7 @@ import request from './request'
  */
 export const getVisitStatisticsList = (params) => {
   return request({
-    url: '/api/statistics/visits',
+    url: '/statistics/visits',
     method: 'get',
     params
   })
@@ -31,7 +31,7 @@ export const getVisitStatisticsList = (params) => {
  */
 export const getVisitStatisticsOverview = (params) => {
   return request({
-    url: '/api/statistics/visits/overview',
+    url: '/statistics/visits/overview',
     method: 'get',
     params
   })
@@ -46,7 +46,7 @@ export const getVisitStatisticsOverview = (params) => {
  */
 export const getVisitTrend = (params) => {
   return request({
-    url: '/api/statistics/visits/trend',
+    url: '/statistics/visits/trend',
     method: 'get',
     params
   })
@@ -61,7 +61,7 @@ export const getVisitTrend = (params) => {
  */
 export const getPopularPages = (params) => {
   return request({
-    url: '/api/statistics/visits/popular-pages',
+    url: '/statistics/visits/popular-pages',
     method: 'get',
     params
   })
@@ -76,7 +76,7 @@ export const getPopularPages = (params) => {
  */
 export const recordVisit = (data) => {
   return request({
-    url: '/api/statistics/visits/record',
+    url: '/statistics/visits/record',
     method: 'post',
     data
   })
@@ -88,7 +88,7 @@ export const recordVisit = (data) => {
  */
 export const exportVisitStatistics = (params) => {
   return request({
-    url: '/api/statistics/visits/export',
+    url: '/statistics/visits/export',
     method: 'get',
     params,
     responseType: 'blob'
@@ -101,7 +101,7 @@ export const exportVisitStatistics = (params) => {
  */
 export const getVisitSourceStatistics = (params) => {
   return request({
-    url: '/api/statistics/visits/sources',
+    url: '/statistics/visits/sources',
     method: 'get',
     params
   })
@@ -113,7 +113,7 @@ export const getVisitSourceStatistics = (params) => {
  */
 export const getDeviceStatistics = (params) => {
   return request({
-    url: '/api/statistics/visits/devices',
+    url: '/statistics/visits/devices',
     method: 'get',
     params
   })
@@ -125,7 +125,7 @@ export const getDeviceStatistics = (params) => {
  */
 export const getBrowserStatistics = (params) => {
   return request({
-    url: '/api/statistics/visits/browsers',
+    url: '/statistics/visits/browsers',
     method: 'get',
     params
   })
@@ -138,7 +138,7 @@ export const getBrowserStatistics = (params) => {
  */
 export const getAnnouncementStatisticsOverview = (params) => {
   return request({
-    url: '/api/statistics/announcements/overview',
+    url: '/statistics/announcements/overview',
     method: 'get',
     params
   })
@@ -154,7 +154,7 @@ export const getAnnouncementStatisticsOverview = (params) => {
  */
 export const getAnnouncementPublishTrend = (params) => {
   return request({
-    url: '/api/statistics/announcements/publish-trend',
+    url: '/statistics/announcements/publish-trend',
     method: 'get',
     params
   })
@@ -166,7 +166,7 @@ export const getAnnouncementPublishTrend = (params) => {
  */
 export const getAnnouncementTypeDistribution = (params) => {
   return request({
-    url: '/api/statistics/announcements/type-distribution',
+    url: '/statistics/announcements/type-distribution',
     method: 'get',
     params
   })
@@ -180,7 +180,7 @@ export const getAnnouncementTypeDistribution = (params) => {
  */
 export const getAnnouncementRegionDistribution = (params) => {
   return request({
-    url: '/api/statistics/announcements/region-distribution',
+    url: '/statistics/announcements/region-distribution',
     method: 'get',
     params
   })
@@ -194,7 +194,7 @@ export const getAnnouncementRegionDistribution = (params) => {
  */
 export const getPopularAnnouncements = (params) => {
   return request({
-    url: '/api/statistics/announcements/popular',
+    url: '/statistics/announcements/popular',
     method: 'get',
     params
   })
@@ -206,7 +206,7 @@ export const getPopularAnnouncements = (params) => {
  */
 export const exportAnnouncementStatistics = (params) => {
   return request({
-    url: '/api/statistics/announcements/export',
+    url: '/statistics/announcements/export',
     method: 'get',
     params,
     responseType: 'blob'
@@ -219,7 +219,7 @@ export const exportAnnouncementStatistics = (params) => {
  */
 export const getAnnouncementStatusDistribution = (params) => {
   return request({
-    url: '/api/statistics/announcements/status-distribution',
+    url: '/statistics/announcements/status-distribution',
     method: 'get',
     params
   })
@@ -231,7 +231,7 @@ export const getAnnouncementStatusDistribution = (params) => {
  */
 export const getAnnouncementTimeAnalysis = (params) => {
   return request({
-    url: '/api/statistics/announcements/time-analysis',
+    url: '/statistics/announcements/time-analysis',
     method: 'get',
     params
   })
@@ -243,7 +243,7 @@ export const getAnnouncementTimeAnalysis = (params) => {
  */
 export const getInfoPublicationStatisticsOverview = (params) => {
   return request({
-    url: '/api/statistics/info-publications/overview',
+    url: '/statistics/info-publications/overview',
     method: 'get',
     params
   })
@@ -254,7 +254,7 @@ export const getInfoPublicationStatisticsOverview = (params) => {
  */
 export const getInfoPublicationPublishTrend = (params) => {
   return request({
-    url: '/api/statistics/info-publications/publish-trend',
+    url: '/statistics/info-publications/publish-trend',
     method: 'get',
     params
   })
@@ -265,7 +265,7 @@ export const getInfoPublicationPublishTrend = (params) => {
  */
 export const getInfoPublicationTypeDistribution = (params) => {
   return request({
-    url: '/api/statistics/info-publications/type-distribution',
+    url: '/statistics/info-publications/type-distribution',
     method: 'get',
     params
   })
@@ -277,7 +277,7 @@ export const getInfoPublicationTypeDistribution = (params) => {
  */
 export const getPopularInfoPublications = (params) => {
   return request({
-    url: '/api/statistics/info-publications/popular',
+    url: '/statistics/info-publications/popular',
     method: 'get',
     params
   })
@@ -289,7 +289,7 @@ export const getPopularInfoPublications = (params) => {
  */
 export const exportInfoPublicationStatistics = (params) => {
   return request({
-    url: '/api/statistics/info-publications/export',
+    url: '/statistics/info-publications/export',
     method: 'get',
     params,
     responseType: 'blob'
@@ -302,7 +302,7 @@ export const exportInfoPublicationStatistics = (params) => {
  */
 export const getAuthorPublishStatistics = (params) => {
   return request({
-    url: '/api/statistics/info-publications/author-statistics',
+    url: '/statistics/info-publications/author-statistics',
     method: 'get',
     params
   })
@@ -314,7 +314,7 @@ export const getAuthorPublishStatistics = (params) => {
  */
 export const getSystemOverview = () => {
   return request({
-    url: '/api/statistics/system/overview',
+    url: '/statistics/system/overview',
     method: 'get'
   })
 }
@@ -324,7 +324,7 @@ export const getSystemOverview = () => {
  */
 export const getRealtimeStatistics = () => {
   return request({
-    url: '/api/statistics/realtime',
+    url: '/statistics/realtime',
     method: 'get'
   })
 }
@@ -335,7 +335,7 @@ export const getRealtimeStatistics = () => {
  */
 export const getHomeStatistics = () => {
   return request({
-    url: '/api/statistics/home',
+    url: '/statistics/home',
     method: 'get'
   })
 }

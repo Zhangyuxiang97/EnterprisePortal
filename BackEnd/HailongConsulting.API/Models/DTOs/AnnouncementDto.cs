@@ -11,6 +11,11 @@ public class AnnouncementDto
     public int Id { get; set; }
 
     /// <summary>
+    /// 公告HashId（用于URL友好型ID）
+    /// </summary>
+    public string HashId { get; set; } = string.Empty;
+
+    /// <summary>
     /// 公告标题
     /// </summary>
     public string Title { get; set; } = string.Empty;

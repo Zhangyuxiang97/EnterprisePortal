@@ -17,7 +17,7 @@ const routes = [
     component: () => import('@/views/announcements/Announcements.vue')
   },
   {
-    path: '/detail/announcement/:id',
+    path: '/announcement/:id',
     name: 'AnnouncementDetail',
     component: () => import('@/views/details/AnnouncementDetail.vue')
   },
@@ -27,22 +27,22 @@ const routes = [
     component: () => import('@/views/announcements/CompanyAnnouncements.vue')
   },
   {
-    path: '/detail/company-announcement/:id',
+    path: '/company-announcement/:id',
     name: 'CompanyAnnouncementDetail',
     component: () => import('@/views/details/CompanyAnnouncementDetail.vue')
   },
   {
-    path: '/detail/business-scope/:id',
+    path: '/business-scope/:id',
     name: 'BusinessScopeDetail',
     component: () => import('@/views/details/BusinessScopeDetail.vue')
   },
   {
-    path: '/detail/achievement/:id',
+    path: '/achievement/:id',
     name: 'AchievementDetail',
     component: () => import('@/views/details/AchievementDetail.vue')
   },
   {
-    path: '/detail/qualification/:id',
+    path: '/qualification/:id',
     name: 'QualificationDetail',
     component: () => import('@/views/details/QualificationDetail.vue')
   },
@@ -52,7 +52,7 @@ const routes = [
     component: () => import('@/views/info-publish/Policies.vue')
   },
   {
-    path: '/detail/policy/:id',
+    path: '/policy/:id',
     name: 'PolicyDetail',
     component: () => import('@/views/details/PolicyDetail.vue')
   },

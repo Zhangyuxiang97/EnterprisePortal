@@ -23,7 +23,7 @@ import request from './request'
  */
 export const getAnnouncementList = (params) => {
   return request({
-    url: '/api/announcements',
+    url: '/announcements',
     method: 'get',
     params
   })
@@ -35,7 +35,7 @@ export const getAnnouncementList = (params) => {
  */
 export const getAnnouncementDetail = (id) => {
   return request({
-    url: `/api/announcements/${id}`,
+    url: `/announcements/${id}`,
     method: 'get'
   })
 }
@@ -64,7 +64,7 @@ export const getAnnouncementDetail = (id) => {
  */
 export const createAnnouncement = (data) => {
   return request({
-    url: '/api/announcements',
+    url: '/announcements',
     method: 'post',
     data
   })
@@ -77,7 +77,7 @@ export const createAnnouncement = (data) => {
  */
 export const updateAnnouncement = (id, data) => {
   return request({
-    url: `/api/announcements/${id}`,
+    url: `/announcements/${id}`,
     method: 'put',
     data
   })
@@ -89,7 +89,7 @@ export const updateAnnouncement = (id, data) => {
  */
 export const deleteAnnouncement = (id) => {
   return request({
-    url: `/api/announcements/${id}`,
+    url: `/announcements/${id}`,
     method: 'delete'
   })
 }
@@ -100,7 +100,7 @@ export const deleteAnnouncement = (id) => {
  */
 export const batchDeleteAnnouncements = (ids) => {
   return request({
-    url: '/api/announcements/batch-delete',
+    url: '/announcements/batch-delete',
     method: 'post',
     data: { ids }
   })
@@ -113,7 +113,7 @@ export const batchDeleteAnnouncements = (ids) => {
  */
 export const toggleAnnouncementTop = (id, isTop) => {
   return request({
-    url: `/api/announcements/${id}/top`,
+    url: `/announcements/${id}/top`,
     method: 'put',
     data: { isTop }
   })
@@ -126,7 +126,7 @@ export const toggleAnnouncementTop = (id, isTop) => {
  */
 export const toggleAnnouncementStatus = (id, status) => {
   return request({
-    url: `/api/announcements/${id}/status`,
+    url: `/announcements/${id}/status`,
     method: 'put',
     data: { status }
   })
@@ -138,7 +138,7 @@ export const toggleAnnouncementStatus = (id, status) => {
  */
 export const incrementAnnouncementView = (id) => {
   return request({
-    url: `/api/announcements/${id}/view`,
+    url: `/announcements/${id}/view`,
     method: 'post'
   })
 }
@@ -149,7 +149,7 @@ export const incrementAnnouncementView = (id) => {
  */
 export const getAnnouncementStatistics = (params) => {
   return request({
-    url: '/api/announcements/statistics',
+    url: '/announcements/statistics',
     method: 'get',
     params
   })

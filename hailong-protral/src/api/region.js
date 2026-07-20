@@ -6,7 +6,7 @@ import request from './request'
  */
 export function getProvinceList() {
   return request({
-    url: '/api/regions/provinces',
+    url: '/regions/provinces',
     method: 'get'
   })
 }
@@ -18,7 +18,7 @@ export function getProvinceList() {
  */
 export function getCityList(provinceCode) {
   return request({
-    url: '/api/regions/cities',
+    url: '/regions/cities',
     method: 'get',
     params: { provinceCode }
   })
@@ -31,7 +31,7 @@ export function getCityList(provinceCode) {
  */
 export function getDistrictList(cityCode) {
   return request({
-    url: '/api/regions/districts',
+    url: '/regions/districts',
     method: 'get',
     params: { cityCode }
   })
@@ -43,7 +43,7 @@ export function getDistrictList(cityCode) {
  */
 export function getRegionTree() {
   return request({
-    url: '/api/regions/tree',
+    url: '/regions/tree',
     method: 'get'
   })
 }
@@ -55,7 +55,7 @@ export function getRegionTree() {
  */
 export function getRegionByCode(regionCode) {
   return request({
-    url: `/api/regions/by-code/${regionCode}`,
+    url: `/regions/by-code/${regionCode}`,
     method: 'get'
   })
 }

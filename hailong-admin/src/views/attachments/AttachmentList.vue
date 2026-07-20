@@ -219,7 +219,7 @@ const uploadDialogVisible = ref(false)
 const uploadRef = ref(null)
 const fileList = ref([])
 const uploading = ref(false)
-const uploadAction = import.meta.env.VITE_API_BASE_URL + '/api/attachments/upload'
+const uploadAction = import.meta.env.VITE_API_BASE_URL + '/attachments/upload'
 const uploadHeaders = {
   Authorization: `Bearer ${tokenUtils.getToken()}`
 }

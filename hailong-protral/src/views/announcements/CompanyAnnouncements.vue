@@ -343,7 +343,7 @@ const getTypeStyle = (category) => {
 
 // 查看详情
 const handleViewDetail = (id) => {
-  router.push(`/detail/company-announcement/${id}`)
+  router.push(`/company-announcement/${id}`)
 }
 
 // 监听路由 Query 变化并重新加载数据

@@ -148,7 +148,7 @@
               <router-link
                 v-for="related in relatedQualifications"
                 :key="related.id"
-                :to="`/detail/qualification/${related.id}`"
+                :to="`/qualification/${related.id}`"
                 class="group bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-100 hover:border-hailong-primary hover:shadow-lg transition-all"
               >
                 <div class="flex items-center gap-3 mb-3">

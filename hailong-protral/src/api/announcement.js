@@ -18,7 +18,7 @@ import request from './request'
  */
 export function getAnnouncementList(params) {
   return request({
-    url: '/api/announcements',
+    url: '/announcements',
     method: 'get',
     params: {
       businessType: params.businessType,
@@ -37,13 +37,13 @@ export function getAnnouncementList(params) {
 }
 
 /**
- * 获取公告详情
- * @param {number} id - 公告ID
+ * 获取公告详情（通过hashId）
+ * @param {string} hashId - 公告hashId
  * @returns {Promise}
  */
-export function getAnnouncementDetail(id) {
+export function getAnnouncementByHash(hashId) {
   return request({
-    url: `/api/announcements/${id}`,
+    url: `/announcements/by-hash/${hashId}`,
     method: 'get'
   })
 }
@@ -55,7 +55,7 @@ export function getAnnouncementDetail(id) {
  */
 export function getGovProcurementList(params) {
   return request({
-    url: '/api/announcements/gov-procurement',
+    url: '/announcements/gov-procurement',
     method: 'get',
     params: {
       noticeType: params.noticeType,
@@ -79,7 +79,7 @@ export function getGovProcurementList(params) {
  */
 export function getConstructionList(params) {
   return request({
-    url: '/api/announcements/construction',
+    url: '/announcements/construction',
     method: 'get',
     params: {
       noticeType: params.noticeType,

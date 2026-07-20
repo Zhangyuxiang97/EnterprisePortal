@@ -14,15 +14,18 @@ namespace HailongConsulting.API.Controllers;
 public class AnnouncementController : ControllerBase
 {
     private readonly IAnnouncementService _announcementService;
+    private readonly IHashIdService _hashIdService;
     private readonly IVisitStatisticService _visitStatisticService;
     private readonly ILogger<AnnouncementController> _logger;
 
     public AnnouncementController(
         IAnnouncementService announcementService,
+        IHashIdService hashIdService,
         IVisitStatisticService visitStatisticService,
         ILogger<AnnouncementController> logger)
     {
         _announcementService = announcementService;
+        _hashIdService = hashIdService;
         _visitStatisticService = visitStatisticService;
         _logger = logger;
     }
@@ -69,6 +72,39 @@ public class AnnouncementController : ControllerBase
         {
             _logger.LogError(ex, "更新公告失败，ID: {Id}", id);
             return StatusCode(500, ApiResponse<AnnouncementDto>.FailResult("更新公告失败"));
+        }
+    }
+
+    /// <summary>
+    /// 根据HashId获取公告详情
+    /// </summary>
+    /// <param name="hashId">公告HashId</param>
+    [HttpGet("by-hash/{hashId}")]
+    public async Task<ActionResult<ApiResponse<AnnouncementDto>>> GetAnnouncementByHash(string hashId)
+    {
+        try
+        {
+            var id = _hashIdService.Decode(hashId);
+            if (id == null)
+            {
+                return NotFound(ApiResponse<AnnouncementDto>.FailResult("无效的公告链接"));
+            }
+
+            var announcement = await _announcementService.GetByIdAsync(id.Value);
+            if (announcement == null)
+            {
+                return NotFound(ApiResponse<AnnouncementDto>.FailResult("公告不存在"));
+            }
+
+            // 增加浏览次数
+            await _visitStatisticService.IncrementAnnouncementViewAsync(id.Value, Request);
+
+            return Ok(ApiResponse<AnnouncementDto>.SuccessResult(announcement, "获取公告成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "根据HashId获取公告失败，HashId: {HashId}", hashId);
+            return StatusCode(500, ApiResponse<AnnouncementDto>.FailResult("获取公告失败"));
         }
     }
 

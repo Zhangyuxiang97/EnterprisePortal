@@ -9,7 +9,7 @@ export default {
    */
   getList(params) {
     return request({
-      url: '/api/User',
+      url: '/User',
       method: 'get',
       params
     })
@@ -20,7 +20,7 @@ export default {
    */
   getById(id) {
     return request({
-      url: `/api/User/${id}`,
+      url: `/User/${id}`,
       method: 'get'
     })
   },
@@ -30,7 +30,7 @@ export default {
    */
   create(data) {
     return request({
-      url: '/api/User',
+      url: '/User',
       method: 'post',
       data
     })
@@ -41,7 +41,7 @@ export default {
    */
   update(id, data) {
     return request({
-      url: `/api/User/${id}`,
+      url: `/User/${id}`,
       method: 'put',
       data
     })
@@ -52,7 +52,7 @@ export default {
    */
   delete(id) {
     return request({
-      url: `/api/User/${id}`,
+      url: `/User/${id}`,
       method: 'delete'
     })
   },
@@ -62,7 +62,7 @@ export default {
    */
   resetPassword(id, data) {
     return request({
-      url: `/api/User/${id}/reset-password`,
+      url: `/User/${id}/reset-password`,
       method: 'post',
       data
     })
@@ -73,7 +73,7 @@ export default {
    */
   toggleStatus(id) {
     return request({
-      url: `/api/User/${id}/toggle-status`,
+      url: `/User/${id}/toggle-status`,
       method: 'post'
     })
   }

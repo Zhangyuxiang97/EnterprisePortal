@@ -20,7 +20,7 @@ import request from './request'
  */
 export const getAttachmentList = (params) => {
   return request({
-    url: '/api/attachments',
+    url: '/attachments',
     method: 'get',
     params
   })
@@ -32,7 +32,7 @@ export const getAttachmentList = (params) => {
  */
 export const getAttachmentDetail = (id) => {
   return request({
-    url: `/api/attachments/${id}`,
+    url: `/attachments/${id}`,
     method: 'get'
   })
 }
@@ -45,7 +45,7 @@ export const getAttachmentDetail = (id) => {
  */
 export const uploadAttachment = (formData) => {
   return request({
-    url: '/api/attachments/upload',
+    url: '/attachments/upload',
     method: 'post',
     data: formData,
     headers: {
@@ -60,7 +60,7 @@ export const uploadAttachment = (formData) => {
  */
 export const batchUploadAttachments = (formData) => {
   return request({
-    url: '/api/attachments/batch-upload',
+    url: '/attachments/batch-upload',
     method: 'post',
     data: formData,
     headers: {
@@ -80,7 +80,7 @@ export const batchUploadAttachments = (formData) => {
  */
 export const updateAttachment = (id, data) => {
   return request({
-    url: `/api/attachments/${id}`,
+    url: `/attachments/${id}`,
     method: 'put',
     data
   })
@@ -92,7 +92,7 @@ export const updateAttachment = (id, data) => {
  */
 export const deleteAttachment = (id) => {
   return request({
-    url: `/api/attachments/${id}`,
+    url: `/attachments/${id}`,
     method: 'delete'
   })
 }
@@ -103,7 +103,7 @@ export const deleteAttachment = (id) => {
  */
 export const batchDeleteAttachments = (ids) => {
   return request({
-    url: '/api/attachments/batch',
+    url: '/attachments/batch',
     method: 'delete',
     data: ids
   })
@@ -115,7 +115,7 @@ export const batchDeleteAttachments = (ids) => {
  */
 export const downloadAttachment = (id) => {
   return request({
-    url: `/api/attachments/${id}/download`,
+    url: `/attachments/${id}/download`,
     method: 'get',
     responseType: 'blob'
   })
@@ -127,7 +127,7 @@ export const downloadAttachment = (id) => {
  */
 export const getAttachmentStatistics = (params) => {
   return request({
-    url: '/api/attachments/statistics',
+    url: '/attachments/statistics',
     method: 'get',
     params
   })
@@ -142,7 +142,7 @@ export const getAttachmentStatistics = (params) => {
  */
 export const linkAttachments = (data) => {
   return request({
-    url: '/api/attachments/link',
+    url: '/attachments/link',
     method: 'post',
     data
   })
@@ -157,7 +157,7 @@ export const linkAttachments = (data) => {
  */
 export const unlinkAttachments = (data) => {
   return request({
-    url: '/api/attachments/unlink',
+    url: '/attachments/unlink',
     method: 'post',
     data
   })

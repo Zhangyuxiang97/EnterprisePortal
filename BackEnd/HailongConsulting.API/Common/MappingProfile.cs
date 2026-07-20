@@ -1,4 +1,5 @@
 using AutoMapper;
+using HashidsNet;
 using HailongConsulting.API.Models.DTOs;
 using HailongConsulting.API.Models.Entities;
 
@@ -115,6 +116,7 @@ public class MappingProfile : Profile
 
         // 公告映射
         CreateMap<Announcement, AnnouncementDto>()
+            .ForMember(dest => dest.HashId, opt => opt.MapFrom(src => EncodeHashId(src.Id)))
             .ForMember(dest => dest.IsTop, opt => opt.MapFrom(src => src.IsTop == 1))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (int)src.Status))
             .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => DeserializeintList(src.AttachmentIds)))
@@ -164,6 +166,14 @@ public class MappingProfile : Profile
         // 系统日志映射
         CreateMap<SystemLog, SystemLogDto>();
         CreateMap<CreateSystemLogDto, SystemLog>();
+    }
+
+    // HashId编码（静态实例，用于AutoMapper映射）
+    private static readonly Hashids _hashids = new Hashids("HailongConsulting2024Portal", 8);
+
+    private static string EncodeHashId(int id)
+    {
+        return _hashids.Encode(id);
     }
 
     // 辅助方法：序列化和反序列化 JSON

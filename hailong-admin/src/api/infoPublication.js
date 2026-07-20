@@ -20,7 +20,7 @@ import request from './request'
  */
 export const getInfoPublicationList = (params) => {
   return request({
-    url: '/api/info-publications',
+    url: '/info-publications',
     method: 'get',
     params
   })
@@ -32,7 +32,7 @@ export const getInfoPublicationList = (params) => {
  */
 export const getInfoPublicationDetail = (id) => {
   return request({
-    url: `/api/info-publications/${id}`,
+    url: `/info-publications/${id}`,
     method: 'get'
   })
 }
@@ -55,7 +55,7 @@ export const getInfoPublicationDetail = (id) => {
  */
 export const createInfoPublication = (data) => {
   return request({
-    url: '/api/info-publications',
+    url: '/info-publications',
     method: 'post',
     data
   })
@@ -68,7 +68,7 @@ export const createInfoPublication = (data) => {
  */
 export const updateInfoPublication = (id, data) => {
   return request({
-    url: `/api/info-publications/${id}`,
+    url: `/info-publications/${id}`,
     method: 'put',
     data
   })
@@ -80,7 +80,7 @@ export const updateInfoPublication = (id, data) => {
  */
 export const deleteInfoPublication = (id) => {
   return request({
-    url: `/api/info-publications/${id}`,
+    url: `/info-publications/${id}`,
     method: 'delete'
   })
 }
@@ -91,7 +91,7 @@ export const deleteInfoPublication = (id) => {
  */
 export const batchDeleteInfoPublications = (ids) => {
   return request({
-    url: '/api/info-publications/batch-delete',
+    url: '/info-publications/batch-delete',
     method: 'post',
     data: { ids }
   })
@@ -104,7 +104,7 @@ export const batchDeleteInfoPublications = (ids) => {
  */
 export const toggleInfoPublicationTop = (id, isTop) => {
   return request({
-    url: `/api/info-publications/${id}/top`,
+    url: `/info-publications/${id}/top`,
     method: 'put',
     data: { isTop }
   })
@@ -117,7 +117,7 @@ export const toggleInfoPublicationTop = (id, isTop) => {
  */
 export const toggleInfoPublicationStatus = (id, status) => {
   return request({
-    url: `/api/info-publications/${id}/status`,
+    url: `/info-publications/${id}/status`,
     method: 'put',
     data: { status }
   })
@@ -129,7 +129,7 @@ export const toggleInfoPublicationStatus = (id, status) => {
  */
 export const incrementInfoPublicationView = (id) => {
   return request({
-    url: `/api/info-publications/${id}/view`,
+    url: `/info-publications/${id}/view`,
     method: 'post'
   })
 }
@@ -140,7 +140,7 @@ export const incrementInfoPublicationView = (id) => {
  */
 export const getInfoPublicationStatistics = (params) => {
   return request({
-    url: '/api/info-publications/statistics',
+    url: '/info-publications/statistics',
     method: 'get',
     params
   })
@@ -152,7 +152,7 @@ export const getInfoPublicationStatistics = (params) => {
  */
 export const getCategoryList = (type) => {
   return request({
-    url: '/api/info-publications/categories',
+    url: '/info-publications/categories',
     method: 'get',
     params: { type }
   })

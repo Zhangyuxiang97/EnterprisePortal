@@ -8,11 +8,11 @@ import request from './request'
 // ==================== 企业简介 ====================
 export const companyProfile = {
   get: () => request({
-    url: '/api/config/company-intro',
+    url: '/config/company-intro',
     method: 'get'
   }),
   update: (data) => request({
-    url: '/api/config/company-intro',
+    url: '/config/company-intro',
     method: 'put',
     data
   })
@@ -21,26 +21,26 @@ export const companyProfile = {
 // ==================== 业务范围 ====================
 export const businessScope = {
   getList: (params) => request({
-    url: '/api/config/business-scope',
+    url: '/config/business-scope',
     method: 'get',
     params
   }),
   getDetail: (id) => request({
-    url: `/api/config/business-scope/${id}`,
+    url: `/config/business-scope/${id}`,
     method: 'get'
   }),
   create: (data) => request({
-    url: '/api/config/business-scope',
+    url: '/config/business-scope',
     method: 'post',
     data
   }),
   update: (id, data) => request({
-    url: `/api/config/business-scope/${id}`,
+    url: `/config/business-scope/${id}`,
     method: 'put',
     data
   }),
   delete: (id) => request({
-    url: `/api/config/business-scope/${id}`,
+    url: `/config/business-scope/${id}`,
     method: 'delete'
   })
 }
@@ -48,26 +48,26 @@ export const businessScope = {
 // ==================== 企业资质 ====================
 export const qualifications = {
   getList: (params) => request({
-    url: '/api/config/qualifications',
+    url: '/config/qualifications',
     method: 'get',
     params
   }),
   getDetail: (id) => request({
-    url: `/api/config/qualifications/${id}`,
+    url: `/config/qualifications/${id}`,
     method: 'get'
   }),
   create: (data) => request({
-    url: '/api/config/qualifications',
+    url: '/config/qualifications',
     method: 'post',
     data
   }),
   update: (id, data) => request({
-    url: `/api/config/qualifications/${id}`,
+    url: `/config/qualifications/${id}`,
     method: 'put',
     data
   }),
   delete: (id) => request({
-    url: `/api/config/qualifications/${id}`,
+    url: `/config/qualifications/${id}`,
     method: 'delete'
   })
 }
@@ -75,30 +75,30 @@ export const qualifications = {
 // ==================== 重要业绩 ====================
 export const achievements = {
   getList: (params) => request({
-    url: '/api/config/achievements',
+    url: '/config/achievements',
     method: 'get',
     params
   }),
   getDetail: (id) => request({
-    url: `/api/config/achievements/${id}`,
+    url: `/config/achievements/${id}`,
     method: 'get'
   }),
   create: (data) => request({
-    url: '/api/config/achievements',
+    url: '/config/achievements',
     method: 'post',
     data
   }),
   update: (id, data) => request({
-    url: `/api/config/achievements/${id}`,
+    url: `/config/achievements/${id}`,
     method: 'put',
     data
   }),
   delete: (id) => request({
-    url: `/api/config/achievements/${id}`,
+    url: `/config/achievements/${id}`,
     method: 'delete'
   }),
   updateSort: (id, direction) => request({
-    url: `/api/config/achievements/${id}/sort`,
+    url: `/config/achievements/${id}/sort`,
     method: 'put',
     data: { direction }
   })
@@ -107,26 +107,26 @@ export const achievements = {
 // ==================== 企业荣誉 ====================
 export const honors = {
   getList: (params) => request({
-    url: '/api/config/honors',
+    url: '/config/honors',
     method: 'get',
     params
   }),
   getDetail: (id) => request({
-    url: `/api/config/honors/${id}`,
+    url: `/config/honors/${id}`,
     method: 'get'
   }),
   create: (data) => request({
-    url: '/api/config/honors',
+    url: '/config/honors',
     method: 'post',
     data
   }),
   update: (id, data) => request({
-    url: `/api/config/honors/${id}`,
+    url: `/config/honors/${id}`,
     method: 'put',
     data
   }),
   delete: (id) => request({
-    url: `/api/config/honors/${id}`,
+    url: `/config/honors/${id}`,
     method: 'delete'
   })
 }
@@ -134,30 +134,30 @@ export const honors = {
 // ==================== 轮播图 ====================
 export const banners = {
   getList: (params) => request({
-    url: '/api/config/banners',
+    url: '/config/banners',
     method: 'get',
     params
   }),
   getDetail: (id) => request({
-    url: `/api/config/banners/${id}`,
+    url: `/config/banners/${id}`,
     method: 'get'
   }),
   create: (data) => request({
-    url: '/api/config/banners',
+    url: '/config/banners',
     method: 'post',
     data
   }),
   update: (id, data) => request({
-    url: `/api/config/banners/${id}`,
+    url: `/config/banners/${id}`,
     method: 'put',
     data
   }),
   delete: (id) => request({
-    url: `/api/config/banners/${id}`,
+    url: `/config/banners/${id}`,
     method: 'delete'
   }),
   updateSort: (id, direction) => request({
-    url: `/api/config/banners/${id}/sort`,
+    url: `/config/banners/${id}/sort`,
     method: 'put',
     data: { direction }
   })
@@ -166,30 +166,30 @@ export const banners = {
 // ==================== 友情链接 ====================
 export const friendlyLinks = {
   getList: (params) => request({
-    url: '/api/config/links',
+    url: '/config/links',
     method: 'get',
     params
   }),
   getDetail: (id) => request({
-    url: `/api/config/links/${id}`,
+    url: `/config/links/${id}`,
     method: 'get'
   }),
   create: (data) => request({
-    url: '/api/config/links',
+    url: '/config/links',
     method: 'post',
     data
   }),
   update: (id, data) => request({
-    url: `/api/config/links/${id}`,
+    url: `/config/links/${id}`,
     method: 'put',
     data
   }),
   delete: (id) => request({
-    url: `/api/config/links/${id}`,
+    url: `/config/links/${id}`,
     method: 'delete'
   }),
   updateSort: (id, direction) => request({
-    url: `/api/config/links/${id}/sort`,
+    url: `/config/links/${id}/sort`,
     method: 'put',
     data: { direction }
   })

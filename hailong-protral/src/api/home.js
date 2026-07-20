@@ -6,7 +6,7 @@ import request from './request'
  */
 export function getStatisticsOverview() {
   return request({
-    url: '/api/home/statistics/overview',
+    url: '/home/statistics/overview',
     method: 'get'
   })
 }
@@ -17,7 +17,7 @@ export function getStatisticsOverview() {
  */
 export function getRecentAnnouncements() {
   return request({
-    url: '/api/home/recent-announcements',
+    url: '/home/recent-announcements',
     method: 'get'
   })
 }

@@ -10,7 +10,7 @@ import request from './request'
  */
 export function getCompanyProfile() {
   return request({
-    url: '/api/config/company-intro',
+    url: '/config/company-intro',
     method: 'get'
   })
 }
@@ -25,7 +25,7 @@ export function getCompanyProfile() {
  */
 export function getBusinessScope() {
   return request({
-    url: '/api/config/business-scope',
+    url: '/config/business-scope',
     method: 'get'
   })
 }
@@ -37,7 +37,7 @@ export function getBusinessScope() {
  */
 export function getBusinessScopeById(id) {
   return request({
-    url: `/api/config/business-scope/${id}`,
+    url: `/config/business-scope/${id}`,
     method: 'get'
   })
 }
@@ -52,7 +52,7 @@ export function getBusinessScopeById(id) {
  */
 export function getCompanyQualifications() {
   return request({
-    url: '/api/config/qualifications',
+    url: '/config/qualifications',
     method: 'get'
   })
 }
@@ -64,7 +64,7 @@ export function getCompanyQualifications() {
  */
 export function getQualificationById(id) {
   return request({
-    url: `/api/config/qualifications/${id}`,
+    url: `/config/qualifications/${id}`,
     method: 'get'
   })
 }
@@ -79,7 +79,7 @@ export function getQualificationById(id) {
  */
 export function getCompanyHonors() {
   return request({
-    url: '/api/config/honors',
+    url: '/config/honors',
     method: 'get'
   })
 }
@@ -91,7 +91,7 @@ export function getCompanyHonors() {
  */
 export function getHonorById(id) {
   return request({
-    url: `/api/config/honors/${id}`,
+    url: `/config/honors/${id}`,
     method: 'get'
   })
 }
@@ -106,7 +106,7 @@ export function getHonorById(id) {
  */
 export function getMajorAchievements() {
   return request({
-    url: '/api/config/achievements',
+    url: '/config/achievements',
     method: 'get'
   })
 }
@@ -118,7 +118,7 @@ export function getMajorAchievements() {
  */
 export function getAchievementById(id) {
   return request({
-    url: `/api/config/achievements/${id}`,
+    url: `/config/achievements/${id}`,
     method: 'get'
   })
 }
@@ -133,7 +133,7 @@ export function getAchievementById(id) {
  */
 export function getVisitStatistics() {
   return request({
-    url: '/api/config/statistics',
+    url: '/config/statistics',
     method: 'get'
   })
 }
@@ -148,7 +148,7 @@ export function getVisitStatistics() {
  */
 export function recordVisit(data) {
   return request({
-    url: '/api/config/statistics/record',
+    url: '/config/statistics/record',
     method: 'post',
     data
   })

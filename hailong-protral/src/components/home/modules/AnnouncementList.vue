@@ -1,121 +1,56 @@
 <template>
-  <div class="py-24 bg-gradient-to-b from-white via-slate-50/50 to-blue-50/20">
+  <div class="py-24 bg-gradient-to-b from-white to-blue-50/30">
     <div class="container-wide">
       <div class="text-center mb-16">
-        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 font-tech tracking-tight">公告信息</h2>
-        <div class="w-12 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto rounded-full mt-3"></div>
+        <h2 class="text-5xl font-bold text-hailong-dark mb-4 font-tech">公告信息</h2>
+        <div class="w-24 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto"></div>
       </div>
-      
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- 政府采购 -->
-        <div class="space-y-6">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-            <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-              <span class="w-1.5 h-5 bg-hailong-primary rounded-full"></span>
-              政府采购
-            </h3>
-            <router-link
-              to="/announcements?tab=GOV_PROCUREMENT"
-              class="text-hailong-primary hover:text-hailong-secondary transition-colors text-xs font-bold flex items-center gap-0.5"
-            >
-              查看全部
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </router-link>
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-hailong-dark">政府采购</h3>
+            <router-link to="/announcements?tab=GOV_PROCUREMENT"
+              class="text-hailong-primary hover:underline text-sm">查看全部 →</router-link>
           </div>
-          
-          <div v-if="loading" class="text-center py-12 text-slate-400 text-sm">正在加载公告数据...</div>
-          <div v-else-if="govProcurementList.length === 0" class="text-center py-12 text-slate-400 text-sm bg-white rounded-2xl border border-slate-100">暂无政府采购公告</div>
+          <div v-if="loading" class="text-center py-8 text-gray-500">加载中...</div>
+          <div v-else-if="govProcurementList.length === 0" class="text-center py-8 text-gray-500">暂无公告</div>
           <div v-else class="space-y-4">
-            <div
-              v-for="announcement in govProcurementList"
-              :key="announcement.id"
-              @click="$emit('announcement-click', announcement.id)"
-              class="group p-6 bg-white rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.05)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer border-l-4 border-l-hailong-primary flex flex-col justify-between"
-            >
-              <div class="flex justify-between items-center mb-3">
-                <span :class="[
-                  'px-2 py-0.5 rounded text-[10px] font-bold border',
-                  announcement.noticeType === 'bidding' ? 'bg-blue-50 text-hailong-primary border-blue-100/30' :
-                  announcement.noticeType === 'result' ? 'bg-emerald-50 text-emerald-600 border-emerald-100/30' :
-                  announcement.noticeType === 'correction' ? 'bg-amber-50 text-amber-600 border-amber-100/30' :
-                  'bg-slate-50 text-slate-600 border-slate-100'
-                ]">
-                  {{ announcement.noticeTypeName }}
-                </span>
-                <span class="text-xs text-slate-400 font-semibold">{{ formatDate(announcement.publishTime) }}</span>
+            <div v-for="announcement in govProcurementList" :key="announcement.id"
+              @click="$emit('announcement-click', announcement.hashId || announcement.id)"
+              class="p-6 bg-white rounded-xl hover:shadow-lg transition-all cursor-pointer border-l-4 border-hailong-primary">
+              <div class="flex justify-between items-start mb-3">
+                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{{ announcement.noticeTypeName }}</span>
+                <span class="text-xs text-gray-500">{{ formatDate(announcement.publishTime) }}</span>
               </div>
-              
-              <h4 class="text-base font-bold text-slate-800 group-hover:text-hailong-primary transition-colors mb-4 line-clamp-2 leading-snug h-11">
-                {{ announcement.title }}
-              </h4>
-              
-              <div class="flex justify-between items-center text-xs text-slate-500 pt-3 border-t border-slate-50">
-                <span>执行区域: <strong class="text-slate-700 font-bold">{{ announcement.projectRegion }}</strong></span>
-                <span class="text-hailong-primary font-bold flex items-center gap-0.5 group-hover:translate-x-1 transition-all">
-                  查看详情
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </span>
+              <h4 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{{ announcement.title }}</h4>
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-600">区域: <strong class="text-hailong-primary">{{ announcement.projectRegion }}</strong></span>
               </div>
             </div>
           </div>
         </div>
 
         <!-- 建设工程 -->
-        <div class="space-y-6">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-            <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-              <span class="w-1.5 h-5 bg-hailong-secondary rounded-full"></span>
-              建设工程
-            </h3>
-            <router-link
-              to="/announcements?tab=CONSTRUCTION"
-              class="text-hailong-primary hover:text-hailong-secondary transition-colors text-xs font-bold flex items-center gap-0.5"
-            >
-              查看全部
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </router-link>
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-hailong-dark">建设工程</h3>
+            <router-link to="/announcements?tab=CONSTRUCTION"
+              class="text-hailong-primary hover:underline text-sm">查看全部 →</router-link>
           </div>
-          
-          <div v-if="loading" class="text-center py-12 text-slate-400 text-sm">正在加载公告数据...</div>
-          <div v-else-if="constructionList.length === 0" class="text-center py-12 text-slate-400 text-sm bg-white rounded-2xl border border-slate-100">暂无建设工程公告</div>
+          <div v-if="loading" class="text-center py-8 text-gray-500">加载中...</div>
+          <div v-else-if="constructionList.length === 0" class="text-center py-8 text-gray-500">暂无公告</div>
           <div v-else class="space-y-4">
-            <div
-              v-for="announcement in constructionList"
-              :key="announcement.id"
-              @click="$emit('announcement-click', announcement.id)"
-              class="group p-6 bg-white rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.05)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer border-l-4 border-l-hailong-secondary flex flex-col justify-between"
-            >
-              <div class="flex justify-between items-center mb-3">
-                <span :class="[
-                  'px-2 py-0.5 rounded text-[10px] font-bold border',
-                  announcement.noticeType === 'bidding' ? 'bg-blue-50 text-hailong-primary border-blue-100/30' :
-                  announcement.noticeType === 'result' ? 'bg-emerald-50 text-emerald-600 border-emerald-100/30' :
-                  announcement.noticeType === 'correction' ? 'bg-amber-50 text-amber-600 border-amber-100/30' :
-                  'bg-slate-50 text-slate-600 border-slate-100'
-                ]">
-                  {{ announcement.noticeTypeName }}
-                </span>
-                <span class="text-xs text-slate-400 font-semibold">{{ formatDate(announcement.publishTime) }}</span>
+            <div v-for="announcement in constructionList" :key="announcement.id"
+              @click="$emit('announcement-click', announcement.hashId || announcement.id)"
+              class="p-6 bg-white rounded-xl hover:shadow-lg transition-all cursor-pointer border-l-4 border-hailong-secondary">
+              <div class="flex justify-between items-start mb-3">
+                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">{{ announcement.noticeTypeName }}</span>
+                <span class="text-xs text-gray-500">{{ formatDate(announcement.publishTime) }}</span>
               </div>
-              
-              <h4 class="text-base font-bold text-slate-800 group-hover:text-hailong-primary transition-colors mb-4 line-clamp-2 leading-snug h-11">
-                {{ announcement.title }}
-              </h4>
-              
-              <div class="flex justify-between items-center text-xs text-slate-500 pt-3 border-t border-slate-50">
-                <span>执行区域: <strong class="text-slate-700 font-bold">{{ announcement.projectRegion }}</strong></span>
-                <span class="text-hailong-primary font-bold flex items-center gap-0.5 group-hover:translate-x-1 transition-all">
-                  查看详情
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </span>
+              <h4 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{{ announcement.title }}</h4>
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-600">区域: <strong class="text-hailong-secondary">{{ announcement.projectRegion }}</strong></span>
               </div>
             </div>
           </div>

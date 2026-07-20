@@ -17,7 +17,7 @@ import request from './request'
  */
 export const getUserList = (params) => {
   return request({
-    url: '/api/User',
+    url: '/User',
     method: 'get',
     params
   })
@@ -29,7 +29,7 @@ export const getUserList = (params) => {
  */
 export const getUserDetail = (id) => {
   return request({
-    url: `/api/User/${id}`,
+    url: `/User/${id}`,
     method: 'get'
   })
 }
@@ -47,7 +47,7 @@ export const getUserDetail = (id) => {
  */
 export const createUser = (data) => {
   return request({
-    url: '/api/User',
+    url: '/User',
     method: 'post',
     data
   })
@@ -60,7 +60,7 @@ export const createUser = (data) => {
  */
 export const updateUser = (id, data) => {
   return request({
-    url: `/api/User/${id}`,
+    url: `/User/${id}`,
     method: 'put',
     data
   })
@@ -72,7 +72,7 @@ export const updateUser = (id, data) => {
  */
 export const deleteUser = (id) => {
   return request({
-    url: `/api/User/${id}`,
+    url: `/User/${id}`,
     method: 'delete'
   })
 }
@@ -84,7 +84,7 @@ export const deleteUser = (id) => {
  */
 export const resetUserPassword = (id, newPassword) => {
   return request({
-    url: `/api/User/${id}/reset-password`,
+    url: `/User/${id}/reset-password`,
     method: 'post',
     data: { newPassword }
   })
@@ -98,7 +98,7 @@ export const resetUserPassword = (id, newPassword) => {
  */
 export const changePassword = (data) => {
   return request({
-    url: '/api/system/users/change-password',
+    url: '/system/users/change-password',
     method: 'put',
     data
   })
@@ -111,7 +111,7 @@ export const changePassword = (data) => {
  */
 export const toggleUserStatus = (id) => {
   return request({
-    url: `/api/User/${id}/toggle-status`,
+    url: `/User/${id}/toggle-status`,
     method: 'post'
   })
 }
@@ -131,7 +131,7 @@ export const toggleUserStatus = (id) => {
  */
 export const getSystemLogList = (params) => {
   return request({
-    url: '/api/SystemLog',
+    url: '/SystemLog',
     method: 'get',
     params
   })
@@ -143,7 +143,7 @@ export const getSystemLogList = (params) => {
  */
 export const getSystemLogDetail = (id) => {
   return request({
-    url: `/api/SystemLog/${id}`,
+    url: `/SystemLog/${id}`,
     method: 'get'
   })
 }
@@ -155,7 +155,7 @@ export const getSystemLogDetail = (id) => {
  */
 export const clearSystemLogs = () => {
   return request({
-    url: '/api/SystemLog/clear',
+    url: '/SystemLog/clear',
     method: 'delete'
   })
 }
@@ -166,7 +166,7 @@ export const clearSystemLogs = () => {
  */
 export const exportSystemLogs = (params) => {
   return request({
-    url: '/api/system/logs/export',
+    url: '/system/logs/export',
     method: 'get',
     params,
     responseType: 'blob'
@@ -183,7 +183,7 @@ export const exportSystemLogs = (params) => {
  */
 export const getRegionList = (params) => {
   return request({
-    url: '/api/regions',
+    url: '/regions',
     method: 'get',
     params
   })
@@ -194,7 +194,7 @@ export const getRegionList = (params) => {
  */
 export const getRegionTree = () => {
   return request({
-    url: '/api/regions/tree',
+    url: '/regions/tree',
     method: 'get'
   })
 }
@@ -204,7 +204,7 @@ export const getRegionTree = () => {
  */
 export const getProvinceList = () => {
   return request({
-    url: '/api/regions/provinces',
+    url: '/regions/provinces',
     method: 'get'
   })
 }
@@ -215,7 +215,7 @@ export const getProvinceList = () => {
  */
 export const getCityList = (provinceCode) => {
   return request({
-    url: '/api/regions/cities',
+    url: '/regions/cities',
     method: 'get',
     params: { provinceCode }
   })
@@ -227,7 +227,7 @@ export const getCityList = (provinceCode) => {
  */
 export const getDistrictList = (cityCode) => {
   return request({
-    url: '/api/regions/districts',
+    url: '/regions/districts',
     method: 'get',
     params: { cityCode }
   })
@@ -239,7 +239,7 @@ export const getDistrictList = (cityCode) => {
  */
 export const getRegionDetail = (id) => {
   return request({
-    url: `/api/regions/${id}`,
+    url: `/regions/${id}`,
     method: 'get'
   })
 }
@@ -250,7 +250,7 @@ export const getRegionDetail = (id) => {
  */
 export const getRegionByCode = (regionCode) => {
   return request({
-    url: `/api/regions/by-code/${regionCode}`,
+    url: `/regions/by-code/${regionCode}`,
     method: 'get'
   })
 }
@@ -266,7 +266,7 @@ export const getRegionByCode = (regionCode) => {
  */
 export const createRegion = (data) => {
   return request({
-    url: '/api/regions',
+    url: '/regions',
     method: 'post',
     data
   })
@@ -279,7 +279,7 @@ export const createRegion = (data) => {
  */
 export const updateRegion = (id, data) => {
   return request({
-    url: `/api/regions/${id}`,
+    url: `/regions/${id}`,
     method: 'put',
     data
   })
@@ -291,7 +291,7 @@ export const updateRegion = (id, data) => {
  */
 export const deleteRegion = (id) => {
   return request({
-    url: `/api/regions/${id}`,
+    url: `/regions/${id}`,
     method: 'delete'
   })
 }
@@ -302,7 +302,7 @@ export const deleteRegion = (id) => {
  */
 export const importRegions = (regions) => {
   return request({
-    url: '/api/regions/import',
+    url: '/regions/import',
     method: 'post',
     data: regions
   })

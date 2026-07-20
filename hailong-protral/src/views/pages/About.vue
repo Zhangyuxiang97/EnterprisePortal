@@ -512,7 +512,7 @@ const closeImagePreview = () => {
 // 业务范围点击处理
 const handleBusinessClick = (id) => {
   router.push({
-    path: `/detail/business-scope/${id}`,
+    path: `/business-scope/${id}`,
     query: { from: 'about', tab: 'business' }
   })
 }
@@ -520,7 +520,7 @@ const handleBusinessClick = (id) => {
 // 重要业绩点击处理
 const handleAchievementClick = (id) => {
   router.push({
-    path: `/detail/achievement/${id}`,
+    path: `/achievement/${id}`,
     query: { from: 'about', tab: 'achievements' }
   })
 }
@@ -528,7 +528,7 @@ const handleAchievementClick = (id) => {
 // 企业资质点击处理
 const handleQualificationClick = (id) => {
   router.push({
-    path: `/detail/qualification/${id}`,
+    path: `/qualification/${id}`,
     query: { from: 'about', tab: 'qualifications' }
   })
 }

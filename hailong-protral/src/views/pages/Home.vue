@@ -151,28 +151,28 @@ const enabledModules = computed(() => {
 const handleBusinessClick = (id) => {
   const savedScrollPosition = window.scrollY
   sessionStorage.setItem('homeScrollPosition', savedScrollPosition.toString())
-  router.push(`/detail/business-scope/${id}`)
+  router.push(`/business-scope/${id}`)
 }
 
 // 重要业绩点击处理
 const handleAchievementClick = (id) => {
   const savedScrollPosition = window.scrollY
   sessionStorage.setItem('homeScrollPosition', savedScrollPosition.toString())
-  router.push(`/detail/achievement/${id}`)
+  router.push(`/achievement/${id}`)
 }
 
 // 公告信息点击处理
 const handleAnnouncementClick = (id) => {
   const savedScrollPosition = window.scrollY
   sessionStorage.setItem('homeScrollPosition', savedScrollPosition.toString())
-  router.push(`/detail/announcement/${id}`)
+  router.push(`/announcement/${id}`)
 }
 
 // 企业资质点击处理
 const handleQualificationClick = (id) => {
   const savedScrollPosition = window.scrollY
   sessionStorage.setItem('homeScrollPosition', savedScrollPosition.toString())
-  router.push(`/detail/qualification/${id}`)
+  router.push(`/qualification/${id}`)
 }
 
 // 恢复滚动条位置

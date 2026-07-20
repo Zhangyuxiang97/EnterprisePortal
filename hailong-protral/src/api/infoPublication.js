@@ -16,7 +16,7 @@ import request from './request'
  */
 export function getInfoPublicationList(params) {
   return request({
-    url: '/api/info-publications',
+    url: '/info-publications',
     method: 'get',
     params: {
       type: params.type,
@@ -39,7 +39,7 @@ export function getInfoPublicationList(params) {
  */
 export function getInfoPublicationDetail(id) {
   return request({
-    url: `/api/info-publications/${id}`,
+    url: `/info-publications/${id}`,
     method: 'get'
   })
 }
@@ -51,7 +51,7 @@ export function getInfoPublicationDetail(id) {
  */
 export function getCompanyNewsList(params) {
   return request({
-    url: '/api/info-publications/company-news',
+    url: '/info-publications/company-news',
     method: 'get',
     params: {
       category: params.category,
@@ -73,7 +73,7 @@ export function getCompanyNewsList(params) {
  */
 export function getPolicyRegulationsList(params) {
   return request({
-    url: '/api/info-publications/policy-regulations',
+    url: '/info-publications/policy-regulations',
     method: 'get',
     params: {
       category: params.category,
@@ -95,7 +95,7 @@ export function getPolicyRegulationsList(params) {
  */
 export function getPolicyInfoList(params) {
   return request({
-    url: '/api/info-publications/policy-info',
+    url: '/info-publications/policy-info',
     method: 'get',
     params: {
       category: params.category,
@@ -117,7 +117,7 @@ export function getPolicyInfoList(params) {
  */
 export function getNoticesList(params) {
   return request({
-    url: '/api/info-publications/notices',
+    url: '/info-publications/notices',
     method: 'get',
     params: {
       category: params.category,

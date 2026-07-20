@@ -333,7 +333,7 @@ const handlePageChange = (page) => {
 
 // 查看详情
 const handleViewDetail = (id) => {
-  router.push(`/detail/policy/${id}`)
+  router.push(`/policy/${id}`)
 }
 
 // 监听路由 Query 变化并重新加载数据
