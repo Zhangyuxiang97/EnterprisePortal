@@ -1,5 +1,5 @@
 <template>
-  <nav class="fixed top-0 left-0 right-0 z-50 bg-hailong-dark/90 backdrop-blur-md text-white shadow-2xl border-b border-hailong-cyan/30">
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-hailong-dark/90 backdrop-blur-md text-white shadow-2xl border-b border-white/10">
     <div class="container-wide">
       <div class="flex items-center justify-between h-20">
         <div class="flex items-center space-x-3">
@@ -52,7 +52,7 @@
       </div>
     </div>
     <!-- 移动端菜单 -->
-    <div v-if="showMobileMenu" class="md:hidden bg-hailong-dark/95 border-t border-hailong-cyan/30">
+    <div v-if="showMobileMenu" class="md:hidden bg-hailong-dark/95 border-t border-white/10">
       <div class="container-wide py-4">
         <template v-for="link in navLinks" :key="link.name">
           <!-- 带子菜单的导航项 -->

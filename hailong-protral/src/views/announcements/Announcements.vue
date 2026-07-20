@@ -10,10 +10,10 @@
       
       <div class="relative z-10 max-w-4xl mx-auto px-6">
         <h1 class="text-4xl md:text-5xl font-extrabold mb-4 font-tech tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-200 bg-clip-text text-transparent">
-          招标采购公告平台
+          公告信息
         </h1>
         <p class="text-base md:text-lg text-slate-300 font-medium max-w-2xl mx-auto mb-6">
-          实时发布最权威的国家政府采购与工程建设招投标动态信息
+          实时发布最权威的政府采购与建设工程招投标动态信息
         </p>
         
         <!-- 数据活跃面板 -->

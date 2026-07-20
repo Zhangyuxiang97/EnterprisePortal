@@ -3,8 +3,8 @@
   <div class="py-24 bg-gradient-to-b from-white via-slate-50/50 to-gray-50/50">
     <div class="container-wide">
       <div class="text-center mb-16">
-        <h2 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-4 font-tech tracking-tight">交易数据可视化</h2>
-        <div class="w-16 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto rounded-full"></div>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 font-tech tracking-tight">交易数据可视化</h2>
+        <div class="w-12 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto rounded-full mt-3"></div>
       </div>
       
       <div v-if="statisticsLoading" class="text-center py-20 bg-white rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">

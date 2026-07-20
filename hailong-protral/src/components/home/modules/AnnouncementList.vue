@@ -2,8 +2,8 @@
   <div class="py-24 bg-gradient-to-b from-white via-slate-50/50 to-blue-50/20">
     <div class="container-wide">
       <div class="text-center mb-16">
-        <h2 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-4 font-tech tracking-tight">最新公告信息</h2>
-        <div class="w-16 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto rounded-full"></div>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 font-tech tracking-tight">公告信息</h2>
+        <div class="w-12 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto rounded-full mt-3"></div>
       </div>
       
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">

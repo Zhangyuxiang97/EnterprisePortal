@@ -2,8 +2,8 @@
   <div class="py-24 bg-gradient-to-b from-blue-50/30 to-gray-50">
     <div class="container-wide">
       <div class="text-center mb-16">
-        <h2 class="text-5xl font-bold text-hailong-dark mb-4 font-tech">业务范围</h2>
-        <div class="w-24 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto"></div>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 font-tech tracking-tight">业务范围</h2>
+        <div class="w-12 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto rounded-full mt-3"></div>
       </div>
       <div v-if="loading" class="text-center py-8 text-gray-500">加载中...</div>
       <div v-else-if="businessList.length === 0" class="text-center py-8 text-gray-500">暂无业务范围数据</div>
