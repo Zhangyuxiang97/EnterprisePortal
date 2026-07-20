@@ -18,36 +18,47 @@
       </div>
     </div>
 
-    <!-- 内容区域 - 列表 -->
-    <div v-if="!selectedHashId" class="py-16 bg-white">
+    <!-- 内容区域 -->
+    <div class="py-16 bg-white">
       <div class="container-wide">
         <div class="animate-fade-in">
       <!-- 搜索筛选区域 -->
-      <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+      <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-[0_12px_40px_rgba(30,41,59,0.03)] border border-slate-100/80 p-6 mb-6">
         <!-- 关键字搜索 - 主搜索框 -->
         <div class="mb-5">
           <div class="flex gap-3">
-            <div class="relative flex-1">
-              <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="relative flex-1 group">
+              <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
                 v-model="searchParams.keyword"
                 type="text"
                 placeholder="请输入项目名称、招标单位等关键字"
-                class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all"
+                class="w-full pl-12 pr-10 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-hailong-primary/20 focus:border-hailong-primary outline-none transition-all text-sm hover:border-slate-300 bg-slate-50/50 focus:bg-white focus:shadow-[0_4px_20px_rgba(40,120,255,0.06)]"
                 @keyup.enter="handleSearch"
               />
+              <!-- 一键清除按钮 -->
+              <button
+                v-if="searchParams.keyword"
+                @click="clearKeyword"
+                class="absolute right-3.5 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 hover:scale-110 active:scale-95 transition-all focus:outline-none"
+                title="清除关键字"
+              >
+                <svg class="w-4 h-4 transition-transform hover:rotate-90 duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
             <button
               @click="handleSearch"
-              class="px-8 py-3 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white rounded-lg hover:shadow-lg transition-all font-medium"
+              class="px-8 py-3 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white rounded-xl hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 font-bold text-sm"
             >
               搜索
             </button>
             <button
               @click="handleReset"
-              class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium"
+              class="px-6 py-3 bg-slate-50 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-100 hover:border-slate-300 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 font-bold text-sm"
             >
               重置
             </button>
@@ -55,19 +66,19 @@
         </div>
 
         <!-- 筛选条件 -->
-        <div class="space-y-3 pt-3 border-t border-gray-100">
+        <div class="space-y-4 pt-3 border-t border-slate-100">
           <!-- 业务类型和采购类型 -->
-          <div class="flex items-center gap-4 flex-wrap">
-            <label class="text-sm font-medium text-gray-700 whitespace-nowrap w-16">业务类型</label>
+          <div class="flex items-center gap-4 flex-wrap pb-4 border-b border-dashed border-slate-100">
+            <label class="text-xs font-bold text-slate-400 whitespace-nowrap w-16">业务类型</label>
             <button
               v-for="type in businessTypes"
               :key="type.value"
               @click="handleBusinessTypeChange(type.value)"
               :class="[
-                'px-5 py-1.5 rounded-lg text-sm font-medium transition-all',
+                'px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200',
                 searchParams.businessType === type.value
-                  ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-md shadow-blue-500/10'
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
               ]"
             >
               {{ type.label }}
@@ -75,16 +86,16 @@
 
             <!-- 采购类型 - 仅在选择政府采购时显示 -->
             <template v-if="searchParams.businessType === 'GOV_PROCUREMENT'">
-              <label class="text-sm font-medium text-gray-700 whitespace-nowrap w-16 ml-6">采购类型</label>
+              <label class="text-xs font-bold text-slate-400 whitespace-nowrap w-16 ml-6">采购类型</label>
               <button
                 v-for="type in procurementTypes"
                 :key="type.value"
-                @click="searchParams.procurementType = type.value"
+                @click="handleProcurementTypeChange(type.value)"
                 :class="[
-                  'px-5 py-1.5 rounded-lg text-sm font-medium transition-all',
+                  'px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200',
                   searchParams.procurementType === type.value
-                    ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-md'
+                    : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
                 ]"
               >
                 {{ type.label }}
@@ -93,18 +104,18 @@
           </div>
 
           <!-- 公告类型 -->
-          <div class="flex items-center gap-4">
-            <label class="text-sm font-medium text-gray-700 whitespace-nowrap w-16">公告类型</label>
+          <div class="flex items-center gap-4 pb-4 border-b border-dashed border-slate-100">
+            <label class="text-xs font-bold text-slate-400 whitespace-nowrap w-16">公告类型</label>
             <div class="flex flex-wrap gap-2">
               <button
                 v-for="type in currentAnnouncementTypes"
                 :key="type.value"
-                @click="searchParams.noticeType = type.value"
+                @click="handleNoticeTypeChange(type.value)"
                 :class="[
-                  'px-5 py-1.5 rounded-lg text-sm font-medium transition-all',
+                  'px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200',
                   searchParams.noticeType === type.value
-                    ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-md'
+                    : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
                 ]"
               >
                 {{ type.label }}
@@ -115,18 +126,18 @@
           <!-- 项目区域和发布时间 -->
           <div class="flex items-center gap-4 flex-wrap">
             <div class="flex items-center gap-4">
-              <label class="text-sm font-medium text-gray-700 whitespace-nowrap w-16">项目区域</label>
+              <label class="text-xs font-bold text-slate-400 whitespace-nowrap w-16">项目区域</label>
               
               <!-- 省份选择 -->
               <div class="relative">
-                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 <select
                   v-model="searchParams.province"
                   @change="onProvinceChange"
-                  class="pl-9 pr-8 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all text-sm bg-white hover:border-hailong-primary cursor-pointer appearance-none"
+                  class="pl-9 pr-8 py-1.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-hailong-primary/20 focus:border-hailong-primary outline-none transition-all text-xs font-semibold hover:border-slate-300 bg-white cursor-pointer appearance-none"
                   style="min-width: 120px;"
                 >
                   <option value="">全部省份</option>
@@ -134,20 +145,20 @@
                     {{ province.regionName }}
                   </option>
                 </select>
-                <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
 
               <!-- 城市选择 -->
               <div class="relative" v-if="searchParams.province">
-                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 <select
                   v-model="searchParams.city"
                   @change="onCityChange"
-                  class="pl-9 pr-8 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all text-sm bg-white hover:border-hailong-primary cursor-pointer appearance-none"
+                  class="pl-9 pr-8 py-1.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-hailong-primary/20 focus:border-hailong-primary outline-none transition-all text-xs font-semibold hover:border-slate-300 bg-white cursor-pointer appearance-none"
                   style="min-width: 120px;"
                 >
                   <option value="">全部城市</option>
@@ -155,19 +166,20 @@
                     {{ city.regionName }}
                   </option>
                 </select>
-                <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
 
               <!-- 区县选择 -->
               <div class="relative" v-if="searchParams.city">
-                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
                 <select
                   v-model="searchParams.district"
-                  class="pl-9 pr-8 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all text-sm bg-white hover:border-hailong-primary cursor-pointer appearance-none"
+                  @change="onDistrictChange"
+                  class="pl-9 pr-8 py-1.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-hailong-primary/20 focus:border-hailong-primary outline-none transition-all text-xs font-semibold hover:border-slate-300 bg-white cursor-pointer appearance-none"
                   style="min-width: 120px;"
                 >
                   <option value="">全部区县</option>
@@ -175,22 +187,22 @@
                     {{ district.regionName }}
                   </option>
                 </select>
-                <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
             </div>
 
-            <label class="text-sm font-medium text-gray-700 whitespace-nowrap w-16">发布时间</label>
+            <label class="text-xs font-bold text-slate-400 whitespace-nowrap w-16 ml-2">发布时间</label>
             <button
               v-for="time in timeRanges"
               :key="time.value"
               @click="selectTimeRange(time.value)"
               :class="[
-                'px-4 py-1.5 rounded-lg text-sm font-medium transition-all',
+                'px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200',
                 searchParams.timeRange === time.value
-                  ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-md'
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
               ]"
             >
               {{ time.label }}
@@ -198,13 +210,13 @@
             <button
               @click="showCustomDatePicker = !showCustomDatePicker"
               :class="[
-                'px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1',
+                'px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1',
                 searchParams.timeRange === 'custom'
-                  ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-md'
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
               ]"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               自定义
@@ -213,26 +225,26 @@
             <!-- 自定义日期选择器 -->
             <template v-if="showCustomDatePicker">
               <div class="relative">
-                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 <input
                   type="date"
                   v-model="searchParams.startDate"
                   @change="onCustomDateChange"
-                  class="pl-9 pr-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all text-sm hover:border-hailong-primary"
+                  class="pl-9 pr-3 py-1.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-hailong-primary/20 focus:border-hailong-primary outline-none transition-all text-xs font-semibold hover:border-slate-300 bg-white"
                 />
               </div>
-              <span class="text-gray-500 text-sm font-medium">至</span>
+              <span class="text-slate-400 text-xs font-bold self-center">至</span>
               <div class="relative">
-                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 <input
                   type="date"
                   v-model="searchParams.endDate"
                   @change="onCustomDateChange"
-                  class="pl-9 pr-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all text-sm hover:border-hailong-primary"
+                  class="pl-9 pr-3 py-1.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-hailong-primary/20 focus:border-hailong-primary outline-none transition-all text-xs font-semibold hover:border-slate-300 bg-white"
                 />
               </div>
             </template>
@@ -246,9 +258,26 @@
       </div>
 
       <!-- 公告列表 -->
-      <div v-if="loading" class="text-center py-32 bg-white rounded-2xl shadow-sm border border-slate-100">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-hailong-primary border-t-transparent"></div>
-        <p class="mt-4 text-slate-400 text-sm">正在获取公告列表...</p>
+      <div v-if="loading" class="space-y-4">
+        <div v-for="i in 3" :key="i" class="bg-white rounded-2xl p-6 border border-slate-100/80 shadow-sm animate-pulse space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex gap-2">
+              <div class="w-16 h-5 bg-slate-200 rounded"></div>
+              <div class="w-12 h-5 bg-slate-100 rounded"></div>
+            </div>
+            <div class="w-16 h-5 bg-slate-100 rounded"></div>
+          </div>
+          <div class="h-6 bg-slate-200 rounded w-3/4"></div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="h-4 bg-slate-100 rounded w-1/2"></div>
+            <div class="h-4 bg-slate-100 rounded w-1/3"></div>
+            <div class="h-4 bg-slate-100 rounded w-1/4"></div>
+          </div>
+          <div class="pt-3 border-t border-slate-100/50 flex justify-between">
+            <div class="w-20 h-4 bg-slate-100 rounded"></div>
+            <div class="w-16 h-4 bg-slate-200 rounded"></div>
+          </div>
+        </div>
       </div>
 
       <div v-else-if="announcements.length === 0" class="text-center py-24 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-100">
@@ -267,7 +296,7 @@
           :key="announcement.id"
           @click="handleViewDetail(announcement.hashId || announcement.id)"
           :class="[
-            'group bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100/80 transition-all duration-300 cursor-pointer border-l-4 flex flex-col gap-4',
+            'group bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100/80 transition-all duration-300 cursor-pointer border-l-4 hover:border-l-[6px] flex flex-col gap-4',
             announcement.businessType === 'GOV_PROCUREMENT' ? 'border-l-hailong-primary' :
             announcement.businessType === 'CONSTRUCTION' ? 'border-l-hailong-secondary' : 'border-l-hailong-primary'
           ]"
@@ -297,7 +326,7 @@
                  announcement.procurementType === 'service' ? '服务' :
                  announcement.procurementType === 'project' ? '工程' : announcement.procurementType }}
             </span>
-
+ 
             <!-- 公告类型 - 优化样式 -->
             <span
               :class="[
@@ -314,34 +343,43 @@
               {{ announcement.noticeTypeName }}
             </span>
           </div>
-
+ 
           <!-- 标题 -->
           <h3 class="text-base md:text-lg font-bold text-slate-800 leading-snug group-hover:text-hailong-primary transition-colors line-clamp-2">
             {{ announcement.title }}
           </h3>
-
+ 
           <!-- 中标人信息 -->
-          <div v-if="announcement.winner" class="p-3 bg-gradient-to-r from-emerald-50/50 to-teal-50/30 border-l-4 border-emerald-500 rounded-lg shadow-sm">
-            <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              <span class="text-xs text-slate-500 font-semibold">中标人：</span>
-              <span class="text-sm text-slate-800 font-bold">{{ announcement.winner }}</span>
+          <div v-if="announcement.winner" class="p-3.5 bg-gradient-to-r from-emerald-50/40 via-teal-50/15 to-transparent border-l-4 border-emerald-500 rounded-r-xl rounded-l-md shadow-[sm_0_2px_8px_rgba(16,185,129,0.02)] flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2 min-w-0">
+              <div class="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span class="text-xs text-slate-400 font-bold shrink-0">中标人：</span>
+              <span class="text-sm text-emerald-800 font-extrabold truncate">{{ announcement.winner }}</span>
+            </div>
+            <div class="shrink-0 flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-100/50 px-2 py-0.5 rounded-full border border-emerald-200/30">
+              <span class="relative flex h-1.5 w-1.5 shrink-0">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+              </span>
+              中标喜报
             </div>
           </div>
-
+ 
           <!-- 其他详细信息 -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs md:text-sm text-slate-500">
             <div v-if="announcement.bidder" class="flex items-center gap-1.5 min-w-0">
-              <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-slate-400 group-hover:text-hailong-primary transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
               <span class="text-slate-400 whitespace-nowrap">招标人：</span>
               <span class="text-slate-600 font-medium truncate">{{ announcement.bidder }}</span>
             </div>
             <div v-if="announcement.projectRegion" class="flex items-center gap-1.5">
-              <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-slate-400 group-hover:text-hailong-secondary transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -349,14 +387,14 @@
               <span class="text-slate-600 font-medium">{{ announcement.projectRegion }}</span>
             </div>
             <div v-if="announcement.publishTime" class="flex items-center gap-1.5">
-              <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               <span class="text-slate-400 whitespace-nowrap">发布时间：</span>
               <span class="text-slate-600 font-medium">{{ formatDate(announcement.publishTime) }}</span>
             </div>
           </div>
-
+ 
           <!-- 底部信息 -->
           <div class="flex items-center justify-between pt-3 border-t border-slate-100/60 text-xs text-slate-400">
             <div class="flex items-center gap-4">
@@ -425,21 +463,15 @@
       </div>
     </div>
 
-    <!-- 内容区域 - 详情 -->
-    <div v-else class="py-16 bg-white">
-      <AnnouncementDetail :hashId="selectedHashId" :embedded="true" @back="handleBackToList" />
-    </div>
-
     <Footer />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
-import AnnouncementDetail from '@/views/details/AnnouncementDetail.vue'
 import { getAnnouncementList } from '@/api/announcement.js'
 import { getProvinceList, getCityList, getDistrictList } from '@/api/region.js'
 
@@ -533,7 +565,6 @@ const announcements = ref([])
 const total = ref(0)
 const currentPage = ref(1)
 const pageSize = ref(10)
-const selectedHashId = ref(null)
 
 // 加载省份列表
 const loadProvinces = async () => {
@@ -727,7 +758,13 @@ const loadAnnouncements = async () => {
 // 搜索
 const handleSearch = () => {
   currentPage.value = 1
-  loadAnnouncements()
+  updateUrlQuery()
+}
+
+// 清除关键字
+const clearKeyword = () => {
+  searchParams.value.keyword = ''
+  handleSearch()
 }
 
 // 重置
@@ -750,20 +787,38 @@ const handleReset = () => {
   selectedProvinceCode.value = ''
   selectedCityCode.value = ''
   currentPage.value = 1
-  loadAnnouncements()
+  updateUrlQuery()
+}
+
+// 采购类型改变
+const handleProcurementTypeChange = (value) => {
+  searchParams.value.procurementType = value
+  currentPage.value = 1
+  updateUrlQuery()
+}
+
+// 公告类型改变
+const handleNoticeTypeChange = (value) => {
+  searchParams.value.noticeType = value
+  currentPage.value = 1
+  updateUrlQuery()
+}
+
+// 区县选择改变
+const onDistrictChange = () => {
+  currentPage.value = 1
+  updateUrlQuery()
 }
 
 // 查看详情
 const handleViewDetail = (hashId) => {
-  selectedHashId.value = hashId
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  router.push(`/announcement/${hashId}`)
 }
 
 // 分页变化
 const handlePageChange = (page) => {
   currentPage.value = page
-  loadAnnouncements()
-  // 滚动到顶部
+  updateUrlQuery()
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
@@ -823,9 +878,139 @@ const getTypeStyle = (typeName) => {
   return 'bg-gray-50 text-gray-600'
 }
 
+// 动态同步筛选条件至 URL Query
+const updateUrlQuery = () => {
+  const query = {}
+  if (searchParams.value.businessType) query.tab = searchParams.value.businessType
+  if (searchParams.value.noticeType) query.noticeType = searchParams.value.noticeType
+  if (searchParams.value.procurementType) query.procurementType = searchParams.value.procurementType
+  if (searchParams.value.keyword) query.keyword = searchParams.value.keyword
+  if (searchParams.value.province) query.province = searchParams.value.province
+  if (searchParams.value.city) query.city = searchParams.value.city
+  if (searchParams.value.district) query.district = searchParams.value.district
+  if (searchParams.value.timeRange) query.timeRange = searchParams.value.timeRange
+  if (searchParams.value.startDate) query.startDate = searchParams.value.startDate
+  if (searchParams.value.endDate) query.endDate = searchParams.value.endDate
+  if (currentPage.value > 1) query.page = currentPage.value
+
+  router.replace({ query }).catch(err => {
+    if (err.name !== 'NavigationDuplicated') console.error(err)
+  })
+}
+
+// 侦听 URL 变化，还原筛选条件并请求数据
+watch(
+  () => route.query,
+  async (newQuery) => {
+    if (route.name !== 'Announcements') return
+    searchParams.value.businessType = newQuery.tab || ''
+    searchParams.value.noticeType = newQuery.noticeType || ''
+    searchParams.value.procurementType = newQuery.procurementType || ''
+    searchParams.value.keyword = newQuery.keyword || ''
+    searchParams.value.timeRange = newQuery.timeRange || ''
+    searchParams.value.startDate = newQuery.startDate || ''
+    searchParams.value.endDate = newQuery.endDate || ''
+    currentPage.value = parseInt(newQuery.page) || 1
+
+    if (newQuery.timeRange === 'custom') {
+      showCustomDatePicker.value = true
+    } else {
+      showCustomDatePicker.value = false
+    }
+
+    searchParams.value.province = newQuery.province || ''
+    if (newQuery.province) {
+      const province = provinces.value.find(p => p.regionName === newQuery.province)
+      if (province) {
+        selectedProvinceCode.value = province.regionCode
+        await loadCities(province.regionCode)
+        
+        searchParams.value.city = newQuery.city || ''
+        if (newQuery.city) {
+          const city = cities.value.find(c => c.regionName === newQuery.city)
+          if (city) {
+            selectedCityCode.value = city.regionCode
+            await loadDistricts(city.regionCode)
+            searchParams.value.district = newQuery.district || ''
+          }
+        } else {
+          selectedCityCode.value = ''
+          districts.value = []
+          searchParams.value.district = ''
+        }
+      }
+    } else {
+      selectedProvinceCode.value = ''
+      cities.value = []
+      selectedCityCode.value = ''
+      districts.value = []
+      searchParams.value.city = ''
+      searchParams.value.district = ''
+    }
+
+    await loadAnnouncements()
+  },
+  { deep: true }
+)
+
+// 离开路由前将 query 暂存至 sessionStorage
+import { onBeforeRouteLeave } from 'vue-router'
+onBeforeRouteLeave((to, from) => {
+  sessionStorage.setItem('announcements_query', JSON.stringify(route.query))
+})
+
 // 初始化
 onMounted(async () => {
   await loadProvinces()
+  
+  // 若 URL query 为空，尝试从 sessionStorage 恢复缓存的条件
+  if (Object.keys(route.query).length === 0) {
+    const savedQueryStr = sessionStorage.getItem('announcements_query')
+    if (savedQueryStr) {
+      try {
+        const savedQuery = JSON.parse(savedQueryStr)
+        if (Object.keys(savedQuery).length > 0) {
+          router.replace({ query: savedQuery })
+          return // 让 watch(route.query) 去接管数据加载流程
+        }
+      } catch (e) {
+        console.error('解析缓存的公告列表查询参数失败:', e)
+      }
+    }
+  }
+
+  const query = route.query
+  searchParams.value.businessType = query.tab || ''
+  searchParams.value.noticeType = query.noticeType || ''
+  searchParams.value.procurementType = query.procurementType || ''
+  searchParams.value.keyword = query.keyword || ''
+  searchParams.value.timeRange = query.timeRange || ''
+  searchParams.value.startDate = query.startDate || ''
+  searchParams.value.endDate = query.endDate || ''
+  currentPage.value = parseInt(query.page) || 1
+
+  if (query.timeRange === 'custom') {
+    showCustomDatePicker.value = true
+  }
+
+  if (query.province) {
+    const province = provinces.value.find(p => p.regionName === query.province)
+    if (province) {
+      selectedProvinceCode.value = province.regionCode
+      await loadCities(province.regionCode)
+      searchParams.value.city = query.city || ''
+      
+      if (query.city) {
+        const city = cities.value.find(c => c.regionName === query.city)
+        if (city) {
+          selectedCityCode.value = city.regionCode
+          await loadDistricts(city.regionCode)
+          searchParams.value.district = query.district || ''
+        }
+      }
+    }
+  }
+  
   await loadAnnouncements()
 })
 </script>

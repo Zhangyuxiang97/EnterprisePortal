@@ -22,14 +22,14 @@ const routes = [
     component: () => import('@/views/details/AnnouncementDetail.vue')
   },
   {
-    path: '/company-announcements',
-    name: 'CompanyAnnouncements',
-    component: () => import('@/views/announcements/CompanyAnnouncements.vue')
+    path: '/news',
+    name: 'News',
+    component: () => import('@/views/news/News.vue')
   },
   {
-    path: '/company-announcement/:id',
-    name: 'CompanyAnnouncementDetail',
-    component: () => import('@/views/details/CompanyAnnouncementDetail.vue')
+    path: '/news/:id',
+    name: 'NewsDetail',
+    component: () => import('@/views/news/NewsDetail.vue')
   },
   {
     path: '/business-scope/:id',

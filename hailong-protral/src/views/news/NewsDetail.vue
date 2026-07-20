@@ -10,7 +10,7 @@
           <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
-          <router-link to="/company-announcements" class="hover:text-hailong-primary transition-colors">新闻中心</router-link>
+          <router-link to="/news" class="hover:text-hailong-primary transition-colors">新闻中心</router-link>
           <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
@@ -32,7 +32,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <p class="text-gray-500 mb-4">{{ error }}</p>
-          <router-link to="/company-announcements" class="text-hailong-primary hover:underline">返回列表</router-link>
+          <router-link to="/news" class="text-hailong-primary hover:underline">返回列表</router-link>
         </div>
 
         <div v-else-if="!item" class="text-center py-20">
@@ -40,7 +40,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           <p class="text-gray-500 mb-4">新闻不存在或已被删除</p>
-          <router-link to="/company-announcements" class="text-hailong-primary hover:underline">返回列表</router-link>
+          <router-link to="/news" class="text-hailong-primary hover:underline">返回列表</router-link>
         </div>
 
         <div v-else class="max-w-5xl mx-auto">
@@ -198,7 +198,7 @@
               <router-link
                 v-for="related in relatedItems"
                 :key="related.id"
-                :to="`/company-announcement/${related.id}`"
+                :to="`/news/${related.id}`"
                 class="flex items-start gap-4 p-4 rounded-lg hover:bg-gray-50 transition-colors group"
               >
                 <div class="flex-shrink-0 w-2 h-2 bg-hailong-primary rounded-full mt-2"></div>
@@ -218,7 +218,7 @@
           <!-- 操作按钮 -->
           <div class="flex items-center justify-between">
             <router-link
-              to="/company-announcements"
+              to="/news"
               class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium flex items-center gap-2"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -388,7 +388,7 @@ const loadItemDetail = async () => {
         tags: [] // 后端暂无tags字段，可以后续扩展
       }
       
-      // TODO: 加载相关新闻（可以后续实现）
+      // 相关新闻（可以后续实现）
       relatedItems.value = []
     } else {
       error.value = response.message || '获取新闻详情失败'

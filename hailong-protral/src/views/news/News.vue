@@ -209,9 +209,10 @@
     <Footer />
   </div>
 </template>
+
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import { getCompanyNewsList } from '@/api/infoPublication'
@@ -343,14 +344,14 @@ const getTypeStyle = (category) => {
 
 // 查看详情
 const handleViewDetail = (id) => {
-  router.push(`/company-announcement/${id}`)
+  router.push(`/news/${id}`)
 }
 
 // 监听路由 Query 变化并重新加载数据
 watch(
   () => route.query,
   async (newQuery) => {
-    if (route.name !== 'CompanyAnnouncements') return
+    if (route.name !== 'News') return
     keyword.value = newQuery.keyword || ''
     currentPage.value = parseInt(newQuery.page) || 1
     await loadItems()
@@ -359,9 +360,8 @@ watch(
 )
 
 // 离开路由前将 query 暂存至 sessionStorage
-import { onBeforeRouteLeave } from 'vue-router'
 onBeforeRouteLeave((to, from) => {
-  sessionStorage.setItem('company_announcements_query', JSON.stringify(route.query))
+  sessionStorage.setItem('news_query', JSON.stringify(route.query))
 })
 
 // 组件挂载时加载数据
@@ -369,7 +369,7 @@ onMounted(async () => {
   let query = route.query
   // 若 URL query 为空，尝试从 sessionStorage 恢复缓存的条件
   if (Object.keys(query).length === 0) {
-    const savedQueryStr = sessionStorage.getItem('company_announcements_query')
+    const savedQueryStr = sessionStorage.getItem('news_query')
     if (savedQueryStr) {
       try {
         const savedQuery = JSON.parse(savedQueryStr)

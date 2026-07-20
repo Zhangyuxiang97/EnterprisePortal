@@ -273,10 +273,14 @@ const currentAttachment = ref({})
 
 // 返回上一页
 const goBack = () => {
-  if (props.hashId) {
+  if (props.hashId && props.embedded) {
     emit('back')
   } else {
-    router.back()
+    if (window.history.length <= 1) {
+      router.push('/announcements')
+    } else {
+      router.back()
+    }
   }
 }
 
