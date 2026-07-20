@@ -1,25 +1,30 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-hailong-dark via-hailong-primary to-hailong-secondary">
+  <div class="min-h-screen bg-slate-50/50">
     <Header />
 
-    <!-- 页面标题 -->
-    <div class="pt-32 pb-16 text-center text-white">
-      <h1
-        class="text-6xl font-bold mb-4 font-tech bg-gradient-to-r from-white via-hailong-cyan to-white bg-clip-text text-transparent animate-fade-in">
-        联系我们
-      </h1>
-      <p class="text-xl text-gray-200">期待与您的合作,共创美好未来</p>
+    <!-- 页面头部 Hero Banner -->
+    <div class="relative pt-32 pb-20 text-center text-white overflow-hidden bg-gradient-to-br from-hailong-dark via-slate-900 to-indigo-950">
+      <!-- 几何网格与光晕背景 -->
+      <div class="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
+      <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-hailong-primary/10 rounded-full blur-[120px] pointer-events-none animate-float"></div>
+      
+      <div class="relative z-10 max-w-4xl mx-auto px-6">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 font-tech tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-200 bg-clip-text text-transparent">
+          联系我们
+        </h1>
+        <p class="text-base md:text-lg text-slate-300 font-medium max-w-2xl mx-auto">期待与您的合作，共创美好未来</p>
+      </div>
     </div>
 
     <!-- 内容区域 -->
-    <div class="py-16 bg-white">
+    <div class="py-12">
       <div class="container-wide">
         <div class="animate-fade-in">
           <!-- 联系方式卡片 -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             <!-- 联系电话 -->
             <div
-              class="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary">
+              class="group bg-white rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300">
               <div
                 class="w-16 h-16 bg-gradient-to-br from-hailong-primary/10 to-hailong-secondary/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <svg class="w-8 h-8 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,7 +44,7 @@
 
             <!-- 邮箱地址 -->
             <div
-              class="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary">
+              class="group bg-white rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300">
               <div
                 class="w-16 h-16 bg-gradient-to-br from-hailong-primary/10 to-hailong-secondary/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <svg class="w-8 h-8 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,7 +64,7 @@
 
             <!-- 公司地址 -->
             <div
-              class="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary">
+              class="group bg-white rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300">
               <div
                 class="w-16 h-16 bg-gradient-to-br from-hailong-primary/10 to-hailong-secondary/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <svg class="w-8 h-8 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,7 +84,7 @@
 
             <!-- 工作时间 -->
             <div
-              class="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary">
+              class="group bg-white rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300">
               <div
                 class="w-16 h-16 bg-gradient-to-br from-hailong-primary/10 to-hailong-secondary/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <svg class="w-8 h-8 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,7 +111,7 @@
           <!-- 交通指引与地图位置 -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- 交通指引 -->
-            <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+            <div class="bg-white rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-100">
               <div class="flex items-center mb-6">
                 <div class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mr-4">
                   <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,7 +124,7 @@
               </div>
               <div class="grid grid-cols-1 gap-4">
                 <!-- 地铁 -->
-                <div v-if="transportation.metro.enabled" class="p-4 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl">
+                <div v-if="transportation.metro.enabled" class="p-5 bg-slate-50 border border-slate-100/50 rounded-2xl transition-all hover:shadow-[0_10px_25px_rgba(0,0,0,0.01)]">
                   <div class="flex items-center mb-3">
                     <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-2">
                       <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,7 +142,7 @@
                   </ul>
                 </div>
                 <!-- 公交 -->
-                <div v-if="transportation.bus.enabled" class="p-4 bg-gradient-to-br from-green-50 to-green-100/50 rounded-xl">
+                <div v-if="transportation.bus.enabled" class="p-5 bg-slate-50 border border-slate-100/50 rounded-2xl transition-all hover:shadow-[0_10px_25px_rgba(0,0,0,0.01)]">
                   <div class="flex items-center mb-3">
                     <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-2">
                       <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,7 +158,7 @@
                   </ul>
                 </div>
                 <!-- 自驾 -->
-                <div v-if="transportation.driving.enabled" class="p-4 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl">
+                <div v-if="transportation.driving.enabled" class="p-5 bg-slate-50 border border-slate-100/50 rounded-2xl transition-all hover:shadow-[0_10px_25px_rgba(0,0,0,0.01)]">
                   <div class="flex items-center mb-3">
                     <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center mr-2">
                       <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -170,7 +175,7 @@
                   </ul>
                 </div>
                 <!-- 周边地标 -->
-                <div v-if="transportation.landmarks.length > 0" class="p-4 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl">
+                <div v-if="transportation.landmarks.length > 0" class="p-5 bg-slate-50 border border-slate-100/50 rounded-2xl transition-all hover:shadow-[0_10px_25px_rgba(0,0,0,0.01)]">
                   <div class="flex items-center mb-3">
                     <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mr-2">
                       <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,7 +196,7 @@
             </div>
 
             <!-- 地图位置 -->
-            <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+            <div class="bg-white rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-100">
               <div class="flex items-center mb-6">
                 <div class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mr-4">
                   <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -226,7 +231,7 @@
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div v-for="(faq, index) in faqs" :key="index"
-          class="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all border-l-4 border-hailong-primary">
+          class="bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-[0_12px_30px_rgba(40,120,255,0.03)] border border-slate-100 border-l-4 border-l-hailong-primary transition-all">
           <h4 class="text-lg font-bold text-gray-900 mb-3 flex items-start">
             <span
               class="inline-block w-6 h-6 bg-hailong-primary text-white rounded-full text-sm flex items-center justify-center mr-2 flex-shrink-0 mt-0.5">Q</span>
@@ -369,5 +374,11 @@ const initMap = () => {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.bg-grid-pattern {
+  background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 </style>

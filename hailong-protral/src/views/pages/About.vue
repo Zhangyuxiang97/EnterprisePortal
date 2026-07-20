@@ -1,24 +1,30 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-hailong-dark via-hailong-primary to-hailong-secondary">
+  <div class="min-h-screen bg-slate-50/50">
     <!-- 导航栏 -->
     <Header />
 
-    <!-- 页面标题 -->
-    <div class="pt-32 pb-16 text-center text-white">
-      <h1 class="text-6xl font-bold mb-4 font-tech bg-gradient-to-r from-white via-hailong-cyan to-white bg-clip-text text-transparent animate-fade-in">
-        关于海隆
-      </h1>
-      <p class="text-xl text-gray-200">{{ companyInfo.slogan }}</p>
+    <!-- 页面头部 Hero Banner -->
+    <div class="relative pt-32 pb-20 text-center text-white overflow-hidden bg-gradient-to-br from-hailong-dark via-slate-900 to-indigo-950">
+      <!-- 几何网格与光晕背景 -->
+      <div class="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
+      <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-hailong-primary/10 rounded-full blur-[120px] pointer-events-none animate-float"></div>
+      
+      <div class="relative z-10 max-w-4xl mx-auto px-6">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 font-tech tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-200 bg-clip-text text-transparent">
+          关于海隆
+        </h1>
+        <p class="text-base md:text-lg text-slate-300 font-medium max-w-2xl mx-auto">{{ companyInfo.slogan }}</p>
+      </div>
     </div>
 
     <!-- Tab导航 -->
-    <div class="bg-white backdrop-blur-md sticky top-20 z-40 border-b border-gray-200 shadow-sm">
+    <div class="bg-white/80 backdrop-blur-md sticky top-20 z-40 border-b border-slate-100/80 shadow-sm">
       <div class="container-wide">
         <div class="flex space-x-8 overflow-x-auto">
           <button v-for="tab in tabs" :key="tab.id"
             @click="activeTab = tab.id"
             class="px-6 py-4 text-gray-700 font-medium whitespace-nowrap transition-all border-b-2"
-            :class="activeTab === tab.id ? 'border-hailong-cyan text-hailong-cyan' : 'border-transparent hover:text-hailong-cyan'">
+            :class="activeTab === tab.id ? 'border-hailong-primary text-hailong-primary' : 'border-transparent hover:text-hailong-primary'">
             {{ tab.name }}
           </button>
         </div>
@@ -26,12 +32,12 @@
     </div>
 
     <!-- 内容区域 -->
-    <div class="py-16 bg-white">
+    <div class="py-12">
       <div class="container-wide">
         <!-- 企业简介 -->
         <div v-show="activeTab === 'intro'" class="animate-fade-in">
           <div class="max-w-5xl mx-auto">
-            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200">
+            <div class="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.02)] overflow-hidden border border-slate-100">
               <div v-if="loading" class="p-12 text-center">
                 <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-hailong-primary"></div>
                 <p class="mt-4 text-gray-600">加载中...</p>
@@ -50,10 +56,10 @@
                 </div>
                 <div class="p-12">
                   <div class="mb-8">
-                    <h2 class="text-2xl md:text-3xl font-semibold mb-3 text-hailong-dark tracking-wide">
+                    <h2 class="text-lg md:text-xl font-extrabold text-slate-800 mb-4 pb-3 border-b border-slate-100 flex items-center gap-2.5">
+                      <span class="w-1.5 h-5.5 bg-gradient-to-b from-hailong-primary to-hailong-secondary rounded-full flex-shrink-0"></span>
                       关于海隆
                     </h2>
-                    <div class="w-16 h-0.5 bg-gradient-to-r from-hailong-primary to-hailong-secondary mb-4"></div>
                     <h3 v-if="companyProfile.title" class="text-xl md:text-2xl font-medium text-gray-700 mb-4">
                       {{ companyProfile.title }}
                     </h3>
@@ -81,7 +87,7 @@
           <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div v-for="business in businessScope" :key="business.id"
               @click="handleBusinessClick(business.id)"
-              class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary cursor-pointer">
+              class="group bg-white rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 transition-all duration-300 border border-slate-100 transition-all duration-300 cursor-pointer">
               <div class="h-48 overflow-hidden">
                 <img :src="business.image" :alt="business.name"
                   class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -118,7 +124,7 @@
           <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div v-for="qualification in qualifications" :key="qualification.id"
               @click="handleQualificationClick(qualification.id)"
-              class="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary cursor-pointer">
+              class="group bg-white rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300 cursor-pointer">
               <div class="relative h-40 overflow-hidden bg-gradient-to-br from-hailong-primary/10 to-hailong-secondary/10">
                 <img :src="qualification.image" :alt="qualification.name"
                   class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
@@ -158,7 +164,7 @@
           <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div v-for="achievement in majorAchievements" :key="achievement.id"
               @click="handleAchievementClick(achievement.id)"
-              class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary cursor-pointer">
+              class="group bg-white rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300 cursor-pointer">
               <div class="h-48 overflow-hidden bg-gradient-to-br from-hailong-primary/5 to-hailong-secondary/5">
                 <img
                   :src="achievement.imageUrls && achievement.imageUrls.length > 0 ? achievement.imageUrls[0] : 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop'"
@@ -212,7 +218,7 @@
             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div v-for="honor in honors" :key="honor.id"
                 @click="openImagePreview(honor.imageUrl)"
-                class="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary cursor-pointer">
+                class="group bg-white rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300 cursor-pointer">
                 <div class="h-48 overflow-hidden bg-gradient-to-br from-hailong-primary/5 to-hailong-secondary/5">
                   <img :src="honor.imageUrl" :alt="honor.name"
                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -607,5 +613,11 @@ onMounted(() => {
 .prose :deep(img) {
   border-radius: 0.5rem;
   margin: 1.5em 0;
+}
+
+.bg-grid-pattern {
+  background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 </style>
