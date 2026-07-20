@@ -37,6 +37,20 @@ public interface IAnnouncementRepository : IRepository<Announcement>
         string? procurementType = null,
         DateTime? startDate = null,
         DateTime? endDate = null);
+
+    /// <summary>
+    /// 按区域层级统计符合筛选条件的公告数量
+    /// </summary>
+    Task<Dictionary<string, int>> GetRegionCountsAsync(
+        int regionLevel,
+        string? businessType,
+        string? noticeType,
+        string? procurementType,
+        string? keyword,
+        DateTime? startDate,
+        DateTime? endDate,
+        string? province = null,
+        string? city = null);
     
     /// <summary>
     /// 软删除公告

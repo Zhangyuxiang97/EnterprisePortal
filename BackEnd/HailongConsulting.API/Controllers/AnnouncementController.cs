@@ -43,6 +43,10 @@ public class AnnouncementController : ControllerBase
             var announcement = await _announcementService.CreateAsync(dto);
             return Ok(ApiResponse<AnnouncementDto>.SuccessResult(announcement, "创建公告成功"));
         }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ApiResponse<AnnouncementDto>.FailResult(ex.Message));
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "创建公告失败");
@@ -67,6 +71,10 @@ public class AnnouncementController : ControllerBase
                 return NotFound(ApiResponse<AnnouncementDto>.FailResult("公告不存在"));
             }
             return Ok(ApiResponse<AnnouncementDto>.SuccessResult(announcement, "更新公告成功"));
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ApiResponse<AnnouncementDto>.FailResult(ex.Message));
         }
         catch (Exception ex)
         {
@@ -151,6 +159,24 @@ public class AnnouncementController : ControllerBase
         {
             _logger.LogError(ex, "获取公告列表失败");
             return StatusCode(500, ApiResponse<PagedResult<AnnouncementDto>>.FailResult("获取公告列表失败"));
+        }
+    }
+
+    /// <summary>
+    /// 获取有公告数据的区域筛选项及对应数量
+    /// </summary>
+    [HttpGet("region-options")]
+    public async Task<ActionResult<ApiResponse<AnnouncementRegionOptionsDto>>> GetRegionOptions([FromQuery] AnnouncementQueryDto query)
+    {
+        try
+        {
+            var result = await _announcementService.GetRegionOptionsAsync(query);
+            return Ok(ApiResponse<AnnouncementRegionOptionsDto>.SuccessResult(result, "获取公告区域筛选项成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取公告区域筛选项失败");
+            return StatusCode(500, ApiResponse<AnnouncementRegionOptionsDto>.FailResult("获取公告区域筛选项失败"));
         }
     }
 

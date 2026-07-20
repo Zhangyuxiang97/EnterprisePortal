@@ -204,3 +204,23 @@ public class AnnouncementQueryDto
     public string? SortBy { get; set; } = "PublishTime";
     public string? SortOrder { get; set; } = "desc";
 }
+
+/// <summary>
+/// 公告区域筛选项
+/// </summary>
+public class AnnouncementRegionOptionDto
+{
+    public string RegionCode { get; set; } = string.Empty;
+    public string RegionName { get; set; } = string.Empty;
+    public int Count { get; set; }
+}
+
+/// <summary>
+/// 公告区域筛选项集合
+/// </summary>
+public class AnnouncementRegionOptionsDto
+{
+    public List<AnnouncementRegionOptionDto> Provinces { get; set; } = [];
+    public List<AnnouncementRegionOptionDto> Cities { get; set; } = [];
+    public List<AnnouncementRegionOptionDto> Districts { get; set; } = [];
+}

@@ -2,7 +2,7 @@
 
 ## 文件说明
 
-**重要提示：** 所有 SQL 文件已按执行顺序编号（01-07），MySQL Docker 容器会按字母顺序自动执行。
+**重要提示：** 所有 SQL 文件已按执行顺序编号（01-10），MySQL Docker 容器会按字母顺序自动执行。
 
 ### 1. 01_hailong_consulting_schema.sql
 **数据库结构文件**，包含：
@@ -57,12 +57,16 @@
 ### 9. 09_announcements_correction.sql
 **变更公告数据**，211条
 
+### 10. 10_normalize_announcement_region_codes.sql
+
+将公告表的 `province`、`city`、`district` 统一转换为区域字典编码。无法映射或层级关系错误的值会被清空，完整展示地址仍保留在 `project_region`。
+
 > 数据来源：henanhailong.com，已清洗（HTML清理、区域映射、字段提取）
 > **总计：2375条**
 
 ## 执行顺序
 
-**Docker 部署：** 文件已按执行顺序编号（01-07），MySQL 容器启动时会自动按顺序执行，无需手动操作。
+**Docker 部署：** 文件已按执行顺序编号（01-10），MySQL 容器启动时会自动按顺序执行，无需手动操作。
 
 **手动执行顺序：**
 
@@ -93,6 +97,9 @@ mysql -u root -p hailong_consulting < 08_announcements_result.sql
 
 # 9. 导入变更公告
 mysql -u root -p hailong_consulting < 09_announcements_correction.sql
+
+# 统一公告区域编码（历史库和新导入均需执行）
+mysql -u root -p hailong_consulting < 10_normalize_announcement_region_codes.sql
 ```
 
 或者在MySQL客户端中执行：
@@ -104,7 +111,10 @@ SOURCE /path/to/03_region_dictionary_supplement.sql;
 SOURCE /path/to/04_region_dictionary_supplement_part2.sql;
 SOURCE /path/to/05_region_dictionary_districts.sql;
 SOURCE /path/to/06_region_dictionary_complete.sql;
-SOURCE /path/to/07_announcements_import.sql;
+SOURCE /path/to/07_announcements_bidding.sql;
+SOURCE /path/to/08_announcements_result.sql;
+SOURCE /path/to/09_announcements_correction.sql;
+SOURCE /path/to/10_normalize_announcement_region_codes.sql;
 ```
 
 ## 数据覆盖范围
@@ -173,7 +183,7 @@ GROUP BY notice_type;
 3. **数据冲突**：如果已有数据，可能会出现主键冲突，建议在空数据库中执行
 4. **区县数据**：全国21省份已包含完整区县级数据
 5. **数据更新**：行政区划可能会有调整，使用时请注意数据的时效性
-6. **历史数据**：07_announcements_import.sql 包含从旧网站抓取的历史公告，数据来源为 henanhailong.com
+6. **历史数据**：07、08、09 三个公告脚本包含从旧网站抓取的历史公告，数据来源为 henanhailong.com；导入后必须执行 10 号脚本统一区域编码
 
 ## 数据格式说明
 

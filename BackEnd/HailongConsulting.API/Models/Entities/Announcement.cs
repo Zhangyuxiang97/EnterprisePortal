@@ -76,21 +76,21 @@ public class Announcement
     public DateTime? Deadline { get; set; }
 
     /// <summary>
-    /// 省份
+    /// 省级行政区划编码
     /// </summary>
     [Column("province")]
     [MaxLength(50)]
     public string? Province { get; set; }
 
     /// <summary>
-    /// 城市
+    /// 市级行政区划编码
     /// </summary>
     [Column("city")]
     [MaxLength(50)]
     public string? City { get; set; }
 
     /// <summary>
-    /// 区县
+    /// 区县级行政区划编码
     /// </summary>
     [Column("district")]
     [MaxLength(50)]

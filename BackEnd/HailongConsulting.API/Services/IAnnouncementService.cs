@@ -27,6 +27,11 @@ public interface IAnnouncementService : IAnnouncementStatisticsExtension
     /// 分页查询公告
     /// </summary>
     Task<PagedResult<AnnouncementDto>> GetPagedAsync(AnnouncementQueryDto queryDto);
+
+    /// <summary>
+    /// 获取仅包含有公告数据的区域筛选项及数量
+    /// </summary>
+    Task<AnnouncementRegionOptionsDto> GetRegionOptionsAsync(AnnouncementQueryDto queryDto);
     
     /// <summary>
     /// 删除公告

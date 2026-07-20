@@ -7,9 +7,9 @@ import request from './request'
  * @param {string} params.keyword - 关键词搜索
  * @param {string} params.noticeType - 公告类型 (bidding: 招标/采购公告, correction: 更正公告, result: 结果公告)
  * @param {string} params.procurementType - 采购类型 (goods: 货物, service: 服务, project: 工程)
- * @param {string} params.province - 省份
- * @param {string} params.city - 城市
- * @param {string} params.district - 区县
+ * @param {string} params.province - 省份编码
+ * @param {string} params.city - 城市编码
+ * @param {string} params.district - 区县编码
  * @param {string} params.startDate - 开始日期 (YYYY-MM-DD)
  * @param {string} params.endDate - 结束日期 (YYYY-MM-DD)
  * @param {number} params.pageNumber - 页码 (从1开始)
@@ -32,6 +32,29 @@ export function getAnnouncementList(params) {
       endDate: params.endDate,
       pageNumber: params.pageNumber || 1,
       pageSize: params.pageSize || 10
+    }
+  })
+}
+
+/**
+ * 获取有公告数据的区域筛选项及对应数量
+ * @param {Object} params - 与公告列表一致的筛选参数
+ * @returns {Promise}
+ */
+export function getAnnouncementRegionOptions(params = {}) {
+  return request({
+    url: '/announcements/region-options',
+    method: 'get',
+    params: {
+      businessType: params.businessType,
+      noticeType: params.noticeType,
+      procurementType: params.procurementType,
+      province: params.province,
+      city: params.city,
+      district: params.district,
+      keyword: params.keyword,
+      startDate: params.startDate,
+      endDate: params.endDate
     }
   })
 }

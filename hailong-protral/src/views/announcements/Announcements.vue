@@ -141,8 +141,8 @@
                   style="min-width: 120px;"
                 >
                   <option value="">全部省份</option>
-                  <option v-for="province in provinces" :key="province.regionCode" :value="province.regionName">
-                    {{ province.regionName }}
+                  <option v-for="province in provinces" :key="province.regionCode" :value="province.regionCode">
+                    {{ province.regionName }} ({{ province.count }})
                   </option>
                 </select>
                 <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,8 +162,8 @@
                   style="min-width: 120px;"
                 >
                   <option value="">全部城市</option>
-                  <option v-for="city in cities" :key="city.regionCode" :value="city.regionName">
-                    {{ city.regionName }}
+                  <option v-for="city in cities" :key="city.regionCode" :value="city.regionCode">
+                    {{ city.regionName }} ({{ city.count }})
                   </option>
                 </select>
                 <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,8 +183,8 @@
                   style="min-width: 120px;"
                 >
                   <option value="">全部区县</option>
-                  <option v-for="district in districts" :key="district.regionCode" :value="district.regionName">
-                    {{ district.regionName }}
+                  <option v-for="district in districts" :key="district.regionCode" :value="district.regionCode">
+                    {{ district.regionName }} ({{ district.count }})
                   </option>
                 </select>
                 <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -472,8 +472,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
-import { getAnnouncementList } from '@/api/announcement.js'
-import { getProvinceList, getCityList, getDistrictList } from '@/api/region.js'
+import { getAnnouncementList, getAnnouncementRegionOptions } from '@/api/announcement.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -532,8 +531,6 @@ const currentAnnouncementTypes = computed(() => {
 const provinces = ref([])
 const cities = ref([])
 const districts = ref([])
-const selectedProvinceCode = ref('')
-const selectedCityCode = ref('')
 
 // 时间范围选项
 const timeRanges = [
@@ -566,86 +563,49 @@ const total = ref(0)
 const currentPage = ref(1)
 const pageSize = ref(10)
 
-// 加载省份列表
-const loadProvinces = async () => {
+// 加载仅包含有公告数据的区域及其数量
+const loadRegionOptions = async () => {
   try {
-    const res = await getProvinceList()
-    if (res.success && res.data) {
-      provinces.value = res.data
+    const params = {}
+    if (searchParams.value.businessType) params.businessType = searchParams.value.businessType
+    if (searchParams.value.noticeType) params.noticeType = searchParams.value.noticeType
+    if (searchParams.value.businessType === 'GOV_PROCUREMENT' && searchParams.value.procurementType) {
+      params.procurementType = searchParams.value.procurementType
     }
-  } catch (error) {
-    console.error('加载省份列表失败:', error)
-  }
-}
+    if (searchParams.value.province) params.province = searchParams.value.province
+    if (searchParams.value.city) params.city = searchParams.value.city
+    if (searchParams.value.district) params.district = searchParams.value.district
+    if (searchParams.value.keyword) params.keyword = searchParams.value.keyword
+    if (searchParams.value.startDate) params.startDate = searchParams.value.startDate
+    if (searchParams.value.endDate) params.endDate = searchParams.value.endDate
 
-// 加载城市列表
-const loadCities = async (provinceCode) => {
-  if (!provinceCode) {
-    cities.value = []
-    return
-  }
-  
-  try {
-    const res = await getCityList(provinceCode)
+    const res = await getAnnouncementRegionOptions(params)
     if (res.success && res.data) {
-      cities.value = res.data
+      provinces.value = res.data.provinces || []
+      cities.value = res.data.cities || []
+      districts.value = res.data.districts || []
     }
   } catch (error) {
-    console.error('加载城市列表失败:', error)
-  }
-}
-
-// 加载区县列表
-const loadDistricts = async (cityCode) => {
-  if (!cityCode) {
-    districts.value = []
-    return
-  }
-  
-  try {
-    const res = await getDistrictList(cityCode)
-    if (res.success && res.data) {
-      districts.value = res.data
-    }
-  } catch (error) {
-    console.error('加载区县列表失败:', error)
+    console.error('加载公告区域筛选项失败:', error)
   }
 }
 
 // 省份变化处理
-const onProvinceChange = async () => {
+const onProvinceChange = () => {
   searchParams.value.city = ''
   searchParams.value.district = ''
   cities.value = []
   districts.value = []
-  
-  if (searchParams.value.province) {
-    // 根据省份名称找到省份代码
-    const province = provinces.value.find(p => p.regionName === searchParams.value.province)
-    if (province) {
-      selectedProvinceCode.value = province.regionCode
-      await loadCities(province.regionCode)
-    }
-  } else {
-    selectedProvinceCode.value = ''
-  }
+  currentPage.value = 1
+  updateUrlQuery()
 }
 
 // 城市变化处理
-const onCityChange = async () => {
+const onCityChange = () => {
   searchParams.value.district = ''
   districts.value = []
-  
-  if (searchParams.value.city) {
-    // 根据城市名称找到城市代码
-    const city = cities.value.find(c => c.regionName === searchParams.value.city)
-    if (city) {
-      selectedCityCode.value = city.regionCode
-      await loadDistricts(city.regionCode)
-    }
-  } else {
-    selectedCityCode.value = ''
-  }
+  currentPage.value = 1
+  updateUrlQuery()
 }
 
 // 业务类型变化处理
@@ -655,6 +615,8 @@ const handleBusinessTypeChange = (value) => {
   if (value !== 'GOV_PROCUREMENT') {
     searchParams.value.procurementType = ''
   }
+  currentPage.value = 1
+  updateUrlQuery()
 }
 
 // 时间范围选择
@@ -690,6 +652,9 @@ const selectTimeRange = (value) => {
       searchParams.value.startDate = ''
       searchParams.value.endDate = ''
   }
+
+  currentPage.value = 1
+  updateUrlQuery()
 }
 
 // 自定义日期变化
@@ -719,7 +684,7 @@ const loadAnnouncements = async () => {
       params.procurementType = searchParams.value.procurementType
     }
     
-    // 传递地区名称（数据库存储的是名称字符串）
+    // 省、市、区县统一传递行政区划编码
     if (searchParams.value.province) {
       params.province = searchParams.value.province
     }
@@ -784,8 +749,6 @@ const handleReset = () => {
   showCustomDatePicker.value = false
   cities.value = []
   districts.value = []
-  selectedProvinceCode.value = ''
-  selectedCityCode.value = ''
   currentPage.value = 1
   updateUrlQuery()
 }
@@ -919,36 +882,10 @@ watch(
     }
 
     searchParams.value.province = newQuery.province || ''
-    if (newQuery.province) {
-      const province = provinces.value.find(p => p.regionName === newQuery.province)
-      if (province) {
-        selectedProvinceCode.value = province.regionCode
-        await loadCities(province.regionCode)
-        
-        searchParams.value.city = newQuery.city || ''
-        if (newQuery.city) {
-          const city = cities.value.find(c => c.regionName === newQuery.city)
-          if (city) {
-            selectedCityCode.value = city.regionCode
-            await loadDistricts(city.regionCode)
-            searchParams.value.district = newQuery.district || ''
-          }
-        } else {
-          selectedCityCode.value = ''
-          districts.value = []
-          searchParams.value.district = ''
-        }
-      }
-    } else {
-      selectedProvinceCode.value = ''
-      cities.value = []
-      selectedCityCode.value = ''
-      districts.value = []
-      searchParams.value.city = ''
-      searchParams.value.district = ''
-    }
+    searchParams.value.city = newQuery.city || ''
+    searchParams.value.district = newQuery.district || ''
 
-    await loadAnnouncements()
+    await Promise.all([loadRegionOptions(), loadAnnouncements()])
   },
   { deep: true }
 )
@@ -961,8 +898,6 @@ onBeforeRouteLeave((to, from) => {
 
 // 初始化
 onMounted(async () => {
-  await loadProvinces()
-  
   // 若 URL query 为空，尝试从 sessionStorage 恢复缓存的条件
   if (Object.keys(route.query).length === 0) {
     const savedQueryStr = sessionStorage.getItem('announcements_query')
@@ -993,25 +928,11 @@ onMounted(async () => {
     showCustomDatePicker.value = true
   }
 
-  if (query.province) {
-    const province = provinces.value.find(p => p.regionName === query.province)
-    if (province) {
-      selectedProvinceCode.value = province.regionCode
-      await loadCities(province.regionCode)
-      searchParams.value.city = query.city || ''
-      
-      if (query.city) {
-        const city = cities.value.find(c => c.regionName === query.city)
-        if (city) {
-          selectedCityCode.value = city.regionCode
-          await loadDistricts(city.regionCode)
-          searchParams.value.district = query.district || ''
-        }
-      }
-    }
-  }
-  
-  await loadAnnouncements()
+  searchParams.value.province = query.province || ''
+  searchParams.value.city = query.city || ''
+  searchParams.value.district = query.district || ''
+
+  await Promise.all([loadRegionOptions(), loadAnnouncements()])
 })
 </script>
 

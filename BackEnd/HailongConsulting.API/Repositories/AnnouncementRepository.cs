@@ -60,6 +60,82 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
         DateTime? startDate = null,
         DateTime? endDate = null)
     {
+        var query = BuildFilteredQuery(
+            businessType,
+            noticeType,
+            procurementType,
+            keyword,
+            startDate,
+            endDate,
+            province,
+            city,
+            district);
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderByDescending(a => a.PublishTime)
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
+
+    public async Task<Dictionary<string, int>> GetRegionCountsAsync(
+        int regionLevel,
+        string? businessType,
+        string? noticeType,
+        string? procurementType,
+        string? keyword,
+        DateTime? startDate,
+        DateTime? endDate,
+        string? province = null,
+        string? city = null)
+    {
+        var query = BuildFilteredQuery(
+            businessType,
+            noticeType,
+            procurementType,
+            keyword,
+            startDate,
+            endDate,
+            province,
+            city,
+            district: null);
+
+        return regionLevel switch
+        {
+            1 => await query
+                .Where(a => a.Province != null && a.Province != string.Empty)
+                .GroupBy(a => a.Province!)
+                .Select(group => new { Region = group.Key, Count = group.Count() })
+                .ToDictionaryAsync(item => item.Region, item => item.Count),
+            2 => await query
+                .Where(a => a.City != null && a.City != string.Empty)
+                .GroupBy(a => a.City!)
+                .Select(group => new { Region = group.Key, Count = group.Count() })
+                .ToDictionaryAsync(item => item.Region, item => item.Count),
+            3 => await query
+                .Where(a => a.District != null && a.District != string.Empty)
+                .GroupBy(a => a.District!)
+                .Select(group => new { Region = group.Key, Count = group.Count() })
+                .ToDictionaryAsync(item => item.Region, item => item.Count),
+            _ => throw new ArgumentOutOfRangeException(nameof(regionLevel), "区域层级必须是 1、2 或 3")
+        };
+    }
+
+    private IQueryable<Announcement> BuildFilteredQuery(
+        string? businessType,
+        string? noticeType,
+        string? procurementType,
+        string? keyword,
+        DateTime? startDate,
+        DateTime? endDate,
+        string? province,
+        string? city,
+        string? district)
+    {
         var query = _dbSet.Where(a => a.IsDeleted == 0);
 
         if (!string.IsNullOrEmpty(businessType))
@@ -88,28 +164,16 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
                 (a.Winner != null && a.Winner.Contains(keyword)));
         }
 
-        // 日期筛选
         if (startDate.HasValue)
-        {
             query = query.Where(a => a.PublishTime >= startDate.Value);
-        }
 
         if (endDate.HasValue)
         {
-            // 将结束日期设置为当天的23:59:59
             var endDateTime = endDate.Value.Date.AddDays(1).AddTicks(-1);
             query = query.Where(a => a.PublishTime <= endDateTime);
         }
 
-        var totalCount = await query.CountAsync();
-
-        var items = await query
-            .OrderByDescending(a => a.PublishTime)
-            .Skip((pageIndex - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-
-        return (items, totalCount);
+        return query;
     }
 
     public async Task SoftDeleteAsync(int id)

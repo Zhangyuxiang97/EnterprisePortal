@@ -59,6 +59,8 @@ services:
         else
           echo "公告数据已存在，跳过导入"
         fi
+        echo "统一公告区域为行政区划编码..."
+        mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/10_normalize_announcement_region_codes.sql
         echo "初始化完成"
       '
     networks:

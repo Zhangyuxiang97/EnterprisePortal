@@ -144,12 +144,4 @@ public class RegionDictionaryRepository : Repository<RegionDictionary>, IRegionD
         return allRegions;
     }
 
-    /// <summary>
-    /// 根据区域名称获取区域
-    /// </summary>
-    public async Task<RegionDictionary?> GetByRegionNameAsync(string regionName)
-    {
-        return await _context.RegionDictionaries
-            .FirstOrDefaultAsync(r => r.RegionName == regionName && r.IsDeleted == 0);
-    }
 }

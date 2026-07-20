@@ -34,6 +34,8 @@ public class AnnouncementService : IAnnouncementService
         try
         {
             var announcement = _mapper.Map<Announcement>(createDto);
+            NormalizeRegionCodes(announcement);
+            await ValidateRegionCodesAsync(announcement.Province, announcement.City, announcement.District);
             announcement.Content = _htmlContentSanitizer.Sanitize(announcement.Content);
             announcement.CreatedAt = DateTime.UtcNow;
             announcement.UpdatedAt = DateTime.UtcNow;
@@ -59,35 +61,9 @@ public class AnnouncementService : IAnnouncementService
             if (announcement == null)
                 return null;
 
-            // 将区域名称转换回区域编码（如果传入的是名称）
-            if (!string.IsNullOrEmpty(updateDto.Province))
-            {
-                var province = await _unitOfWork.RegionDictionaries.GetByRegionNameAsync(updateDto.Province);
-                if (province != null)
-                {
-                    updateDto.Province = province.RegionCode;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(updateDto.City))
-            {
-                var city = await _unitOfWork.RegionDictionaries.GetByRegionNameAsync(updateDto.City);
-                if (city != null)
-                {
-                    updateDto.City = city.RegionCode;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(updateDto.District))
-            {
-                var district = await _unitOfWork.RegionDictionaries.GetByRegionNameAsync(updateDto.District);
-                if (district != null)
-                {
-                    updateDto.District = district.RegionCode;
-                }
-            }
-
             _mapper.Map(updateDto, announcement);
+            NormalizeRegionCodes(announcement);
+            await ValidateRegionCodesAsync(announcement.Province, announcement.City, announcement.District);
             announcement.Content = _htmlContentSanitizer.Sanitize(announcement.Content);
             announcement.UpdatedAt = DateTime.UtcNow;
 
@@ -221,6 +197,140 @@ public class AnnouncementService : IAnnouncementService
             PageIndex = queryDto.PageNumber,
             PageSize = queryDto.PageSize
         };
+    }
+
+    public async Task<AnnouncementRegionOptionsDto> GetRegionOptionsAsync(AnnouncementQueryDto queryDto)
+    {
+        var regions = await _unitOfWork.RegionDictionaries.GetTreeAsync();
+        var selectedProvince = FindRegion(regions, queryDto.Province, 1, parentCode: null);
+        var selectedCity = FindRegion(regions, queryDto.City, 2, selectedProvince?.RegionCode);
+
+        var provinceCounts = await _unitOfWork.Announcements.GetRegionCountsAsync(
+            1,
+            queryDto.BusinessType,
+            queryDto.NoticeType,
+            queryDto.ProcurementType,
+            queryDto.Keyword,
+            queryDto.StartDate,
+            queryDto.EndDate);
+
+        Dictionary<string, int> cityCounts = [];
+        if (selectedProvince != null)
+        {
+            cityCounts = await _unitOfWork.Announcements.GetRegionCountsAsync(
+                2,
+                queryDto.BusinessType,
+                queryDto.NoticeType,
+                queryDto.ProcurementType,
+                queryDto.Keyword,
+                queryDto.StartDate,
+                queryDto.EndDate,
+                selectedProvince.RegionCode);
+        }
+
+        Dictionary<string, int> districtCounts = [];
+        if (selectedProvince != null && selectedCity != null)
+        {
+            districtCounts = await _unitOfWork.Announcements.GetRegionCountsAsync(
+                3,
+                queryDto.BusinessType,
+                queryDto.NoticeType,
+                queryDto.ProcurementType,
+                queryDto.Keyword,
+                queryDto.StartDate,
+                queryDto.EndDate,
+                selectedProvince.RegionCode,
+                selectedCity.RegionCode);
+        }
+
+        return new AnnouncementRegionOptionsDto
+        {
+            Provinces = BuildRegionOptions(provinceCounts, regions, 1, parentCode: null),
+            Cities = BuildRegionOptions(cityCounts, regions, 2, selectedProvince?.RegionCode),
+            Districts = BuildRegionOptions(districtCounts, regions, 3, selectedCity?.RegionCode)
+        };
+    }
+
+    private static RegionDictionary? FindRegion(
+        IEnumerable<RegionDictionary> regions,
+        string? value,
+        int regionLevel,
+        string? parentCode)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return null;
+
+        return regions.FirstOrDefault(region =>
+            region.RegionLevel == regionLevel &&
+            (parentCode == null || region.ParentCode == parentCode) &&
+            region.RegionCode == value);
+    }
+
+    private static List<AnnouncementRegionOptionDto> BuildRegionOptions(
+        IReadOnlyDictionary<string, int> counts,
+        IReadOnlyCollection<RegionDictionary> regions,
+        int regionLevel,
+        string? parentCode)
+    {
+        return counts
+            .Select(item => new
+            {
+                Region = regions.FirstOrDefault(region =>
+                    region.RegionLevel == regionLevel &&
+                    (parentCode == null || region.ParentCode == parentCode) &&
+                    region.RegionCode == item.Key),
+                Count = item.Value
+            })
+            .Where(item => item.Region != null)
+            .OrderBy(item => item.Region!.SortOrder)
+            .ThenBy(item => item.Region!.RegionCode)
+            .Select(item => new AnnouncementRegionOptionDto
+            {
+                RegionCode = item.Region!.RegionCode,
+                RegionName = item.Region.RegionName,
+                Count = item.Count
+            })
+            .ToList();
+    }
+
+    private async Task ValidateRegionCodesAsync(string? provinceCode, string? cityCode, string? districtCode)
+    {
+        RegionDictionary? province = null;
+        RegionDictionary? city = null;
+
+        if (!string.IsNullOrWhiteSpace(provinceCode))
+        {
+            province = await _unitOfWork.RegionDictionaries.GetByRegionCodeAsync(provinceCode);
+            if (province == null || province.RegionLevel != 1)
+                throw new ArgumentException($"无效的省份编码: {provinceCode}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(cityCode))
+        {
+            if (province == null)
+                throw new ArgumentException("选择城市时必须同时提供省份编码");
+
+            city = await _unitOfWork.RegionDictionaries.GetByRegionCodeAsync(cityCode);
+            if (city == null || city.RegionLevel != 2 || city.ParentCode != province.RegionCode)
+                throw new ArgumentException($"城市编码 {cityCode} 不属于省份 {province.RegionCode}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(districtCode))
+        {
+            if (city == null)
+                throw new ArgumentException("选择区县时必须同时提供城市编码");
+
+            var district = await _unitOfWork.RegionDictionaries.GetByRegionCodeAsync(districtCode);
+            if (district == null || district.RegionLevel != 3 || district.ParentCode != city.RegionCode)
+                throw new ArgumentException($"区县编码 {districtCode} 不属于城市 {city.RegionCode}");
+        }
+    }
+
+    private static void NormalizeRegionCodes(Announcement announcement)
+    {
+        announcement.Province = string.IsNullOrWhiteSpace(announcement.Province) ? null : announcement.Province.Trim();
+        announcement.City = string.IsNullOrWhiteSpace(announcement.City) ? null : announcement.City.Trim();
+        announcement.District = string.IsNullOrWhiteSpace(announcement.District) ? null : announcement.District.Trim();
     }
 
     private AnnouncementDto SanitizeDto(AnnouncementDto dto)
