@@ -1,43 +1,51 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-hailong-dark via-hailong-primary to-hailong-secondary">
+  <div class="min-h-screen bg-slate-50/50">
     <Header />
     
-    <!-- 页面标题 -->
-    <div class="pt-32 pb-16 text-center text-white">
-      <h1 class="text-6xl font-bold mb-4 font-tech bg-gradient-to-r from-white via-hailong-cyan to-white bg-clip-text text-transparent animate-fade-in">
-        政策法规
-      </h1>
-      <p class="text-xl text-gray-200">行业政策与法律法规</p>
+    <!-- 页面头部 Hero Banner -->
+    <div class="relative pt-32 pb-20 text-center text-white overflow-hidden bg-gradient-to-br from-hailong-dark via-slate-900 to-indigo-950">
+      <!-- 几何网格与光晕背景 -->
+      <div class="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
+      <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-hailong-primary/10 rounded-full blur-[120px] pointer-events-none animate-float"></div>
+      
+      <div class="relative z-10 max-w-4xl mx-auto px-6">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 font-tech tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-200 bg-clip-text text-transparent">
+          政策法规
+        </h1>
+        <p class="text-base md:text-lg text-slate-300 font-medium max-w-2xl mx-auto">
+          汇聚国家、地方关于招投标与工程咨询的最新政策规章与法律条文
+        </p>
+      </div>
     </div>
 
     <!-- 内容区域 -->
-    <div class="py-16 bg-white">
+    <div class="py-10">
       <div class="container-wide">
         <div class="animate-fade-in">
           <!-- 搜索区域 -->
-          <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <div class="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-100 p-6 mb-6">
             <div class="flex gap-3">
               <div class="relative flex-1">
-                <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input
                   v-model="keyword"
                   type="text"
-                  placeholder="请输入政策法规标题关键字"
-                  class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all"
+                  placeholder="请输入您想检索的政策法规标题关键字"
+                  class="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-hailong-primary/20 focus:border-hailong-primary outline-none transition-all text-sm hover:border-slate-300 bg-slate-50/50 focus:bg-white"
                   @keyup.enter="handleSearch"
                 />
               </div>
               <button
                 @click="handleSearch"
-                class="px-8 py-3 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white rounded-lg hover:shadow-lg transition-all font-medium"
+                class="px-8 py-3 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white rounded-xl hover:shadow-lg transition-all font-bold text-sm hover:-translate-y-0.5"
               >
                 搜索
               </button>
               <button
                 @click="handleReset"
-                class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium"
+                class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-all font-bold text-sm"
               >
                 重置
               </button>
@@ -45,106 +53,121 @@
           </div>
 
           <!-- 结果统计 -->
-          <div class="mb-4 text-sm text-gray-600">
-            共找到 <span class="text-hailong-primary font-semibold">{{ total }}</span> 条政策法规
+          <div class="mb-4 text-xs md:text-sm text-slate-500 font-medium">
+            共找到 <span class="text-hailong-primary font-bold">{{ total }}</span> 条政策法规
           </div>
 
-          <!-- 列表 -->
-          <div v-if="loading" class="text-center py-20">
+          <!-- 状态：加载中 -->
+          <div v-if="loading" class="text-center py-32 bg-white rounded-2xl shadow-sm border border-slate-100">
             <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-hailong-primary border-t-transparent"></div>
-            <p class="mt-4 text-gray-500">加载中...</p>
+            <p class="mt-4 text-slate-400 text-sm">正在获取政策法规列表...</p>
           </div>
 
-          <div v-else-if="items.length === 0" class="text-center py-20">
-            <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <p class="text-gray-500">暂无政策法规信息</p>
+          <!-- 状态：无结果 -->
+          <div v-else-if="items.length === 0" class="text-center py-24 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-100">
+            <div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p class="text-slate-500 font-bold mb-1">暂无相关政策法规信息</p>
+            <p class="text-slate-400 text-xs">可以尝试更换其他词汇进行检索</p>
           </div>
 
+          <!-- 数据列表 -->
           <div v-else class="space-y-4">
             <div
               v-for="item in items"
               :key="item.id"
               @click="handleViewDetail(item.id)"
-              class="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all cursor-pointer border-l-4 border-hailong-primary"
+              class="group bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300 cursor-pointer flex flex-col gap-4"
             >
-              <!-- 标题和标签 -->
-              <div class="flex items-start justify-between mb-3">
-                <h3 class="text-lg font-bold text-gray-900 flex-1 hover:text-hailong-primary transition-colors line-clamp-2">
-                  <span v-if="item.isTop" class="inline-block px-2 py-0.5 bg-red-500 text-white text-xs rounded mr-2">置顶</span>
+              <!-- 标题和类别 -->
+              <div class="flex items-start justify-between gap-3">
+                <h3 class="text-base md:text-lg font-bold text-slate-800 leading-snug group-hover:text-hailong-primary transition-colors flex-1 min-w-0 line-clamp-2">
+                  <span v-if="item.isTop" class="inline-flex items-center bg-red-50 text-red-500 border border-red-100 text-[10px] font-extrabold px-1.5 py-0.5 rounded shadow-sm mr-2 align-middle">
+                    置顶
+                  </span>
                   {{ item.title }}
                 </h3>
-                <span 
+                
+                <span
                   v-if="item.category"
-                  class="ml-4 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap bg-blue-100 text-blue-700 border border-blue-200"
+                  class="px-2.5 py-0.5 rounded-md text-[10px] font-bold whitespace-nowrap bg-blue-50/50 text-blue-600 border border-blue-100/50 shadow-sm self-start"
                 >
                   {{ item.category }}
                 </span>
               </div>
 
-              <!-- 摘要 -->
-              <p v-if="item.summary" class="text-gray-600 text-sm mb-4 line-clamp-2">
+              <!-- 摘要说明 -->
+              <p v-if="item.summary" class="text-slate-500 text-xs md:text-sm line-clamp-2 leading-relaxed">
                 {{ item.summary }}
               </p>
 
-              <!-- 底部信息 -->
-              <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                <div class="flex items-center gap-4 text-xs text-gray-500">
+              <!-- 底部元数据信息 -->
+              <div class="flex items-center justify-between pt-3 border-t border-slate-100/60 text-xs text-slate-400">
+                <div class="flex items-center gap-4">
                   <span class="flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     {{ formatDate(item.publishTime) }}
                   </span>
                   <span class="flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                     {{ item.viewCount || 0 }} 次浏览
                   </span>
-                  <span v-if="item.attachments && item.attachments.length > 0" class="flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  <span
+                    v-if="item.attachments && item.attachments.length > 0"
+                    class="flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-50 text-slate-500 border border-slate-100 text-[10px] font-semibold"
+                  >
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                     </svg>
-                    {{ item.attachments.length }} 个附件
+                    含 {{ item.attachments.length }} 个附件
                   </span>
                 </div>
-                <span class="text-hailong-primary text-sm font-medium hover:underline">
-                  查看详情 →
+                
+                <span class="text-hailong-primary font-bold text-xs flex items-center gap-0.5 group-hover:translate-x-1 transition-all">
+                  查看详情
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
                 </span>
               </div>
             </div>
           </div>
 
-          <!-- 分页组件 -->
-          <div v-if="total > 0" class="mt-8 flex items-center justify-center gap-2">
+          <!-- 精细圆角分页器 -->
+          <div v-if="total > 0" class="mt-12 flex items-center justify-center gap-2">
             <button
               @click="handlePageChange(currentPage - 1)"
               :disabled="currentPage === 1"
               :class="[
-                'px-4 py-2 rounded-lg border transition-all',
+                'px-4 py-2 rounded-xl border text-sm font-semibold transition-all duration-200',
                 currentPage === 1
-                  ? 'border-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                  ? 'border-slate-100 text-slate-300 cursor-not-allowed bg-slate-50/50'
+                  : 'border-slate-200 text-slate-600 bg-white hover:bg-slate-50 hover:border-slate-300'
               ]"
             >
               上一页
             </button>
 
-            <div class="flex gap-1">
+            <div class="flex gap-1.5">
               <button
                 v-for="page in displayPages"
                 :key="page"
                 @click="page !== '...' && handlePageChange(page)"
                 :class="[
-                  'px-4 py-2 rounded-lg transition-all',
+                  'w-10 h-10 rounded-xl text-sm font-bold transition-all duration-200 flex items-center justify-center',
                   page === currentPage
-                    ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white'
+                    ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-md shadow-blue-500/15'
                     : page === '...'
-                    ? 'text-gray-400 cursor-default'
-                    : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
+                    ? 'text-slate-400 cursor-default'
+                    : 'text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300'
                 ]"
               >
                 {{ page }}
@@ -155,10 +178,10 @@
               @click="handlePageChange(currentPage + 1)"
               :disabled="currentPage === totalPages"
               :class="[
-                'px-4 py-2 rounded-lg border transition-all',
+                'px-4 py-2 rounded-xl border text-sm font-semibold transition-all duration-200',
                 currentPage === totalPages
-                  ? 'border-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                  ? 'border-slate-100 text-slate-300 cursor-not-allowed bg-slate-50/50'
+                  : 'border-slate-200 text-slate-600 bg-white hover:bg-slate-50 hover:border-slate-300'
               ]"
             >
               下一页
@@ -304,6 +327,12 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.container-wide {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -311,18 +340,9 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-in;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.bg-grid-pattern {
+  background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 </style>

@@ -1,17 +1,25 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-hailong-dark via-hailong-primary to-hailong-secondary">
+  <div class="min-h-screen bg-slate-50/50">
     <Header />
     
-    <!-- 页面标题 -->
-    <div class="pt-32 pb-16 text-center text-white">
-      <h1 class="text-6xl font-bold mb-4 font-tech bg-gradient-to-r from-white via-hailong-cyan to-white bg-clip-text text-transparent animate-fade-in">
-        实用工具
-      </h1>
-      <p class="text-xl text-gray-200">专业费用测算工具，快速准确计算</p>
+    <!-- 页面头部 Hero Banner -->
+    <div class="relative pt-32 pb-20 text-center text-white overflow-hidden bg-gradient-to-br from-hailong-dark via-slate-900 to-indigo-950">
+      <!-- 几何网格与光晕背景 -->
+      <div class="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
+      <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-hailong-primary/10 rounded-full blur-[120px] pointer-events-none animate-float"></div>
+      
+      <div class="relative z-10 max-w-4xl mx-auto px-6">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 font-tech tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-200 bg-clip-text text-transparent">
+          实用工具
+        </h1>
+        <p class="text-base md:text-lg text-slate-300 font-medium max-w-2xl mx-auto">
+          为招投标与工程造价提供专业费用测算，助力项目快捷准确计算
+        </p>
+      </div>
     </div>
 
     <!-- 内容区域 -->
-    <div class="py-16 bg-white">
+    <div class="py-12">
       <div class="container-wide">
         <div class="animate-fade-in">
           <!-- 工具列表 -->
@@ -19,46 +27,48 @@
             <div
               v-for="tool in tools"
               :key="tool.id"
-              class="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary"
+              class="group bg-white rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300 flex flex-col justify-between"
             >
-              <div class="relative h-48 overflow-hidden bg-gradient-to-br from-hailong-primary/10 to-hailong-secondary/10">
+              <div class="relative h-48 overflow-hidden bg-gradient-to-br from-hailong-primary/5 to-hailong-secondary/5 border-b border-slate-100/50">
                 <div class="absolute inset-0 flex items-center justify-center">
-                  <svg class="w-24 h-24 text-hailong-primary/30 group-hover:text-hailong-primary/50 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-24 h-24 text-hailong-primary/20 group-hover:text-hailong-primary/40 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="tool.icon" />
                   </svg>
                 </div>
                 <div class="absolute top-4 right-4">
                   <span :class="[
-                    'px-3 py-1 rounded-full text-xs font-semibold',
-                    tool.status === 'available' ? 'bg-green-100 text-green-700' :
-                    tool.status === 'coming' ? 'bg-yellow-100 text-yellow-700' :
-                    'bg-gray-100 text-gray-700'
+                    'px-3 py-1 rounded-full text-xs font-bold shadow-sm',
+                    tool.status === 'available' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100/50' :
+                    tool.status === 'coming' ? 'bg-amber-50 text-amber-700 border border-amber-100/50' :
+                    'bg-slate-100 text-slate-600 border border-slate-200'
                   ]">
-                    {{ tool.status === 'available' ? '可用' : tool.status === 'coming' ? '即将上线' : '维护中' }}
+                    {{ tool.status === 'available' ? '可使用' : tool.status === 'coming' ? '即将上线' : '维护中' }}
                   </span>
                 </div>
               </div>
               
-              <div class="p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-hailong-primary transition-colors">
-                  {{ tool.name }}
-                </h3>
-                <p class="text-gray-600 text-sm mb-4 line-clamp-2">
-                  {{ tool.description }}
-                </p>
+              <div class="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 class="text-lg font-bold text-slate-800 mb-2 group-hover:text-hailong-primary transition-colors">
+                    {{ tool.name }}
+                  </h3>
+                  <p class="text-slate-500 text-sm mb-6 leading-relaxed line-clamp-2">
+                    {{ tool.description }}
+                  </p>
+                </div>
                 
-                <div class="flex items-center justify-end pt-4 border-t border-gray-100">
+                <div class="flex items-center justify-end pt-4 border-t border-slate-100/60">
                   <button
                     v-if="tool.status === 'available'"
                     @click="handleToolClick(tool)"
-                    class="px-4 py-2 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white rounded-lg hover:shadow-lg transition-all text-sm font-medium"
+                    class="px-5 py-2 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white rounded-xl hover:shadow-lg transition-all text-xs font-bold hover:-translate-y-0.5"
                   >
                     立即使用
                   </button>
                   <button
                     v-else
                     disabled
-                    class="px-4 py-2 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed text-sm font-medium"
+                    class="px-5 py-2 bg-slate-100 text-slate-400 rounded-xl cursor-not-allowed text-xs font-bold"
                   >
                     {{ tool.status === 'coming' ? '敬请期待' : '维护中' }}
                   </button>
@@ -77,40 +87,38 @@
           <JudicialAppraisalCalculator v-if="showJudicialCalculator" @close="showJudicialCalculator = false" class="mb-12" />
 
           <!-- 使用说明 -->
-          <div class="bg-gradient-to-r from-hailong-primary/5 to-hailong-secondary/5 rounded-xl p-8 border border-hailong-primary/20">
-            <h2 class="text-2xl font-bold text-hailong-dark mb-4 flex items-center gap-2">
-              <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              使用说明
+          <div class="bg-white rounded-2xl p-8 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
+            <h2 class="text-xl font-extrabold text-slate-800 mb-6 flex items-center gap-2">
+              <span class="w-1 h-5 bg-hailong-primary rounded-full"></span>
+              测算工具使用说明
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-slate-700">
               <div class="flex gap-3">
-                <div class="flex-shrink-0 w-8 h-8 bg-hailong-primary text-white rounded-full flex items-center justify-center font-bold">1</div>
+                <div class="flex-shrink-0 w-8 h-8 bg-blue-50 text-hailong-primary rounded-xl flex items-center justify-center font-bold text-sm">1</div>
                 <div>
-                  <h3 class="font-semibold mb-1">选择工具</h3>
-                  <p class="text-sm text-gray-600">根据您的需求选择合适的工具</p>
+                  <h3 class="font-bold text-slate-800 text-sm mb-1">选择工具</h3>
+                  <p class="text-xs text-slate-400 leading-normal">根据您的业务测算需求选择合适的计算工具</p>
                 </div>
               </div>
               <div class="flex gap-3">
-                <div class="flex-shrink-0 w-8 h-8 bg-hailong-primary text-white rounded-full flex items-center justify-center font-bold">2</div>
+                <div class="flex-shrink-0 w-8 h-8 bg-blue-50 text-hailong-primary rounded-xl flex items-center justify-center font-bold text-sm">2</div>
                 <div>
-                  <h3 class="font-semibold mb-1">点击使用</h3>
-                  <p class="text-sm text-gray-600">点击"立即使用"按钮打开工具</p>
+                  <h3 class="font-bold text-slate-800 text-sm mb-1">点击开启</h3>
+                  <p class="text-xs text-slate-400 leading-normal">点击“立即使用”按钮，在页面下方展开测算面板</p>
                 </div>
               </div>
               <div class="flex gap-3">
-                <div class="flex-shrink-0 w-8 h-8 bg-hailong-primary text-white rounded-full flex items-center justify-center font-bold">3</div>
+                <div class="flex-shrink-0 w-8 h-8 bg-blue-50 text-hailong-primary rounded-xl flex items-center justify-center font-bold text-sm">3</div>
                 <div>
-                  <h3 class="font-semibold mb-1">输入数据</h3>
-                  <p class="text-sm text-gray-600">按照提示输入相关数据和参数</p>
+                  <h3 class="font-bold text-slate-800 text-sm mb-1">输入参数</h3>
+                  <p class="text-xs text-slate-400 leading-normal">按照业务提示输入计算基数、行业类别等参数</p>
                 </div>
               </div>
               <div class="flex gap-3">
-                <div class="flex-shrink-0 w-8 h-8 bg-hailong-primary text-white rounded-full flex items-center justify-center font-bold">4</div>
+                <div class="flex-shrink-0 w-8 h-8 bg-blue-50 text-hailong-primary rounded-xl flex items-center justify-center font-bold text-sm">4</div>
                 <div>
-                  <h3 class="font-semibold mb-1">获取结果</h3>
-                  <p class="text-sm text-gray-600">系统自动计算并展示结果，支持复制</p>
+                  <h3 class="font-bold text-slate-800 text-sm mb-1">计算结果</h3>
+                  <p class="text-xs text-slate-400 leading-normal">系统实时演算得出各项费用明细，支持一键复制</p>
                 </div>
               </div>
             </div>
@@ -199,6 +207,12 @@ const scrollToCalculator = () => {
 </script>
 
 <style scoped>
+.container-wide {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -206,18 +220,9 @@ const scrollToCalculator = () => {
   overflow: hidden;
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-in;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.bg-grid-pattern {
+  background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 </style>
