@@ -136,10 +136,8 @@
 
           <!-- 附件列表 -->
           <div v-if="item.attachments && item.attachments.length > 0" class="bg-white rounded-xl shadow-sm p-8 mb-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200 flex items-center gap-2">
-              <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-              </svg>
+            <h2 class="text-lg md:text-xl font-extrabold text-slate-800 mb-6 pb-4 border-b border-slate-100 flex items-center gap-2.5">
+              <span class="w-1.5 h-5.5 bg-gradient-to-b from-hailong-primary to-hailong-secondary rounded-full flex-shrink-0"></span>
               附件列表
             </h2>
             <div class="space-y-3">
@@ -191,7 +189,8 @@
 
           <!-- 相关新闻 -->
           <div v-if="relatedItems.length > 0" class="bg-white rounded-xl shadow-sm p-8 mb-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200">
+            <h2 class="text-lg md:text-xl font-extrabold text-slate-800 mb-6 pb-4 border-b border-slate-100 flex items-center gap-2.5">
+              <span class="w-1.5 h-5.5 bg-gradient-to-b from-hailong-primary to-hailong-secondary rounded-full flex-shrink-0"></span>
               相关新闻
             </h2>
             <div class="space-y-4">

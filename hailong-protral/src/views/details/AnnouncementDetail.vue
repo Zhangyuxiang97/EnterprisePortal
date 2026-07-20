@@ -174,7 +174,7 @@
               <!-- 正文卡片 -->
               <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-6 md:p-10">
                 <h2 class="text-lg md:text-xl font-extrabold text-slate-900 mb-6 pb-4 border-b border-slate-100 flex items-center gap-2.5">
-                  <span class="w-1.5 h-6 bg-hailong-primary rounded-full"></span>
+                  <span class="w-1.5 h-5.5 bg-gradient-to-b from-hailong-primary to-hailong-secondary rounded-full flex-shrink-0"></span>
                   公告正文内容
                 </h2>
                 
@@ -184,7 +184,7 @@
               <!-- 附件下载卡片 -->
               <div v-if="announcement.attachments && announcement.attachments.length > 0" class="bg-white rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-6 md:p-8">
                 <h2 class="text-lg md:text-xl font-extrabold text-slate-900 mb-6 pb-4 border-b border-slate-100 flex items-center gap-2.5">
-                  <span class="w-1.5 h-6 bg-hailong-primary rounded-full"></span>
+                  <span class="w-1.5 h-5.5 bg-gradient-to-b from-hailong-primary to-hailong-secondary rounded-full flex-shrink-0"></span>
                   相关附件下载
                 </h2>
 

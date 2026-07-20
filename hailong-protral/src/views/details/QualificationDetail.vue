@@ -120,12 +120,8 @@
 
           <!-- 资质详情 -->
           <div class="bg-white rounded-xl shadow-sm p-8 mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200 flex items-center gap-3">
-              <div class="w-10 h-10 bg-hailong-primary/10 rounded-lg flex items-center justify-center">
-                <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
+            <h2 class="text-lg md:text-xl font-extrabold text-slate-800 mb-6 pb-4 border-b border-slate-100 flex items-center gap-2.5">
+              <span class="w-1.5 h-5.5 bg-gradient-to-b from-hailong-primary to-hailong-secondary rounded-full flex-shrink-0"></span>
               资质说明
             </h2>
             <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
@@ -144,7 +140,8 @@
 
           <!-- 相关资质 -->
           <div v-if="relatedQualifications.length > 0" class="bg-white rounded-xl shadow-sm p-8 mb-8">
-            <h2 class="text-xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200">
+            <h2 class="text-lg md:text-xl font-extrabold text-slate-800 mb-6 pb-4 border-b border-slate-100 flex items-center gap-2.5">
+              <span class="w-1.5 h-5.5 bg-gradient-to-b from-hailong-primary to-hailong-secondary rounded-full flex-shrink-0"></span>
               相关资质
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

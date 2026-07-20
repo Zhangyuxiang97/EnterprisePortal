@@ -66,12 +66,8 @@
 
           <!-- 业务特点 -->
           <div class="bg-white rounded-xl shadow-sm p-8 mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200 flex items-center gap-3">
-              <div class="w-10 h-10 bg-hailong-primary/10 rounded-lg flex items-center justify-center">
-                <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
+            <h2 class="text-lg md:text-xl font-extrabold text-slate-800 mb-6 pb-4 border-b border-slate-100 flex items-center gap-2.5">
+              <span class="w-1.5 h-5.5 bg-gradient-to-b from-hailong-primary to-hailong-secondary rounded-full flex-shrink-0"></span>
               业务特点
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -92,12 +88,8 @@
 
           <!-- 详细内容 -->
           <div class="bg-white rounded-xl shadow-sm p-8 mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200 flex items-center gap-3">
-              <div class="w-10 h-10 bg-hailong-secondary/10 rounded-lg flex items-center justify-center">
-                <svg class="w-6 h-6 text-hailong-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
+            <h2 class="text-lg md:text-xl font-extrabold text-slate-800 mb-6 pb-4 border-b border-slate-100 flex items-center gap-2.5">
+              <span class="w-1.5 h-5.5 bg-gradient-to-b from-hailong-primary to-hailong-secondary rounded-full flex-shrink-0"></span>
               详细介绍
             </h2>
             <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed" v-html="business.detailContent"></div>

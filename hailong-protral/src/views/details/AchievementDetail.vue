@@ -112,12 +112,8 @@
 
           <!-- 项目描述 -->
           <div v-if="achievement.description" class="bg-white rounded-xl shadow-sm p-8 mb-8">
-            <h2 class="text-xl font-bold text-gray-900 mb-4 pb-3 border-b border-gray-200 flex items-center gap-2">
-              <div class="w-8 h-8 bg-hailong-primary/10 rounded-lg flex items-center justify-center">
-                <svg class="w-5 h-5 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
+            <h2 class="text-lg md:text-xl font-extrabold text-slate-800 mb-4 pb-3 border-b border-slate-100 flex items-center gap-2.5">
+              <span class="w-1.5 h-5.5 bg-gradient-to-b from-hailong-primary to-hailong-secondary rounded-full flex-shrink-0"></span>
               项目描述
             </h2>
             <div class="text-gray-700 leading-relaxed whitespace-pre-wrap">{{ achievement.description }}</div>
