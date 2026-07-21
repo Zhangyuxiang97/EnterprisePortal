@@ -5,7 +5,9 @@
   "scripts": {
     "scrape": "node scrape-hailong.js",
     "transform": "node transform-data.js",
-    "preview": "start preview.html"
+    "preview": "start preview.html",
+    "generate-initial-sql": "node generate-initial-announcement-sql.js",
+    "generate-region-batches": "node generate-region-initialization-batches.js"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",

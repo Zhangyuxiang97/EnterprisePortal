@@ -49,20 +49,16 @@ services:
         echo "当前公告数量: $$COUNT"
         if [ "$$COUNT" -lt 100 ]; then
           echo "导入招标公告..."
-          mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/07_announcements_bidding.sql
+          mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/06_announcements_bidding.sql
           echo "导入中标公告..."
-          mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/08_announcements_result.sql
+          mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/07_announcements_result.sql
           echo "导入变更公告..."
-          mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/09_announcements_correction.sql
+          mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/08_announcements_correction.sql
           COUNT=$$(mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD -e "SELECT COUNT(*) FROM hailong_consulting.announcements" -s -N 2>/dev/null)
           echo "导入完成，公告数量: $$COUNT"
         else
           echo "公告数据已存在，跳过导入"
         fi
-        echo "补齐区域字典..."
-        mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/06_region_dictionary_complete.sql
-        echo "统一公告区域为行政区划编码..."
-        mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/10_normalize_announcement_region_codes.sql
         echo "初始化完成"
       '
     networks:
