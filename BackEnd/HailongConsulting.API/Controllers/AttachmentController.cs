@@ -81,7 +81,7 @@ public class AttachmentController : ControllerBase
             {
                 FileName = file.FileName ?? "unknown",
                 FilePath = uploadResult.filePath ?? throw new InvalidOperationException("上传服务未返回文件路径"),
-                FileUrl = $"{Request.Scheme}://{Request.Host}{uploadResult.filePath}",
+                FileUrl = uploadResult.filePath,
                 FileSize = file.Length,
                 FileType = file.ContentType ?? "application/octet-stream",
                 FileExtension = Path.GetExtension(file.FileName) ?? "",
@@ -170,7 +170,7 @@ public class AttachmentController : ControllerBase
                         {
                             FileName = file.FileName ?? "unknown",
                             FilePath = uploadResult.filePath,
-                            FileUrl = $"{Request.Scheme}://{Request.Host}{uploadResult.filePath}",
+                            FileUrl = uploadResult.filePath,
                             FileSize = file.Length,
                             FileType = file.ContentType ?? "application/octet-stream",
                             FileExtension = Path.GetExtension(file.FileName) ?? "",

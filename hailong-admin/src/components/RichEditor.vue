@@ -76,7 +76,7 @@ const editorConfig = {
   MENU_CONF: {
     // 配置上传图片
     uploadImage: {
-      server: `${API_CONFIG.baseURL}/api/attachments/upload`,
+      server: `${API_CONFIG.baseURL}/attachments/upload`,
       fieldName: 'file',
       maxFileSize: 5 * 1024 * 1024, // 5M
       allowedFileTypes: ['image/*'],
@@ -110,7 +110,7 @@ const editorConfig = {
     
     // 配置上传视频
     uploadVideo: {
-      server: `${API_CONFIG.baseURL}/api/attachments/upload`,
+      server: `${API_CONFIG.baseURL}/attachments/upload`,
       fieldName: 'file',
       maxFileSize: 100 * 1024 * 1024, // 100M
       allowedFileTypes: ['video/*'],

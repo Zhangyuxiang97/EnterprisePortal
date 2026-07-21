@@ -121,7 +121,7 @@ const previewVisible = ref(false)
 const previewUrl = ref('')
 
 // 上传地址
-const uploadUrl = computed(() => `${API_CONFIG.baseURL}/api/attachments/upload`)
+const uploadUrl = computed(() => `${API_CONFIG.baseURL}/attachments/upload`)
 
 // 上传请求头
 const uploadHeaders = computed(() => {
