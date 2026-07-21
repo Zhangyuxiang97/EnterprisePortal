@@ -5,7 +5,7 @@
 -- ============================================================
 
 -- 石家庄市 (130100) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('130101', '石家庄市区', 3, '130100', 1),
 ('130121', '井陉县', 3, '130100', 2),
 ('130123', '正定县', 3, '130100', 3),
@@ -23,7 +23,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('130184', '新乐市', 3, '130100', 15);
 
 -- 唐山市 (130200) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('130201', '唐山市区', 3, '130200', 1),
 ('130224', '滦南县', 3, '130200', 2),
 ('130225', '乐亭县', 3, '130200', 3),
@@ -34,14 +34,14 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('130284', '滦州市', 3, '130200', 8);
 
 -- 秦皇岛市 (130300) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('130301', '秦皇岛市区', 3, '130300', 1),
 ('130321', '青龙满族自治县', 3, '130300', 2),
 ('130322', '昌黎县', 3, '130300', 3),
 ('130324', '卢龙县', 3, '130300', 4);
 
 -- 邯郸市 (130400) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('130401', '邯郸市区', 3, '130400', 1),
 ('130423', '临漳县', 3, '130400', 2),
 ('130424', '成安县', 3, '130400', 3),
@@ -57,7 +57,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('130481', '武安市', 3, '130400', 13);
 
 -- 邢台市 (130500) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('130501', '邢台市区', 3, '130500', 1),
 ('130522', '临城县', 3, '130500', 2),
 ('130523', '内丘县', 3, '130500', 3),
@@ -75,7 +75,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('130582', '沙河市', 3, '130500', 15);
 
 -- 保定市 (130600) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('130601', '保定市区', 3, '130600', 1),
 ('130623', '涞水县', 3, '130600', 2),
 ('130624', '阜平县', 3, '130600', 3),
@@ -97,7 +97,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('130684', '高碑店市', 3, '130600', 19);
 
 -- 张家口市 (130700) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('130701', '张家口市区', 3, '130700', 1),
 ('130722', '张北县', 3, '130700', 2),
 ('130723', '康保县', 3, '130700', 3),
@@ -111,7 +111,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('130732', '赤城县', 3, '130700', 11);
 
 -- 承德市 (130800) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('130801', '承德市区', 3, '130800', 1),
 ('130821', '承德县', 3, '130800', 2),
 ('130822', '兴隆县', 3, '130800', 3),
@@ -123,7 +123,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('130881', '平泉市', 3, '130800', 9);
 
 -- 沧州市 (130900) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('130901', '沧州市区', 3, '130900', 1),
 ('130921', '沧县', 3, '130900', 2),
 ('130922', '青县', 3, '130900', 3),
@@ -141,7 +141,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('130984', '河间市', 3, '130900', 15);
 
 -- 廊坊市 (131000) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('131001', '廊坊市区', 3, '131000', 1),
 ('131022', '固安县', 3, '131000', 2),
 ('131023', '永清县', 3, '131000', 3),
@@ -153,7 +153,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('131082', '霸州市', 3, '131000', 9);
 
 -- 衡水市 (131100) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('131101', '衡水市区', 3, '131100', 1),
 ('131121', '枣强县', 3, '131100', 2),
 ('131122', '武邑县', 3, '131100', 3),
@@ -171,7 +171,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 -- ============================================================
 
 -- 太原市 (140100) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('140101', '太原市区', 3, '140100', 1),
 ('140121', '清徐县', 3, '140100', 2),
 ('140122', '阳曲县', 3, '140100', 3),
@@ -179,7 +179,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('140181', '古交市', 3, '140100', 5);
 
 -- 大同市 (140200) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('140201', '大同市区', 3, '140200', 1),
 ('140221', '阳高县', 3, '140200', 2),
 ('140222', '天镇县', 3, '140200', 3),
@@ -189,13 +189,13 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('140226', '左云县', 3, '140200', 7);
 
 -- 阳泉市 (140300) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('140301', '阳泉市区', 3, '140300', 1),
 ('140321', '平定县', 3, '140300', 2),
 ('140322', '盂县', 3, '140300', 3);
 
 -- 长治市 (140400) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('140401', '长治市区', 3, '140400', 1),
 ('140423', '襄垣县', 3, '140400', 2),
 ('140425', '平顺县', 3, '140400', 3),
@@ -207,7 +207,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('140431', '沁源县', 3, '140400', 9);
 
 -- 晋城市 (140500) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('140501', '晋城市区', 3, '140500', 1),
 ('140521', '沁水县', 3, '140500', 2),
 ('140522', '阳城县', 3, '140500', 3),
@@ -216,7 +216,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('140581', '高平市', 3, '140500', 6);
 
 -- 朔州市 (140600) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('140601', '朔州市区', 3, '140600', 1),
 ('140621', '山阴县', 3, '140600', 2),
 ('140622', '应县', 3, '140600', 3),
@@ -224,7 +224,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('140681', '怀仁市', 3, '140600', 5);
 
 -- 晋中市 (140700) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('140701', '晋中市区', 3, '140700', 1),
 ('140721', '榆社县', 3, '140700', 2),
 ('140722', '左权县', 3, '140700', 3),
@@ -237,7 +237,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('140781', '介休市', 3, '140700', 10);
 
 -- 运城市 (140800) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('140801', '运城市区', 3, '140800', 1),
 ('140821', '临猗县', 3, '140800', 2),
 ('140822', '万荣县', 3, '140800', 3),
@@ -253,7 +253,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('140882', '河津市', 3, '140800', 13);
 
 -- 忻州市 (140900) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('140901', '忻州市区', 3, '140900', 1),
 ('140921', '定襄县', 3, '140900', 2),
 ('140922', '五台县', 3, '140900', 3),
@@ -270,7 +270,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('140981', '原平市', 3, '140900', 14);
 
 -- 临汾市 (141000) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('141001', '临汾市区', 3, '141000', 1),
 ('141021', '曲沃县', 3, '141000', 2),
 ('141022', '翼城县', 3, '141000', 3),
@@ -290,7 +290,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('141082', '霍州市', 3, '141000', 17);
 
 -- 吕梁市 (141100) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('141101', '吕梁市区', 3, '141100', 1),
 ('141121', '文水县', 3, '141100', 2),
 ('141122', '交城县', 3, '141100', 3),
@@ -428,7 +428,7 @@ INSERT INTO `region_dictionary` (`region_code`, `region_name`, `region_level`, `
 -- ============================================================
 
 -- 沈阳市 (210100) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('210101', '沈阳市区', 3, '210100', 1),
 ('210112', '浑南区', 3, '210100', 2),
 ('210113', '沈北新区', 3, '210100', 3),
@@ -439,7 +439,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('210181', '新民市', 3, '210100', 8);
 
 -- 大连市 (210200) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('210201', '大连市区', 3, '210200', 1),
 ('210212', '旅顺口区', 3, '210200', 2),
 ('210213', '金州区', 3, '210200', 3),
@@ -449,34 +449,34 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('210283', '庄河市', 3, '210200', 7);
 
 -- 鞍山市 (210300) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('210301', '鞍山市区', 3, '210300', 1),
 ('210321', '台安县', 3, '210300', 2),
 ('210323', '岫岩满族自治县', 3, '210300', 3),
 ('210381', '海城市', 3, '210300', 4);
 
 -- 抚顺市 (210400) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('210401', '抚顺市区', 3, '210400', 1),
 ('210421', '抚顺县', 3, '210400', 2),
 ('210422', '新宾满族自治县', 3, '210400', 3),
 ('210423', '清原满族自治县', 3, '210400', 4);
 
 -- 本溪市 (210500) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('210501', '本溪市区', 3, '210500', 1),
 ('210521', '本溪满族自治县', 3, '210500', 2),
 ('210522', '桓仁满族自治县', 3, '210500', 3);
 
 -- 丹东市 (210600) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('210601', '丹东市区', 3, '210600', 1),
 ('210624', '宽甸满族自治县', 3, '210600', 2),
 ('210681', '东港市', 3, '210600', 3),
 ('210682', '凤城市', 3, '210600', 4);
 
 -- 锦州市 (210700) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('210701', '锦州市区', 3, '210700', 1),
 ('210726', '黑山县', 3, '210700', 2),
 ('210727', '义县', 3, '210700', 3),
@@ -484,30 +484,30 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('210782', '北镇市', 3, '210700', 5);
 
 -- 营口市 (210800) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('210801', '营口市区', 3, '210800', 1),
 ('210881', '盖州市', 3, '210800', 2),
 ('210882', '大石桥市', 3, '210800', 3);
 
 -- 阜新市 (210900) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('210901', '阜新市区', 3, '210900', 1),
 ('210921', '阜新蒙古族自治县', 3, '210900', 2),
 ('210922', '彰武县', 3, '210900', 3);
 
 -- 辽阳市 (211000) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('211001', '辽阳市区', 3, '211000', 1),
 ('211021', '辽阳县', 3, '211000', 2),
 ('211081', '灯塔市', 3, '211000', 3);
 
 -- 盘锦市 (211100) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('211101', '盘锦市区', 3, '211100', 1),
 ('211122', '盘山县', 3, '211100', 2);
 
 -- 铁岭市 (211200) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('211201', '铁岭市区', 3, '211200', 1),
 ('211221', '铁岭县', 3, '211200', 2),
 ('211223', '西丰县', 3, '211200', 3),
@@ -516,7 +516,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('211282', '开原市', 3, '211200', 6);
 
 -- 朝阳市 (211300) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('211301', '朝阳市区', 3, '211300', 1),
 ('211321', '朝阳县', 3, '211300', 2),
 ('211322', '建平县', 3, '211300', 3),
@@ -525,7 +525,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('211382', '凌源市', 3, '211300', 6);
 
 -- 葫芦岛市 (211400) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('211401', '葫芦岛市区', 3, '211400', 1),
 ('211421', '绥中县', 3, '211400', 2),
 ('211422', '建昌县', 3, '211400', 3),
@@ -538,7 +538,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 -- =============================================
 
 -- 长春市 (220100) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('220101', '长春市区', 3, '220100', 1),
 ('220122', '农安县', 3, '220100', 2),
 ('220182', '榆树市', 3, '220100', 3),
@@ -546,7 +546,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('220184', '公主岭市', 3, '220100', 5);
 
 -- 吉林市 (220200) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('220201', '吉林市区', 3, '220200', 1),
 ('220221', '永吉县', 3, '220200', 2),
 ('220281', '蛟河市', 3, '220200', 3),
@@ -555,20 +555,20 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('220284', '磐石市', 3, '220200', 6);
 
 -- 四平市 (220300) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('220301', '四平市区', 3, '220300', 1),
 ('220322', '梨树县', 3, '220300', 2),
 ('220323', '伊通满族自治县', 3, '220300', 3),
 ('220382', '双辽市', 3, '220300', 4);
 
 -- 辽源市 (220400) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('220401', '辽源市区', 3, '220400', 1),
 ('220421', '东丰县', 3, '220400', 2),
 ('220422', '东辽县', 3, '220400', 3);
 
 -- 通化市 (220500) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('220501', '通化市区', 3, '220500', 1),
 ('220521', '通化县', 3, '220500', 2),
 ('220523', '辉南县', 3, '220500', 3),
@@ -577,7 +577,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('220582', '集安市', 3, '220500', 6);
 
 -- 白山市 (220600) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('220601', '白山市区', 3, '220600', 1),
 ('220621', '抚松县', 3, '220600', 2),
 ('220622', '靖宇县', 3, '220600', 3),
@@ -585,7 +585,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('220681', '临江市', 3, '220600', 5);
 
 -- 松原市 (220700) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('220701', '松原市区', 3, '220700', 1),
 ('220721', '前郭尔罗斯蒙古族自治县', 3, '220700', 2),
 ('220722', '长岭县', 3, '220700', 3),
@@ -593,7 +593,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('220781', '扶余市', 3, '220700', 5);
 
 -- 白城市 (220800) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('220801', '白城市区', 3, '220800', 1),
 ('220821', '镇赉县', 3, '220800', 2),
 ('220822', '通榆县', 3, '220800', 3),
@@ -602,7 +602,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 
 -- 延边朝鲜族自治州 (222400) 下辖县市
 -- 注: 自治州以州府延吉市作为市区
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('222401', '延边州市区', 3, '222400', 1),
 ('222402', '图们市', 3, '222400', 2),
 ('222403', '敦化市', 3, '222400', 3),
@@ -618,7 +618,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 -- ============================================================
 
 -- 哈尔滨市 (230100) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('230101', '哈尔滨市区', 3, '230100', 1),
 ('230123', '依兰县', 3, '230100', 2),
 ('230124', '方正县', 3, '230100', 3),
@@ -631,7 +631,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('230184', '五常市', 3, '230100', 10);
 
 -- 齐齐哈尔市 (230200) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('230201', '齐齐哈尔市区', 3, '230200', 1),
 ('230221', '龙江县', 3, '230200', 2),
 ('230223', '依安县', 3, '230200', 3),
@@ -644,20 +644,20 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('230281', '讷河市', 3, '230200', 10);
 
 -- 鸡西市 (230300) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('230301', '鸡西市区', 3, '230300', 1),
 ('230321', '鸡东县', 3, '230300', 2),
 ('230381', '虎林市', 3, '230300', 3),
 ('230382', '密山市', 3, '230300', 4);
 
 -- 鹤岗市 (230400) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('230401', '鹤岗市区', 3, '230400', 1),
 ('230421', '萝北县', 3, '230400', 2),
 ('230422', '绥滨县', 3, '230400', 3);
 
 -- 双鸭山市 (230500) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('230501', '双鸭山市区', 3, '230500', 1),
 ('230521', '集贤县', 3, '230500', 2),
 ('230522', '友谊县', 3, '230500', 3),
@@ -665,7 +665,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('230524', '饶河县', 3, '230500', 5);
 
 -- 大庆市 (230600) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('230601', '大庆市区', 3, '230600', 1),
 ('230621', '肇州县', 3, '230600', 2),
 ('230622', '肇源县', 3, '230600', 3),
@@ -674,7 +674,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 
 -- 伊春市 (230700) - 区县
 -- 注：伊春市2019年行政区划调整，原15个市辖区合并为4区4县1市
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('230701', '伊春市区', 3, '230700', 1),
 ('230717', '汤旺县', 3, '230700', 2),
 ('230718', '丰林县', 3, '230700', 3),
@@ -683,7 +683,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('230723', '铁力市', 3, '230700', 6);
 
 -- 佳木斯市 (230800) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('230801', '佳木斯市区', 3, '230800', 1),
 ('230822', '桦南县', 3, '230800', 2),
 ('230826', '桦川县', 3, '230800', 3),
@@ -693,12 +693,12 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('230883', '抚远市', 3, '230800', 7);
 
 -- 七台河市 (230900) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('230901', '七台河市区', 3, '230900', 1),
 ('230921', '勃利县', 3, '230900', 2);
 
 -- 牡丹江市 (231000) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('231001', '牡丹江市区', 3, '231000', 1),
 ('231025', '林口县', 3, '231000', 2),
 ('231081', '绥芬河市', 3, '231000', 3),
@@ -708,7 +708,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('231086', '东宁市', 3, '231000', 7);
 
 -- 黑河市 (231100) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('231101', '黑河市区', 3, '231100', 1),
 ('231123', '逊克县', 3, '231100', 2),
 ('231124', '孙吴县', 3, '231100', 3),
@@ -717,7 +717,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('231183', '嫩江市', 3, '231100', 6);
 
 -- 绥化市 (231200) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('231201', '绥化市区', 3, '231200', 1),
 ('231221', '望奎县', 3, '231200', 2),
 ('231222', '兰西县', 3, '231200', 3),
@@ -731,7 +731,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 
 -- 大兴安岭地区 (232700) - 区县
 -- 注：加格达奇区、松岭区、新林区、呼中区为地区管辖的县级行政区
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('232701', '大兴安岭地区市区', 3, '232700', 1),
 ('232721', '呼玛县', 3, '232700', 2),
 ('232722', '塔河县', 3, '232700', 3),
@@ -743,17 +743,17 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 -- ============================================================
 
 -- 南京市 (320100) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('320101', '南京市区', 3, '320100', 1);
 
 -- 无锡市 (320200) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('320201', '无锡市区', 3, '320200', 1),
 ('320281', '江阴市', 3, '320200', 2),
 ('320282', '宜兴市', 3, '320200', 3);
 
 -- 徐州市 (320300) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('320301', '徐州市区', 3, '320300', 1),
 ('320321', '丰县', 3, '320300', 2),
 ('320322', '沛县', 3, '320300', 3),
@@ -762,12 +762,12 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('320382', '邳州市', 3, '320300', 6);
 
 -- 常州市 (320400) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('320401', '常州市区', 3, '320400', 1),
 ('320481', '溧阳市', 3, '320400', 2);
 
 -- 苏州市 (320500) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('320501', '苏州市区', 3, '320500', 1),
 ('320581', '常熟市', 3, '320500', 2),
 ('320582', '张家港市', 3, '320500', 3),
@@ -775,7 +775,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('320585', '太仓市', 3, '320500', 5);
 
 -- 南通市 (320600) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('320601', '南通市区', 3, '320600', 1),
 ('320623', '如东县', 3, '320600', 2),
 ('320681', '启东市', 3, '320600', 3),
@@ -783,21 +783,21 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('320685', '海门市', 3, '320600', 5);
 
 -- 连云港市 (320700) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('320701', '连云港市区', 3, '320700', 1),
 ('320722', '东海县', 3, '320700', 2),
 ('320723', '灌云县', 3, '320700', 3),
 ('320724', '灌南县', 3, '320700', 4);
 
 -- 淮安市 (320800) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('320801', '淮安市区', 3, '320800', 1),
 ('320826', '涟水县', 3, '320800', 2),
 ('320830', '盱眙县', 3, '320800', 3),
 ('320831', '金湖县', 3, '320800', 4);
 
 -- 盐城市 (320900) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('320901', '盐城市区', 3, '320900', 1),
 ('320921', '响水县', 3, '320900', 2),
 ('320922', '滨海县', 3, '320900', 3),
@@ -807,28 +807,28 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('320981', '东台市', 3, '320900', 7);
 
 -- 扬州市 (321000) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('321001', '扬州市区', 3, '321000', 1),
 ('321023', '宝应县', 3, '321000', 2),
 ('321081', '仪征市', 3, '321000', 3),
 ('321084', '高邮市', 3, '321000', 4);
 
 -- 镇江市 (321100) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('321101', '镇江市区', 3, '321100', 1),
 ('321181', '丹阳市', 3, '321100', 2),
 ('321182', '扬中市', 3, '321100', 3),
 ('321183', '句容市', 3, '321100', 4);
 
 -- 泰州市 (321200) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('321201', '泰州市区', 3, '321200', 1),
 ('321281', '兴化市', 3, '321200', 2),
 ('321282', '靖江市', 3, '321200', 3),
 ('321283', '泰兴市', 3, '321200', 4);
 
 -- 宿迁市 (321300) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('321301', '宿迁市区', 3, '321300', 1),
 ('321322', '沭阳县', 3, '321300', 2),
 ('321323', '泗阳县', 3, '321300', 3),
@@ -840,257 +840,258 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 -- ============================================================
 
 -- 杭州市 (330100) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330102', '上城区', 3, '330100', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330105', '拱墅区', 3, '330100', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330106', '西湖区', 3, '330100', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330108', '滨江区', 3, '330100', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330109', '萧山区', 3, '330100', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330110', '余杭区', 3, '330100', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330111', '富阳区', 3, '330100', 7);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330112', '临安区', 3, '330100', 8);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330113', '临平区', 3, '330100', 9);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330114', '钱塘区', 3, '330100', 10);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330122', '桐庐县', 3, '330100', 11);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330127', '淳安县', 3, '330100', 12);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330182', '建德市', 3, '330100', 13);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330102', '上城区', 3, '330100', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330105', '拱墅区', 3, '330100', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330106', '西湖区', 3, '330100', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330108', '滨江区', 3, '330100', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330109', '萧山区', 3, '330100', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330110', '余杭区', 3, '330100', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330111', '富阳区', 3, '330100', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330112', '临安区', 3, '330100', 8);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330113', '临平区', 3, '330100', 9);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330114', '钱塘区', 3, '330100', 10);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330122', '桐庐县', 3, '330100', 11);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330127', '淳安县', 3, '330100', 12);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330182', '建德市', 3, '330100', 13);
 
 -- 宁波市 (330200) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330203', '海曙区', 3, '330200', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330205', '江北区', 3, '330200', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330206', '北仑区', 3, '330200', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330211', '镇海区', 3, '330200', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330212', '鄞州区', 3, '330200', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330213', '奉化区', 3, '330200', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330225', '象山县', 3, '330200', 7);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330226', '宁海县', 3, '330200', 8);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330281', '余姚市', 3, '330200', 9);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330282', '慈溪市', 3, '330200', 10);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330203', '海曙区', 3, '330200', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330205', '江北区', 3, '330200', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330206', '北仑区', 3, '330200', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330211', '镇海区', 3, '330200', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330212', '鄞州区', 3, '330200', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330213', '奉化区', 3, '330200', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330225', '象山县', 3, '330200', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330226', '宁海县', 3, '330200', 8);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330281', '余姚市', 3, '330200', 9);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330282', '慈溪市', 3, '330200', 10);
 
 -- 温州市 (330300) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330302', '鹿城区', 3, '330300', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330303', '龙湾区', 3, '330300', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330304', '瓯海区', 3, '330300', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330305', '洞头区', 3, '330300', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330324', '永嘉县', 3, '330300', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330326', '平阳县', 3, '330300', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330327', '苍南县', 3, '330300', 7);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330328', '文成县', 3, '330300', 8);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330329', '泰顺县', 3, '330300', 9);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330381', '瑞安市', 3, '330300', 10);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330382', '乐清市', 3, '330300', 11);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330383', '龙港市', 3, '330300', 12);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330302', '鹿城区', 3, '330300', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330303', '龙湾区', 3, '330300', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330304', '瓯海区', 3, '330300', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330305', '洞头区', 3, '330300', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330324', '永嘉县', 3, '330300', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330326', '平阳县', 3, '330300', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330327', '苍南县', 3, '330300', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330328', '文成县', 3, '330300', 8);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330329', '泰顺县', 3, '330300', 9);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330381', '瑞安市', 3, '330300', 10);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330382', '乐清市', 3, '330300', 11);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330383', '龙港市', 3, '330300', 12);
 
 -- 嘉兴市 (330400) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330402', '南湖区', 3, '330400', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330411', '秀洲区', 3, '330400', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330421', '嘉善县', 3, '330400', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330424', '海盐县', 3, '330400', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330481', '海宁市', 3, '330400', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330482', '平湖市', 3, '330400', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330483', '桐乡市', 3, '330400', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330402', '南湖区', 3, '330400', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330411', '秀洲区', 3, '330400', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330421', '嘉善县', 3, '330400', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330424', '海盐县', 3, '330400', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330481', '海宁市', 3, '330400', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330482', '平湖市', 3, '330400', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330483', '桐乡市', 3, '330400', 7);
 
 -- 湖州市 (330500) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330502', '吴兴区', 3, '330500', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330503', '南浔区', 3, '330500', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330521', '德清县', 3, '330500', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330522', '长兴县', 3, '330500', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330523', '安吉县', 3, '330500', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330502', '吴兴区', 3, '330500', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330503', '南浔区', 3, '330500', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330521', '德清县', 3, '330500', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330522', '长兴县', 3, '330500', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330523', '安吉县', 3, '330500', 5);
 
 -- 绍兴市 (330600) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330602', '越城区', 3, '330600', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330603', '柯桥区', 3, '330600', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330604', '上虞区', 3, '330600', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330624', '新昌县', 3, '330600', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330681', '诸暨市', 3, '330600', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330683', '嵊州市', 3, '330600', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330602', '越城区', 3, '330600', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330603', '柯桥区', 3, '330600', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330604', '上虞区', 3, '330600', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330624', '新昌县', 3, '330600', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330681', '诸暨市', 3, '330600', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330683', '嵊州市', 3, '330600', 6);
 
 -- 金华市 (330700) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330702', '婺城区', 3, '330700', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330703', '金东区', 3, '330700', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330723', '武义县', 3, '330700', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330726', '浦江县', 3, '330700', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330727', '磐安县', 3, '330700', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330781', '兰溪市', 3, '330700', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330782', '义乌市', 3, '330700', 7);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330783', '东阳市', 3, '330700', 8);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330784', '永康市', 3, '330700', 9);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330702', '婺城区', 3, '330700', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330703', '金东区', 3, '330700', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330723', '武义县', 3, '330700', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330726', '浦江县', 3, '330700', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330727', '磐安县', 3, '330700', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330781', '兰溪市', 3, '330700', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330782', '义乌市', 3, '330700', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330783', '东阳市', 3, '330700', 8);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330784', '永康市', 3, '330700', 9);
 
 -- 衢州市 (330800) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330802', '柯城区', 3, '330800', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330803', '衢江区', 3, '330800', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330822', '常山县', 3, '330800', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330824', '开化县', 3, '330800', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330825', '龙游县', 3, '330800', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330881', '江山市', 3, '330800', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330802', '柯城区', 3, '330800', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330803', '衢江区', 3, '330800', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330822', '常山县', 3, '330800', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330824', '开化县', 3, '330800', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330825', '龙游县', 3, '330800', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330881', '江山市', 3, '330800', 6);
 
 -- 舟山市 (330900) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330902', '定海区', 3, '330900', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330903', '普陀区', 3, '330900', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330921', '岱山县', 3, '330900', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330922', '嵊泗县', 3, '330900', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330902', '定海区', 3, '330900', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330903', '普陀区', 3, '330900', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330921', '岱山县', 3, '330900', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('330922', '嵊泗县', 3, '330900', 4);
 
 -- 台州市 (331000) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331002', '椒江区', 3, '331000', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331003', '黄岩区', 3, '331000', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331004', '路桥区', 3, '331000', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331022', '三门县', 3, '331000', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331023', '天台县', 3, '331000', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331024', '仙居县', 3, '331000', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331081', '温岭市', 3, '331000', 7);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331082', '临海市', 3, '331000', 8);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331083', '玉环市', 3, '331000', 9);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331002', '椒江区', 3, '331000', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331003', '黄岩区', 3, '331000', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331004', '路桥区', 3, '331000', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331022', '三门县', 3, '331000', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331023', '天台县', 3, '331000', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331024', '仙居县', 3, '331000', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331081', '温岭市', 3, '331000', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331082', '临海市', 3, '331000', 8);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331083', '玉环市', 3, '331000', 9);
 
 -- 丽水市 (331100) 下辖区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331102', '莲都区', 3, '331100', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331121', '青田县', 3, '331100', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331122', '缙云县', 3, '331100', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331123', '遂昌县', 3, '331100', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331124', '松阳县', 3, '331100', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331125', '云和县', 3, '331100', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331126', '庆元县', 3, '331100', 7);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331127', '景宁畲族自治县', 3, '331100', 8);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331181', '龙泉市', 3, '331100', 9);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331102', '莲都区', 3, '331100', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331121', '青田县', 3, '331100', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331122', '缙云县', 3, '331100', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331123', '遂昌县', 3, '331100', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331124', '松阳县', 3, '331100', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331125', '云和县', 3, '331100', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331126', '庆元县', 3, '331100', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331127', '景宁畲族自治县', 3, '331100', 8);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('331181', '龙泉市', 3, '331100', 9);
 -- =============================================
 -- 安徽省区县级行政区划 INSERT 语句
 -- region_level: 3 (区县级)
 -- 生成日期: 2026-07-16
--- 共 16 个地级市，105 个区县
+-- 共 16 个地级市，104 个区县（现行行政区划）
 -- =============================================
 
 -- 合肥市 (340100)
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340102', '瑶海区', 3, '340100', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340103', '庐阳区', 3, '340100', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340104', '蜀山区', 3, '340100', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340111', '包河区', 3, '340100', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340121', '长丰县', 3, '340100', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340122', '肥东县', 3, '340100', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340123', '肥西县', 3, '340100', 7);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340124', '庐江县', 3, '340100', 8);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340181', '巢湖市', 3, '340100', 9);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340102', '瑶海区', 3, '340100', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340103', '庐阳区', 3, '340100', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340104', '蜀山区', 3, '340100', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340111', '包河区', 3, '340100', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340121', '长丰县', 3, '340100', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340122', '肥东县', 3, '340100', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340123', '肥西县', 3, '340100', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340124', '庐江县', 3, '340100', 8);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340181', '巢湖市', 3, '340100', 9);
 
 -- 芜湖市 (340200)
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340202', '镜湖区', 3, '340200', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340203', '弋江区', 3, '340200', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340207', '鸠江区', 3, '340200', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340208', '湾沚区', 3, '340200', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340209', '繁昌区', 3, '340200', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340223', '南陵县', 3, '340200', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340281', '无为市', 3, '340200', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340202', '镜湖区', 3, '340200', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340203', '弋江区', 3, '340200', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340207', '鸠江区', 3, '340200', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340208', '湾沚区', 3, '340200', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340209', '繁昌区', 3, '340200', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340223', '南陵县', 3, '340200', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340281', '无为市', 3, '340200', 7);
 
 -- 蚌埠市 (340300)
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340302', '龙子湖区', 3, '340300', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340303', '蚌山区', 3, '340300', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340304', '禹会区', 3, '340300', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340311', '淮上区', 3, '340300', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340321', '怀远县', 3, '340300', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340322', '五河县', 3, '340300', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340323', '固镇县', 3, '340300', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340302', '龙子湖区', 3, '340300', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340303', '蚌山区', 3, '340300', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340304', '禹会区', 3, '340300', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340311', '淮上区', 3, '340300', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340321', '怀远县', 3, '340300', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340322', '五河县', 3, '340300', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340323', '固镇县', 3, '340300', 7);
 
 -- 淮南市 (340400)
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340402', '大通区', 3, '340400', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340403', '田家庵区', 3, '340400', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340404', '谢家集区', 3, '340400', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340405', '八公山区', 3, '340400', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340406', '潘集区', 3, '340400', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340421', '凤台县', 3, '340400', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340422', '寿县', 3, '340400', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340402', '大通区', 3, '340400', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340403', '田家庵区', 3, '340400', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340404', '谢家集区', 3, '340400', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340405', '八公山区', 3, '340400', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340406', '潘集区', 3, '340400', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340421', '凤台县', 3, '340400', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340422', '寿县', 3, '340400', 7);
 
 -- 马鞍山市 (340500)
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340503', '花山区', 3, '340500', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340504', '雨山区', 3, '340500', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340506', '博望区', 3, '340500', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340521', '当涂县', 3, '340500', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340522', '含山县', 3, '340500', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340523', '和县', 3, '340500', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340503', '花山区', 3, '340500', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340504', '雨山区', 3, '340500', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340506', '博望区', 3, '340500', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340521', '当涂县', 3, '340500', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340522', '含山县', 3, '340500', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340523', '和县', 3, '340500', 6);
 
 -- 淮北市 (340600)
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340602', '杜集区', 3, '340600', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340603', '相山区', 3, '340600', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340604', '烈山区', 3, '340600', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340621', '濉溪县', 3, '340600', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340602', '杜集区', 3, '340600', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340603', '相山区', 3, '340600', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340604', '烈山区', 3, '340600', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340621', '濉溪县', 3, '340600', 4);
 
 -- 铜陵市 (340700)
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340705', '铜官区', 3, '340700', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340706', '义安区', 3, '340700', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340711', '郊区', 3, '340700', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340722', '枞阳县', 3, '340700', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340705', '铜官区', 3, '340700', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340706', '义安区', 3, '340700', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340711', '郊区', 3, '340700', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340722', '枞阳县', 3, '340700', 4);
 
 -- 安庆市 (340800)
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340802', '迎江区', 3, '340800', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340803', '大观区', 3, '340800', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340811', '宜秀区', 3, '340800', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340822', '怀宁县', 3, '340800', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340825', '太湖县', 3, '340800', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340826', '宿松县', 3, '340800', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340827', '望江县', 3, '340800', 7);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340828', '岳西县', 3, '340800', 8);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340881', '桐城市', 3, '340800', 9);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340802', '迎江区', 3, '340800', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340803', '大观区', 3, '340800', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340811', '宜秀区', 3, '340800', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340822', '怀宁县', 3, '340800', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340825', '太湖县', 3, '340800', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340826', '宿松县', 3, '340800', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340827', '望江县', 3, '340800', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340828', '岳西县', 3, '340800', 8);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340881', '桐城市', 3, '340800', 9);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340882', '潜山市', 3, '340800', 10);
 
 -- 黄山市 (341000)
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341002', '屯溪区', 3, '341000', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341003', '黄山区', 3, '341000', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341004', '徽州区', 3, '341000', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341021', '歙县', 3, '341000', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341022', '休宁县', 3, '341000', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341023', '黟县', 3, '341000', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341024', '祁门县', 3, '341000', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341002', '屯溪区', 3, '341000', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341003', '黄山区', 3, '341000', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341004', '徽州区', 3, '341000', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341021', '歙县', 3, '341000', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341022', '休宁县', 3, '341000', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341023', '黟县', 3, '341000', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341024', '祁门县', 3, '341000', 7);
 
 -- 滁州市 (341100)
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341102', '琅琊区', 3, '341100', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341103', '南谯区', 3, '341100', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341122', '来安县', 3, '341100', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341124', '全椒县', 3, '341100', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341125', '定远县', 3, '341100', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341126', '凤阳县', 3, '341100', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341181', '天长市', 3, '341100', 7);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341182', '明光市', 3, '341100', 8);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341102', '琅琊区', 3, '341100', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341103', '南谯区', 3, '341100', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341122', '来安县', 3, '341100', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341124', '全椒县', 3, '341100', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341125', '定远县', 3, '341100', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341126', '凤阳县', 3, '341100', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341181', '天长市', 3, '341100', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341182', '明光市', 3, '341100', 8);
 
 -- 阜阳市 (341200)
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341202', '颍州区', 3, '341200', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341203', '颍东区', 3, '341200', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341204', '颍泉区', 3, '341200', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341221', '临泉县', 3, '341200', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341222', '太和县', 3, '341200', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341225', '阜南县', 3, '341200', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341226', '颍上县', 3, '341200', 7);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341282', '界首市', 3, '341200', 8);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341202', '颍州区', 3, '341200', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341203', '颍东区', 3, '341200', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341204', '颍泉区', 3, '341200', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341221', '临泉县', 3, '341200', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341222', '太和县', 3, '341200', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341225', '阜南县', 3, '341200', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341226', '颍上县', 3, '341200', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341282', '界首市', 3, '341200', 8);
 
 -- 宿州市 (341300)
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341302', '埇桥区', 3, '341300', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341321', '砀山县', 3, '341300', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341322', '萧县', 3, '341300', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341323', '灵璧县', 3, '341300', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341324', '泗县', 3, '341300', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341302', '埇桥区', 3, '341300', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341321', '砀山县', 3, '341300', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341322', '萧县', 3, '341300', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341323', '灵璧县', 3, '341300', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341324', '泗县', 3, '341300', 5);
 
 -- 六安市 (341500)
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341502', '金安区', 3, '341500', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341503', '裕安区', 3, '341500', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341504', '叶集区', 3, '341500', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341522', '霍邱县', 3, '341500', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341523', '舒城县', 3, '341500', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341524', '金寨县', 3, '341500', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341525', '霍山县', 3, '341500', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341502', '金安区', 3, '341500', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341503', '裕安区', 3, '341500', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341504', '叶集区', 3, '341500', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341522', '霍邱县', 3, '341500', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341523', '舒城县', 3, '341500', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341524', '金寨县', 3, '341500', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341525', '霍山县', 3, '341500', 7);
 
 -- 亳州市 (341600)
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341602', '谯城区', 3, '341600', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341621', '涡阳县', 3, '341600', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341622', '蒙城县', 3, '341600', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341623', '利辛县', 3, '341600', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341602', '谯城区', 3, '341600', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341621', '涡阳县', 3, '341600', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341622', '蒙城县', 3, '341600', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341623', '利辛县', 3, '341600', 4);
 
 -- 池州市 (341700)
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341702', '贵池区', 3, '341700', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341721', '东至县', 3, '341700', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341722', '石台县', 3, '341700', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341723', '青阳县', 3, '341700', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341702', '贵池区', 3, '341700', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341721', '东至县', 3, '341700', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341722', '石台县', 3, '341700', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341723', '青阳县', 3, '341700', 4);
 
 -- 宣城市 (341800)
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341802', '宣州区', 3, '341800', 1);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341821', '郎溪县', 3, '341800', 2);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341822', '广德市', 3, '341800', 3);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341823', '泾县', 3, '341800', 4);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341824', '绩溪县', 3, '341800', 5);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341825', '旌德县', 3, '341800', 6);
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341881', '宁国市', 3, '341800', 7);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341802', '宣州区', 3, '341800', 1);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341821', '郎溪县', 3, '341800', 2);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341822', '广德市', 3, '341800', 3);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341823', '泾县', 3, '341800', 4);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341824', '绩溪县', 3, '341800', 5);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341825', '旌德县', 3, '341800', 6);
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341881', '宁国市', 3, '341800', 7);
 -- ============================================================
 -- 湖北省各区县 SQL INSERT 语句
 -- 表名: region_dictionary
@@ -1099,17 +1100,17 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 -- ============================================================
 
 -- 武汉市 (420100) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('420101', '武汉市区', 3, '420100', 1);
 
 -- 黄石市 (420200) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('420201', '黄石市区', 3, '420200', 1),
 ('420222', '阳新县', 3, '420200', 2),
 ('420281', '大冶市', 3, '420200', 3);
 
 -- 十堰市 (420300) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('420301', '十堰市区', 3, '420300', 1),
 ('420322', '郧西县', 3, '420300', 2),
 ('420323', '竹山县', 3, '420300', 3),
@@ -1118,7 +1119,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('420381', '丹江口市', 3, '420300', 6);
 
 -- 宜昌市 (420500) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('420501', '宜昌市区', 3, '420500', 1),
 ('420525', '远安县', 3, '420500', 2),
 ('420526', '兴山县', 3, '420500', 3),
@@ -1130,7 +1131,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('420583', '枝江市', 3, '420500', 9);
 
 -- 襄阳市 (420600) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('420601', '襄阳市区', 3, '420600', 1),
 ('420624', '南漳县', 3, '420600', 2),
 ('420625', '谷城县', 3, '420600', 3),
@@ -1140,18 +1141,18 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('420684', '宜城市', 3, '420600', 7);
 
 -- 鄂州市 (420700) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('420701', '鄂州市区', 3, '420700', 1);
 
 -- 荆门市 (420800) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('420801', '荆门市区', 3, '420800', 1),
 ('420822', '沙洋县', 3, '420800', 2),
 ('420881', '钟祥市', 3, '420800', 3),
 ('420882', '京山市', 3, '420800', 4);
 
 -- 孝感市 (420900) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('420901', '孝感市区', 3, '420900', 1),
 ('420921', '孝昌县', 3, '420900', 2),
 ('420922', '大悟县', 3, '420900', 3),
@@ -1161,7 +1162,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('420984', '汉川市', 3, '420900', 7);
 
 -- 荆州市 (421000) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('421001', '荆州市区', 3, '421000', 1),
 ('421022', '公安县', 3, '421000', 2),
 ('421024', '江陵县', 3, '421000', 3),
@@ -1171,7 +1172,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('421088', '监利市', 3, '421000', 7);
 
 -- 黄冈市 (421100) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('421101', '黄冈市区', 3, '421100', 1),
 ('421121', '团风县', 3, '421100', 2),
 ('421122', '红安县', 3, '421100', 3),
@@ -1184,7 +1185,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('421182', '武穴市', 3, '421100', 10);
 
 -- 咸宁市 (421200) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('421201', '咸宁市区', 3, '421200', 1),
 ('421221', '嘉鱼县', 3, '421200', 2),
 ('421222', '通城县', 3, '421200', 3),
@@ -1193,13 +1194,13 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('421281', '赤壁市', 3, '421200', 6);
 
 -- 随州市 (421300) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('421301', '随州市区', 3, '421300', 1),
 ('421321', '随县', 3, '421300', 2),
 ('421381', '广水市', 3, '421300', 3);
 
 -- 恩施土家族苗族自治州 (422800) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('422801', '恩施市', 3, '422800', 1),
 ('422802', '利川市', 3, '422800', 2),
 ('422822', '建始县', 3, '422800', 3),
@@ -1212,7 +1213,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 -- region_level: 3 表示区县级
 -- 市区统一标记为"XX市区"，县和县级市单独列出
 
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 
 -- 长沙市 (430100)
 (430101, '长沙市区', 3, 430100, 1),
@@ -1343,7 +1344,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 -- 广东省区县数据
 -- region_level = 3 (区县级)
 
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 
 -- ============ 广州市 (440100) ============
 ('440101', '广州市市区', 3, '440100', 1),
@@ -1904,7 +1905,7 @@ INSERT INTO region (region_code, region_name, region_level, parent_code, sort_or
 -- ============================================================
 
 -- 贵阳市 (520100) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('520101', '贵阳市区', 3, '520100', 1),
 ('520121', '开阳县', 3, '520100', 2),
 ('520122', '息烽县', 3, '520100', 3),
@@ -1912,12 +1913,12 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('520181', '清镇市', 3, '520100', 5);
 
 -- 六盘水市 (520200) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('520201', '六盘水市区', 3, '520200', 1),
 ('520281', '盘州市', 3, '520200', 2);
 
 -- 遵义市 (520300) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('520301', '遵义市区', 3, '520300', 1),
 ('520322', '桐梓县', 3, '520300', 2),
 ('520323', '绥阳县', 3, '520300', 3),
@@ -1932,7 +1933,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('520382', '仁怀市', 3, '520300', 12);
 
 -- 安顺市 (520400) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('520401', '安顺市区', 3, '520400', 1),
 ('520422', '普定县', 3, '520400', 2),
 ('520423', '镇宁布依族苗族自治县', 3, '520400', 3),
@@ -1940,7 +1941,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('520425', '紫云苗族布依族自治县', 3, '520400', 5);
 
 -- 毕节市 (520500) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('520501', '毕节市区', 3, '520500', 1),
 ('520521', '大方县', 3, '520500', 2),
 ('520522', '黔西市', 3, '520500', 3),
@@ -1951,7 +1952,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('520527', '赫章县', 3, '520500', 8);
 
 -- 铜仁市 (520600) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('520601', '铜仁市区', 3, '520600', 1),
 ('520621', '江口县', 3, '520600', 2),
 ('520622', '玉屏侗族自治县', 3, '520600', 3),
@@ -1963,7 +1964,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('520628', '松桃苗族自治县', 3, '520600', 9);
 
 -- 黔西南布依族苗族自治州 (522300) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('522301', '兴义市', 3, '522300', 1),
 ('522322', '兴仁市', 3, '522300', 2),
 ('522323', '普安县', 3, '522300', 3),
@@ -1974,7 +1975,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('522328', '安龙县', 3, '522300', 8);
 
 -- 黔东南苗族侗族自治州 (522600) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('522601', '凯里市', 3, '522600', 1),
 ('522622', '黄平县', 3, '522600', 2),
 ('522623', '施秉县', 3, '522600', 3),
@@ -1993,7 +1994,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('522636', '丹寨县', 3, '522600', 16);
 
 -- 黔南布依族苗族自治州 (522700) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('522701', '都匀市', 3, '522700', 1),
 ('522702', '福泉市', 3, '522700', 2),
 ('522722', '荔波县', 3, '522700', 3),
@@ -2014,7 +2015,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 -- ============================================================
 
 -- 昆明市 (530100) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('530101', '昆明市区', 3, '530100', 1),
 ('530113', '东川区', 3, '530100', 2),
 ('530124', '富民县', 3, '530100', 3),
@@ -2026,7 +2027,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('530181', '安宁市', 3, '530100', 9);
 
 -- 曲靖市 (530300) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('530301', '曲靖市区', 3, '530300', 1),
 ('530322', '陆良县', 3, '530300', 2),
 ('530323', '师宗县', 3, '530300', 3),
@@ -2036,7 +2037,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('530381', '宣威市', 3, '530300', 7);
 
 -- 玉溪市 (530400) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('530401', '玉溪市区', 3, '530400', 1),
 ('530422', '通海县', 3, '530400', 2),
 ('530423', '华宁县', 3, '530400', 3),
@@ -2047,7 +2048,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('530481', '澄江市', 3, '530400', 8);
 
 -- 保山市 (530500) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('530501', '保山市区', 3, '530500', 1),
 ('530522', '施甸县', 3, '530500', 2),
 ('530523', '龙陵县', 3, '530500', 3),
@@ -2055,7 +2056,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('530581', '腾冲市', 3, '530500', 5);
 
 -- 昭通市 (530600) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('530601', '昭通市区', 3, '530600', 1),
 ('530622', '鲁甸县', 3, '530600', 2),
 ('530623', '巧家县', 3, '530600', 3),
@@ -2069,7 +2070,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('530681', '水富市', 3, '530600', 11);
 
 -- 丽江市 (530700) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('530701', '丽江市区', 3, '530700', 1),
 ('530721', '玉龙纳西族自治县', 3, '530700', 2),
 ('530722', '永胜县', 3, '530700', 3),
@@ -2077,7 +2078,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('530724', '宁蒗彝族自治县', 3, '530700', 5);
 
 -- 普洱市 (530800) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('530801', '普洱市区', 3, '530800', 1),
 ('530822', '宁洱哈尼族彝族自治县', 3, '530800', 2),
 ('530823', '景东彝族自治县', 3, '530800', 3),
@@ -2089,7 +2090,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('530829', '西盟佤族自治县', 3, '530800', 9);
 
 -- 临沧市 (530900) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('530901', '临沧市区', 3, '530900', 1),
 ('530922', '凤庆县', 3, '530900', 2),
 ('530923', '云县', 3, '530900', 3),
@@ -2100,7 +2101,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('530928', '沧源佤族自治县', 3, '530900', 8);
 
 -- 楚雄彝族自治州 (532300) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('532301', '楚雄市', 3, '532300', 1),
 ('532322', '双柏县', 3, '532300', 2),
 ('532323', '牟定县', 3, '532300', 3),
@@ -2113,7 +2114,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('532331', '禄丰市', 3, '532300', 10);
 
 -- 红河哈尼族彝族自治州 (532500) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('532501', '个旧市', 3, '532500', 1),
 ('532502', '开远市', 3, '532500', 2),
 ('532503', '蒙自市', 3, '532500', 3),
@@ -2129,7 +2130,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('532532', '河口瑶族自治县', 3, '532500', 13);
 
 -- 文山壮族苗族自治州 (532600) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('532601', '文山市', 3, '532600', 1),
 ('532622', '砚山县', 3, '532600', 2),
 ('532623', '西畴县', 3, '532600', 3),
@@ -2140,13 +2141,13 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('532628', '富宁县', 3, '532600', 8);
 
 -- 西双版纳傣族自治州 (532800) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('532801', '景洪市', 3, '532800', 1),
 ('532822', '勐海县', 3, '532800', 2),
 ('532823', '勐腊县', 3, '532800', 3);
 
 -- 大理白族自治州 (532900) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('532901', '大理市', 3, '532900', 1),
 ('532922', '漾濞彝族自治县', 3, '532900', 2),
 ('532923', '祥云县', 3, '532900', 3),
@@ -2161,7 +2162,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('532932', '鹤庆县', 3, '532900', 12);
 
 -- 德宏傣族景颇族自治州 (533100) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('533101', '芒市', 3, '533100', 1),
 ('533102', '瑞丽市', 3, '533100', 2),
 ('533122', '梁河县', 3, '533100', 3),
@@ -2169,14 +2170,14 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('533124', '陇川县', 3, '533100', 5);
 
 -- 怒江傈僳族自治州 (533300) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('533301', '泸水市', 3, '533300', 1),
 ('533323', '福贡县', 3, '533300', 2),
 ('533324', '贡山独龙族怒族自治县', 3, '533300', 3),
 ('533325', '兰坪白族普米族自治县', 3, '533300', 4);
 
 -- 迪庆藏族自治州 (533400) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('533401', '香格里拉市', 3, '533400', 1),
 ('533422', '德钦县', 3, '533400', 2),
 ('533423', '维西傈僳族自治县', 3, '533400', 3);
@@ -2188,7 +2189,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 -- ============================================================
 
 -- 拉萨市 (540100) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('540101', '拉萨市区', 3, '540100', 1),
 ('540121', '林周县', 3, '540100', 2),
 ('540122', '当雄县', 3, '540100', 3),
@@ -2199,7 +2200,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('540128', '墨竹工卡县', 3, '540100', 8);
 
 -- 日喀则市 (540200) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('540201', '日喀则市区', 3, '540200', 1),
 ('540222', '南木林县', 3, '540200', 2),
 ('540223', '江孜县', 3, '540200', 3),
@@ -2220,7 +2221,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('540238', '岗巴县', 3, '540200', 18);
 
 -- 昌都市 (540300) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('540301', '昌都市区', 3, '540300', 1),
 ('540321', '江达县', 3, '540300', 2),
 ('540322', '贡觉县', 3, '540300', 3),
@@ -2234,7 +2235,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('540330', '边坝县', 3, '540300', 11);
 
 -- 林芝市 (540400) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('540401', '林芝市区', 3, '540400', 1),
 ('540421', '工布江达县', 3, '540400', 2),
 ('540422', '米林县', 3, '540400', 3),
@@ -2244,7 +2245,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('540426', '朗县', 3, '540400', 7);
 
 -- 山南市 (540500) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('540501', '山南市区', 3, '540500', 1),
 ('540521', '扎囊县', 3, '540500', 2),
 ('540522', '贡嘎县', 3, '540500', 3),
@@ -2259,7 +2260,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('540531', '浪卡子县', 3, '540500', 12);
 
 -- 那曲市 (540600) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('540601', '那曲市区', 3, '540600', 1),
 ('540621', '嘉黎县', 3, '540600', 2),
 ('540622', '比如县', 3, '540600', 3),
@@ -2273,7 +2274,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 ('540630', '双湖县', 3, '540600', 11);
 
 -- 阿里地区 (542500) - 区县
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 ('542521', '普兰县', 3, '542500', 1),
 ('542522', '札达县', 3, '542500', 2),
 ('542523', '噶尔县', 3, '542500', 3),
@@ -2284,7 +2285,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 -- 陕西省区县数据
 -- region_level = 3 (区县级)
 
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 
 -- ============ 西安市 (610100) ============
 ('610101', '西安市市区', 3, '610100', 1),
@@ -2425,7 +2426,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 -- 甘肃省区县数据
 -- region_level = 3 (区县级)
 
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 
 -- ============ 兰州市 (620100) ============
 ('620101', '兰州市市区', 3, '620100', 1),
@@ -2557,7 +2558,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 -- 青海省区县数据
 -- region_level = 3 (区县级)
 
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 
 -- ============ 西宁市 (630100) ============
 ('630101', '西宁市市区', 3, '630100', 1),
@@ -2623,7 +2624,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 -- 宁夏回族自治区区县数据
 -- region_level = 3 (区县级)
 
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 
 -- ============ 银川市 (640100) ============
 ('640101', '银川市市区', 3, '640100', 1),
@@ -2664,7 +2665,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 -- 新疆维吾尔自治区区县数据
 -- region_level = 3 (区县级)
 
-INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
+INSERT IGNORE INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES
 
 -- ============ 乌鲁木齐市 (650100) ============
 ('650101', '乌鲁木齐市市区', 3, '650100', 1),

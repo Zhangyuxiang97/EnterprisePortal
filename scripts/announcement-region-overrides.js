@@ -31,7 +31,7 @@ const ANNOUNCEMENT_REGION_OVERRIDES = [
   },
   {
     titlePrefix: '合肥新质产业总部中心项目',
-    province: '安徽省', city: '合肥市', district: '市区'
+    province: '安徽省', city: '合肥市', district: '包河区'
   },
   {
     titlePrefix: '湖北黄冈黄梅平北46MW分散式风电项目',

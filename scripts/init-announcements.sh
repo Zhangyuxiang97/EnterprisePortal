@@ -33,8 +33,11 @@ else
     done
 fi
 
-# 无论是否为新导入，都统一公告区域字段为行政区划编码。
-echo "[4/4] 统一公告区域编码..."
+# 无论是否为新导入，都补齐区域字典并统一公告区域字段为行政区划编码。
+echo "[4/5] 补齐区域字典..."
+docker exec -i hailong-mysql mysql -u hailong_app -p"$(grep MYSQL_PASSWORD /home/sean/projects/friend-dev/EnterprisePortal/.runtime/secrets.env | cut -d= -f2)" hailong_consulting < /home/sean/projects/friend-dev/EnterprisePortal/SQL/06_region_dictionary_complete.sql
+
+echo "[5/5] 统一公告区域编码..."
 docker exec -i hailong-mysql mysql -u hailong_app -p"$(grep MYSQL_PASSWORD /home/sean/projects/friend-dev/EnterprisePortal/.runtime/secrets.env | cut -d= -f2)" hailong_consulting < /home/sean/projects/friend-dev/EnterprisePortal/SQL/10_normalize_announcement_region_codes.sql
 
 # 验证导入结果

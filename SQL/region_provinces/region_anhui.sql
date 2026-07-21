@@ -2,7 +2,7 @@
 -- 安徽省区县级行政区划 INSERT 语句
 -- region_level: 3 (区县级)
 -- 生成日期: 2026-07-16
--- 共 16 个地级市，105 个区县
+-- 共 16 个地级市，104 个区县（现行行政区划）
 -- =============================================
 
 -- 合肥市 (340100)
@@ -73,6 +73,7 @@ INSERT INTO region_dictionary (region_code, region_name, region_level, parent_co
 INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340827', '望江县', 3, '340800', 7);
 INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340828', '岳西县', 3, '340800', 8);
 INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340881', '桐城市', 3, '340800', 9);
+INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('340882', '潜山市', 3, '340800', 10);
 
 -- 黄山市 (341000)
 INSERT INTO region_dictionary (region_code, region_name, region_level, parent_code, sort_order) VALUES ('341002', '屯溪区', 3, '341000', 1);
