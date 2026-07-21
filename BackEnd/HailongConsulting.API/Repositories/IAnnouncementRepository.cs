@@ -41,7 +41,7 @@ public interface IAnnouncementRepository : IRepository<Announcement>
     /// <summary>
     /// 按区域层级统计符合筛选条件的公告数量
     /// </summary>
-    Task<Dictionary<string, int>> GetRegionCountsAsync(
+    Task<(Dictionary<string, int> Counts, int TotalCount)> GetRegionCountsAsync(
         int regionLevel,
         string? businessType,
         string? noticeType,

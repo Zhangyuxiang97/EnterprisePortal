@@ -4,6 +4,8 @@
 
 const fs = require('fs');
 const path = require('path');
+const { findAnnouncementRegionOverride } = require('./announcement-region-overrides');
+const { HENAN_DISTRICT_TO_CITY } = require('./region-dictionary');
 
 const INPUT_FILE = path.join(__dirname, 'data', 'transformed-data.json');
 const OUTPUT_FILE = path.join(__dirname, 'data', 'final-data.json');
@@ -55,42 +57,18 @@ const CITY_MAP = {
   '洛阳': '洛阳市', '郑州': '郑州市'
 };
 
-// 县到市的映射
-const COUNTY_TO_CITY = {
-  '固始县': '信阳市', '光山县': '信阳市', '潢川县': '信阳市', '息县': '信阳市',
-  '商城县': '信阳市', '罗山县': '信阳市', '淮滨县': '信阳市', '新县': '信阳市',
-  '内黄县': '安阳市', '汤阴县': '安阳市', '滑县': '安阳市', '林州市': '安阳市',
-  '舞阳县': '漯河市', '临颍县': '漯河市',
-  '尉氏县': '开封市', '兰考县': '开封市', '杞县': '开封市', '通许县': '开封市',
-  '太康县': '周口市', '扶沟县': '周口市', '西华县': '周口市', '商水县': '周口市',
-  '沈丘县': '周口市', '郸城县': '周口市', '淮阳县': '周口市', '鹿邑县': '周口市',
-  '西峡县': '南阳市', '淅川县': '南阳市', '方城县': '南阳市', '镇平县': '南阳市',
-  '内乡县': '南阳市', '社旗县': '南阳市', '唐河县': '南阳市', '新野县': '南阳市',
-  '南召县': '南阳市', '桐柏县': '南阳市',
-  '武陟县': '焦作市', '博爱县': '焦作市', '修武县': '焦作市', '温县': '焦作市',
-  '沁阳市': '焦作市', '孟州市': '焦作市',
-  '范县': '濮阳市', '台前县': '濮阳市', '濮阳县': '濮阳市', '清丰县': '濮阳市', '南乐县': '濮阳市',
-  '民权县': '商丘市', '睢县': '商丘市', '宁陵县': '商丘市', '柘城县': '商丘市',
-  '虞城县': '商丘市', '夏邑县': '商丘市', '永城市': '商丘市',
-  '获嘉县': '新乡市', '原阳县': '新乡市', '延津县': '新乡市', '封丘县': '新乡市',
-  '长垣市': '新乡市', '卫辉市': '新乡市', '辉县市': '新乡市',
-  '赞皇县': '石家庄市', '行唐县': '石家庄市', '灵寿县': '石家庄市',
-  '新蔡县': '驻马店市', '西平县': '驻马店市', '平舆县': '驻马店市', '确山县': '驻马店市',
-  '遂平县': '驻马店市', '上蔡县': '驻马店市', '汝南县': '驻马店市', '泌阳县': '驻马店市',
-  '夏邑县': '商丘市',
-};
-
 /**
  * 映射区域到字典格式
  */
 function mapRegion(item) {
-  let province = item.province || '';
-  let city = item.city || '';
-  let district = item.district || '';
+  const regionOverride = findAnnouncementRegionOverride(item.title);
+  let province = regionOverride?.province || item.province || '';
+  let city = regionOverride?.city || item.city || '';
+  let district = regionOverride ? regionOverride.district : (item.district || '');
 
   // 优先从县名反推城市
-  if (district && COUNTY_TO_CITY[district]) {
-    city = COUNTY_TO_CITY[district];
+  if (!regionOverride && district && HENAN_DISTRICT_TO_CITY[district]) {
+    city = HENAN_DISTRICT_TO_CITY[district];
   }
   // 如果还是没有城市，从标题提取
   if (!city || city === '郑州市') {
@@ -249,4 +227,8 @@ function main() {
   Object.entries(districts).sort((a, b) => b[1] - a[1]).slice(0, 10).forEach(([k, v]) => console.log(k + ': ' + v));
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = { cleanHtml, mapRegion };

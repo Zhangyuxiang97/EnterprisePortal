@@ -140,9 +140,12 @@
                   class="pl-9 pr-8 py-1.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-hailong-primary/20 focus:border-hailong-primary outline-none transition-all text-xs font-semibold hover:border-slate-300 bg-white cursor-pointer appearance-none"
                   style="min-width: 120px;"
                 >
-                  <option value="">全部省份</option>
+                  <option value="">全部省份 ({{ regionCounts.provinceTotal }})</option>
                   <option v-for="province in provinces" :key="province.regionCode" :value="province.regionCode">
                     {{ province.regionName }} ({{ province.count }})
+                  </option>
+                  <option v-if="regionCounts.provinceUnlocated > 0" disabled>
+                    省份未明确 ({{ regionCounts.provinceUnlocated }})
                   </option>
                 </select>
                 <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,9 +164,12 @@
                   class="pl-9 pr-8 py-1.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-hailong-primary/20 focus:border-hailong-primary outline-none transition-all text-xs font-semibold hover:border-slate-300 bg-white cursor-pointer appearance-none"
                   style="min-width: 120px;"
                 >
-                  <option value="">全部城市</option>
+                  <option value="">全部城市 ({{ regionCounts.cityTotal }})</option>
                   <option v-for="city in cities" :key="city.regionCode" :value="city.regionCode">
                     {{ city.regionName }} ({{ city.count }})
+                  </option>
+                  <option v-if="regionCounts.cityUnlocated > 0" disabled>
+                    城市未明确 ({{ regionCounts.cityUnlocated }})
                   </option>
                 </select>
                 <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -182,9 +188,12 @@
                   class="pl-9 pr-8 py-1.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-hailong-primary/20 focus:border-hailong-primary outline-none transition-all text-xs font-semibold hover:border-slate-300 bg-white cursor-pointer appearance-none"
                   style="min-width: 120px;"
                 >
-                  <option value="">全部区县</option>
+                  <option value="">全部区县 ({{ regionCounts.districtTotal }})</option>
                   <option v-for="district in districts" :key="district.regionCode" :value="district.regionCode">
                     {{ district.regionName }} ({{ district.count }})
+                  </option>
+                  <option v-if="regionCounts.districtUnlocated > 0" disabled>
+                    区县未明确 ({{ regionCounts.districtUnlocated }})
                   </option>
                 </select>
                 <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -531,6 +540,14 @@ const currentAnnouncementTypes = computed(() => {
 const provinces = ref([])
 const cities = ref([])
 const districts = ref([])
+const regionCounts = ref({
+  provinceTotal: 0,
+  cityTotal: 0,
+  districtTotal: 0,
+  provinceUnlocated: 0,
+  cityUnlocated: 0,
+  districtUnlocated: 0
+})
 
 // 时间范围选项
 const timeRanges = [
@@ -584,10 +601,38 @@ const loadRegionOptions = async () => {
       provinces.value = res.data.provinces || []
       cities.value = res.data.cities || []
       districts.value = res.data.districts || []
+
+      regionCounts.value = {
+        provinceTotal: res.data.provinceTotalCount || 0,
+        cityTotal: res.data.cityTotalCount || 0,
+        districtTotal: res.data.districtTotalCount || 0,
+        provinceUnlocated: res.data.provinceUnlocatedCount || 0,
+        cityUnlocated: res.data.cityUnlocatedCount || 0,
+        districtUnlocated: res.data.districtUnlocatedCount || 0
+      }
+
+      // 服务端以最具体的合法区域编码为准补齐父级；非法或层级冲突的编码会被清理。
+      const resolvedProvince = res.data.selectedProvinceCode || ''
+      const resolvedCity = res.data.selectedCityCode || ''
+      const resolvedDistrict = res.data.selectedDistrictCode || ''
+      const pathChanged =
+        searchParams.value.province !== resolvedProvince ||
+        searchParams.value.city !== resolvedCity ||
+        searchParams.value.district !== resolvedDistrict
+
+      if (pathChanged) {
+        searchParams.value.province = resolvedProvince
+        searchParams.value.city = resolvedCity
+        searchParams.value.district = resolvedDistrict
+      }
+
+      return pathChanged
     }
   } catch (error) {
     console.error('加载公告区域筛选项失败:', error)
   }
+
+  return false
 }
 
 // 省份变化处理
@@ -717,6 +762,15 @@ const loadAnnouncements = async () => {
     console.error('加载公告列表失败:', error)
   } finally {
     loading.value = false
+  }
+}
+
+// 区域选项和公告列表并行加载；若服务端纠正了区域层级，则同步 URL 后重新查询一次。
+const loadPageData = async () => {
+  const [regionPathChanged] = await Promise.all([loadRegionOptions(), loadAnnouncements()])
+  if (regionPathChanged) {
+    currentPage.value = 1
+    updateUrlQuery()
   }
 }
 
@@ -885,7 +939,7 @@ watch(
     searchParams.value.city = newQuery.city || ''
     searchParams.value.district = newQuery.district || ''
 
-    await Promise.all([loadRegionOptions(), loadAnnouncements()])
+    await loadPageData()
   },
   { deep: true }
 )
@@ -932,7 +986,7 @@ onMounted(async () => {
   searchParams.value.city = query.city || ''
   searchParams.value.district = query.district || ''
 
-  await Promise.all([loadRegionOptions(), loadAnnouncements()])
+  await loadPageData()
 })
 </script>
 

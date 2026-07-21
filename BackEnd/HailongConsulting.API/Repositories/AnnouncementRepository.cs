@@ -82,7 +82,7 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
         return (items, totalCount);
     }
 
-    public async Task<Dictionary<string, int>> GetRegionCountsAsync(
+    public async Task<(Dictionary<string, int> Counts, int TotalCount)> GetRegionCountsAsync(
         int regionLevel,
         string? businessType,
         string? noticeType,
@@ -104,25 +104,29 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
             city,
             district: null);
 
-        return regionLevel switch
+        var groupedCounts = regionLevel switch
         {
             1 => await query
-                .Where(a => a.Province != null && a.Province != string.Empty)
-                .GroupBy(a => a.Province!)
+                .GroupBy(a => a.Province)
                 .Select(group => new { Region = group.Key, Count = group.Count() })
-                .ToDictionaryAsync(item => item.Region, item => item.Count),
+                .ToListAsync(),
             2 => await query
-                .Where(a => a.City != null && a.City != string.Empty)
-                .GroupBy(a => a.City!)
+                .GroupBy(a => a.City)
                 .Select(group => new { Region = group.Key, Count = group.Count() })
-                .ToDictionaryAsync(item => item.Region, item => item.Count),
+                .ToListAsync(),
             3 => await query
-                .Where(a => a.District != null && a.District != string.Empty)
-                .GroupBy(a => a.District!)
+                .GroupBy(a => a.District)
                 .Select(group => new { Region = group.Key, Count = group.Count() })
-                .ToDictionaryAsync(item => item.Region, item => item.Count),
+                .ToListAsync(),
             _ => throw new ArgumentOutOfRangeException(nameof(regionLevel), "区域层级必须是 1、2 或 3")
         };
+
+        var counts = groupedCounts
+            .Where(item => !string.IsNullOrEmpty(item.Region))
+            .ToDictionary(item => item.Region!, item => item.Count);
+        var totalCount = groupedCounts.Sum(item => item.Count);
+
+        return (counts, totalCount);
     }
 
     private IQueryable<Announcement> BuildFilteredQuery(

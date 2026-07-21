@@ -202,10 +202,10 @@ public class AnnouncementService : IAnnouncementService
     public async Task<AnnouncementRegionOptionsDto> GetRegionOptionsAsync(AnnouncementQueryDto queryDto)
     {
         var regions = await _unitOfWork.RegionDictionaries.GetTreeAsync();
-        var selectedProvince = FindRegion(regions, queryDto.Province, 1, parentCode: null);
-        var selectedCity = FindRegion(regions, queryDto.City, 2, selectedProvince?.RegionCode);
+        var (selectedProvince, selectedCity, selectedDistrict) = ResolveSelectedRegionPath(regions, queryDto);
 
-        var provinceCounts = await _unitOfWork.Announcements.GetRegionCountsAsync(
+        var (provinceCounts, provinceTotalCount) =
+            await _unitOfWork.Announcements.GetRegionCountsAsync(
             1,
             queryDto.BusinessType,
             queryDto.NoticeType,
@@ -215,9 +215,11 @@ public class AnnouncementService : IAnnouncementService
             queryDto.EndDate);
 
         Dictionary<string, int> cityCounts = [];
+        var cityTotalCount = 0;
         if (selectedProvince != null)
         {
-            cityCounts = await _unitOfWork.Announcements.GetRegionCountsAsync(
+            (cityCounts, cityTotalCount) =
+                await _unitOfWork.Announcements.GetRegionCountsAsync(
                 2,
                 queryDto.BusinessType,
                 queryDto.NoticeType,
@@ -229,9 +231,11 @@ public class AnnouncementService : IAnnouncementService
         }
 
         Dictionary<string, int> districtCounts = [];
+        var districtTotalCount = 0;
         if (selectedProvince != null && selectedCity != null)
         {
-            districtCounts = await _unitOfWork.Announcements.GetRegionCountsAsync(
+            (districtCounts, districtTotalCount) =
+                await _unitOfWork.Announcements.GetRegionCountsAsync(
                 3,
                 queryDto.BusinessType,
                 queryDto.NoticeType,
@@ -243,12 +247,55 @@ public class AnnouncementService : IAnnouncementService
                 selectedCity.RegionCode);
         }
 
+        var provinceOptions = BuildRegionOptions(
+            provinceCounts, regions, 1, parentCode: null, selectedProvince?.RegionCode);
+        var cityOptions = BuildRegionOptions(
+            cityCounts, regions, 2, selectedProvince?.RegionCode, selectedCity?.RegionCode);
+        var districtOptions = BuildRegionOptions(
+            districtCounts, regions, 3, selectedCity?.RegionCode, selectedDistrict?.RegionCode);
+
         return new AnnouncementRegionOptionsDto
         {
-            Provinces = BuildRegionOptions(provinceCounts, regions, 1, parentCode: null),
-            Cities = BuildRegionOptions(cityCounts, regions, 2, selectedProvince?.RegionCode),
-            Districts = BuildRegionOptions(districtCounts, regions, 3, selectedCity?.RegionCode)
+            Provinces = provinceOptions,
+            Cities = cityOptions,
+            Districts = districtOptions,
+            SelectedProvinceCode = selectedProvince?.RegionCode,
+            SelectedCityCode = selectedCity?.RegionCode,
+            SelectedDistrictCode = selectedDistrict?.RegionCode,
+            ProvinceTotalCount = provinceTotalCount,
+            CityTotalCount = cityTotalCount,
+            DistrictTotalCount = districtTotalCount,
+            ProvinceUnlocatedCount = Math.Max(0, provinceTotalCount - provinceOptions.Sum(item => item.Count)),
+            CityUnlocatedCount = Math.Max(0, cityTotalCount - cityOptions.Sum(item => item.Count)),
+            DistrictUnlocatedCount = Math.Max(0, districtTotalCount - districtOptions.Sum(item => item.Count))
         };
+    }
+
+    private static (RegionDictionary? Province, RegionDictionary? City, RegionDictionary? District)
+        ResolveSelectedRegionPath(
+            IReadOnlyCollection<RegionDictionary> regions,
+            AnnouncementQueryDto queryDto)
+    {
+        var requestedProvince = FindRegion(regions, queryDto.Province, 1, parentCode: null);
+        var requestedCity = FindRegion(regions, queryDto.City, 2, parentCode: null);
+        var requestedDistrict = FindRegion(regions, queryDto.District, 3, parentCode: null);
+
+        if (requestedDistrict != null)
+        {
+            var districtCity = FindRegion(regions, requestedDistrict.ParentCode, 2, parentCode: null);
+            var districtProvince = FindRegion(regions, districtCity?.ParentCode, 1, parentCode: null);
+            if (districtCity != null && districtProvince != null)
+                return (districtProvince, districtCity, requestedDistrict);
+        }
+
+        if (requestedCity != null)
+        {
+            var cityProvince = FindRegion(regions, requestedCity.ParentCode, 1, parentCode: null);
+            if (cityProvince != null)
+                return (cityProvince, requestedCity, null);
+        }
+
+        return (requestedProvince, null, null);
     }
 
     private static RegionDictionary? FindRegion(
@@ -270,25 +317,21 @@ public class AnnouncementService : IAnnouncementService
         IReadOnlyDictionary<string, int> counts,
         IReadOnlyCollection<RegionDictionary> regions,
         int regionLevel,
-        string? parentCode)
+        string? parentCode,
+        string? selectedRegionCode)
     {
-        return counts
-            .Select(item => new
+        return regions
+            .Where(region =>
+                region.RegionLevel == regionLevel &&
+                (parentCode == null || region.ParentCode == parentCode) &&
+                (counts.ContainsKey(region.RegionCode) || region.RegionCode == selectedRegionCode))
+            .OrderBy(region => region.SortOrder)
+            .ThenBy(region => region.RegionCode)
+            .Select(region => new AnnouncementRegionOptionDto
             {
-                Region = regions.FirstOrDefault(region =>
-                    region.RegionLevel == regionLevel &&
-                    (parentCode == null || region.ParentCode == parentCode) &&
-                    region.RegionCode == item.Key),
-                Count = item.Value
-            })
-            .Where(item => item.Region != null)
-            .OrderBy(item => item.Region!.SortOrder)
-            .ThenBy(item => item.Region!.RegionCode)
-            .Select(item => new AnnouncementRegionOptionDto
-            {
-                RegionCode = item.Region!.RegionCode,
-                RegionName = item.Region.RegionName,
-                Count = item.Count
+                RegionCode = region.RegionCode,
+                RegionName = region.RegionName,
+                Count = counts.GetValueOrDefault(region.RegionCode)
             })
             .ToList();
     }

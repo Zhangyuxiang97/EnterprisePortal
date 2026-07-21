@@ -223,4 +223,13 @@ public class AnnouncementRegionOptionsDto
     public List<AnnouncementRegionOptionDto> Provinces { get; set; } = [];
     public List<AnnouncementRegionOptionDto> Cities { get; set; } = [];
     public List<AnnouncementRegionOptionDto> Districts { get; set; } = [];
+    public string? SelectedProvinceCode { get; set; }
+    public string? SelectedCityCode { get; set; }
+    public string? SelectedDistrictCode { get; set; }
+    public int ProvinceTotalCount { get; set; }
+    public int CityTotalCount { get; set; }
+    public int DistrictTotalCount { get; set; }
+    public int ProvinceUnlocatedCount { get; set; }
+    public int CityUnlocatedCount { get; set; }
+    public int DistrictUnlocatedCount { get; set; }
 }

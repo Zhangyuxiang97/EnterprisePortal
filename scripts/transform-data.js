@@ -5,6 +5,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { findAnnouncementRegionOverride } = require('./announcement-region-overrides');
 
 const INPUT_FILE = path.join(__dirname, 'data', 'scraped-data.json');
 const OUTPUT_FILE = path.join(__dirname, 'data', 'transformed-data.json');
@@ -112,9 +113,27 @@ function inferProcurementType(title, contentText) {
  * 从标题和正文提取地区信息
  */
 function extractRegion(title, contentText, projectLocation) {
-  const text = title + ' ' + (projectLocation || '') + ' ' + (contentText || '');
+  const regionOverride = findAnnouncementRegionOverride(title);
+  if (regionOverride) {
+    return {
+      province: regionOverride.province.replace(/省$|市$|自治区$/, ''),
+      city: regionOverride.city,
+      district: regionOverride.district
+    };
+  }
 
-  // 省份 - 大部分是河南
+  // 只从标题、结构化项目地点和正文中的“项目/建设地点”片段识别区域。
+  // 不能扫描整篇正文，否则代理机构地址、供应商地址和候选人注册地址会污染项目区域。
+  const locationParts = [];
+  const locationPattern = /(?:项目建设地点|建设地点|项目地点|项目地址|项目所在地|供货地点)\s*[：:]?\s*([^。；;\n]{0,120})/g;
+  let locationMatch;
+  while ((locationMatch = locationPattern.exec(contentText || '')) !== null && locationParts.length < 5) {
+    locationParts.push(locationMatch[1]);
+  }
+
+  const locationText = [title, projectLocation, ...locationParts].filter(Boolean).join(' ');
+
+  // 旧站主体数据默认属于河南；已核实的跨省项目已在上方按项目系列覆盖。
   const province = '河南';
 
   // 城市
@@ -134,17 +153,20 @@ function extractRegion(title, contentText, projectLocation) {
   let district = '';
 
   for (const [key, value] of Object.entries(cityMap)) {
-    if (text.includes(key)) {
+    if (locationText.includes(key)) {
       city = value;
       break;
     }
   }
 
   // 区县逻辑：县单独标记，其他（区、开发区、功能区等）统一标"市区"
-  // 找所有县名，取最后一个（通常是真正的县名）
-  const countyMatches = text.match(/[一-龥]{2,}县/g);
+  // 按标题、结构化项目地点、正文地点片段的优先级提取，避免取到正文末尾的企业注册地址。
+  const countySources = [title, projectLocation, ...locationParts].filter(Boolean);
+  const countyMatches = countySources
+    .map(source => source.match(/[一-龥]{2,}县/g))
+    .find(matches => matches && matches.length > 0);
   if (countyMatches && countyMatches.length > 0) {
-    // 取最后一个匹配的县名
+    // 同一地点片段有多个县名时取最后一个，通常是最具体的项目所在地。
     district = countyMatches[countyMatches.length - 1];
   } else if (city) {
     // 有城市但没有县，就是市区
@@ -642,4 +664,8 @@ function main() {
   }
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = { extractRegion };
