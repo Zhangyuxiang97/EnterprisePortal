@@ -15,47 +15,38 @@ public class VisitStatisticRepository : Repository<VisitStatistic>, IVisitStatis
 
     public async Task RecordVisitAsync(string pageUrl, string? pageTitle, string? visitorIp, string? userAgent, string? referer)
     {
-        var today = DateOnly.FromDateTime(DateTime.Now);
-        
-        // 查找今天是否已有该页面的访问记录
-        var existingRecord = await _dbSet
-            .FirstOrDefaultAsync(v => v.PageUrl == pageUrl && v.VisitDate == today && v.IsDeleted == 0);
-
-        if (existingRecord != null)
+        var now = DateTime.Now;
+        await _dbSet.AddAsync(new VisitStatistic
         {
-            // 更新现有记录
-            existingRecord.VisitCount++;
-            existingRecord.PageTitle = pageTitle ?? existingRecord.PageTitle;
-            existingRecord.VisitorIp = visitorIp ?? existingRecord.VisitorIp;
-            existingRecord.UserAgent = userAgent ?? existingRecord.UserAgent;
-            existingRecord.Referer = referer ?? existingRecord.Referer;
-            existingRecord.UpdatedAt = DateTime.Now;
-        }
-        else
-        {
-            // 创建新记录
-            var newRecord = new VisitStatistic
-            {
-                VisitDate = today,
-                PageUrl = pageUrl,
-                PageTitle = pageTitle,
-                VisitorIp = visitorIp,
-                UserAgent = userAgent,
-                Referer = referer,
-                VisitCount = 1,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
-            };
-            await _dbSet.AddAsync(newRecord);
-        }
+            VisitDate = DateOnly.FromDateTime(now),
+            PageUrl = pageUrl,
+            PageTitle = pageTitle,
+            VisitorIp = visitorIp,
+            UserAgent = userAgent,
+            Referer = referer,
+            VisitCount = 1,
+            CreatedAt = now,
+            UpdatedAt = now
+        });
     }
 
-    public async Task<IEnumerable<VisitStatistic>> GetByDateRangeAsync(DateOnly startDate, DateOnly endDate)
+    public async Task<(IEnumerable<VisitStatistic> Items, int TotalCount)> GetPagedByDateRangeAsync(
+        DateOnly startDate, DateOnly endDate, string? pagePath, int page, int pageSize)
     {
-        return await _dbSet
-            .Where(v => v.VisitDate >= startDate && v.VisitDate <= endDate && v.IsDeleted == 0)
-            .OrderByDescending(v => v.VisitDate)
+        var query = _dbSet.AsNoTracking()
+            .Where(v => v.VisitDate >= startDate && v.VisitDate <= endDate && v.IsDeleted == 0);
+        if (!string.IsNullOrWhiteSpace(pagePath))
+        {
+            query = query.Where(v => v.PageUrl != null && v.PageUrl.Contains(pagePath));
+        }
+
+        var totalCount = await query.CountAsync();
+        var items = await query.OrderByDescending(v => v.CreatedAt)
+            .ThenByDescending(v => v.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+        return (items, totalCount);
     }
 
     public async Task<IEnumerable<(string PageUrl, string? PageTitle, int TotalViews)>> GetTopPagesAsync(int topCount, int days)

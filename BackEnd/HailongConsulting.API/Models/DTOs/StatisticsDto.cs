@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace HailongConsulting.API.Models.DTOs;
 
 /// <summary>
@@ -21,8 +23,14 @@ public class VisitStatisticDetailDto
 /// </summary>
 public class RecordVisitDto
 {
+    [Required]
+    [MaxLength(500)]
     public string? PageUrl { get; set; }
+
+    [MaxLength(255)]
     public string? PageTitle { get; set; }
+
+    [MaxLength(500)]
     public string? Referer { get; set; }
 }
 

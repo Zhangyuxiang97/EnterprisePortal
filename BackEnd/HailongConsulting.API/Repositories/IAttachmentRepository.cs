@@ -7,6 +7,9 @@ namespace HailongConsulting.API.Repositories;
 /// </summary>
 public interface IAttachmentRepository : IRepository<Attachment>
 {
+    Task<(IEnumerable<Attachment> Items, int TotalCount)> GetFilteredPagedAsync(
+        int page, int pageSize, string? category, string? relatedType, string? keyword);
+
     /// <summary>
     /// 根据关联类型和关联ID获取附件列表
     /// </summary>

@@ -156,11 +156,11 @@ npm run build
 npm run preview
 ```
 
-## 🔑 默认登录账号
+## 🔑 首次登录账号
 
 ```
 用户名: admin
-密码: Admin@123456
+密码: 后端首次启动时生成，见后端运行目录的 logs/bootstrap/initial-admin-credentials.txt
 ```
 
 ⚠️ **安全提示**: 首次登录后请立即修改密码！
@@ -317,7 +317,7 @@ const login = async () => {
   try {
     const res = await authApi.login({
       username: 'admin',
-      password: 'Admin@123456'
+      password: '<首次启动生成的管理员密码>'
     })
     
     if (res.success) {

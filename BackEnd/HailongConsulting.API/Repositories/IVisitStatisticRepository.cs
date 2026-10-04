@@ -8,7 +8,7 @@ namespace HailongConsulting.API.Repositories;
 public interface IVisitStatisticRepository : IRepository<VisitStatistic>
 {
     /// <summary>
-    /// 记录或更新访问统计
+    /// 为每次页面访问新增一条记录
     /// </summary>
     /// <param name="pageUrl">页面URL</param>
     /// <param name="pageTitle">页面标题</param>
@@ -18,9 +18,10 @@ public interface IVisitStatisticRepository : IRepository<VisitStatistic>
     Task RecordVisitAsync(string pageUrl, string? pageTitle, string? visitorIp, string? userAgent, string? referer);
 
     /// <summary>
-    /// 获取指定日期范围的访问统计
+    /// 分页获取指定日期范围的访问记录
     /// </summary>
-    Task<IEnumerable<VisitStatistic>> GetByDateRangeAsync(DateOnly startDate, DateOnly endDate);
+    Task<(IEnumerable<VisitStatistic> Items, int TotalCount)> GetPagedByDateRangeAsync(
+        DateOnly startDate, DateOnly endDate, string? pagePath, int page, int pageSize);
 
     /// <summary>
     /// 获取热门页面统计

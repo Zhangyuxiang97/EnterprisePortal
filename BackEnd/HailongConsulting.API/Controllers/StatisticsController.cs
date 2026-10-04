@@ -53,6 +53,11 @@ public class StatisticsController : ControllerBase
     {
         try
         {
+            if (page < 1 || pageSize < 1 || pageSize > 100)
+            {
+                return BadRequest(ApiResponse<PagedResult<VisitStatisticDetailDto>>.FailResult("页码必须大于 0，每页数量必须在 1 到 100 之间"));
+            }
+
             var start = string.IsNullOrEmpty(startDate) 
                 ? DateOnly.FromDateTime(DateTime.Now.AddDays(-30)) 
                 : DateOnly.Parse(startDate);
@@ -60,21 +65,8 @@ public class StatisticsController : ControllerBase
                 ? DateOnly.FromDateTime(DateTime.Now) 
                 : DateOnly.Parse(endDate);
 
-            var statistics = await _visitStatisticService.GetVisitStatisticsAsync(start, end);
-            
-            // 如果指定了页面路径，进行过滤
-            if (!string.IsNullOrEmpty(pagePath))
-            {
-                statistics = statistics.Where(s => s.PageUrl != null && s.PageUrl.Contains(pagePath));
-            }
-
-            var totalCount = statistics.Count();
-            var items = statistics
-                .OrderByDescending(s => s.CreatedAt)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
+            var (items, totalCount) = await _visitStatisticService.GetVisitStatisticsPageAsync(
+                start, end, pagePath, page, pageSize);
             var dtos = _mapper.Map<List<VisitStatisticDetailDto>>(items);
             
             var result = new PagedResult<VisitStatisticDetailDto>
@@ -185,6 +177,7 @@ public class StatisticsController : ControllerBase
     /// </summary>
     [HttpPost("visits/record")]
     [AllowAnonymous]
+    [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("visit")]
     public async Task<ActionResult<ApiResponse<bool>>> RecordVisit([FromBody] RecordVisitDto dto)
     {
         try

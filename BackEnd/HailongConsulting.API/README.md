@@ -14,13 +14,13 @@
 
 | 技术 | 版本 | 用途 |
 |------|------|------|
-| .NET | 7.0 | Web API框架 |
-| Entity Framework Core | 7.0.14 | ORM框架 |
+| .NET | 8.0 | Web API框架 |
+| Entity Framework Core | 8.0.29 | ORM框架 |
 | MySQL | 8.0+ | 关系型数据库 |
-| Pomelo.EntityFrameworkCore.MySql | 7.0.0 | MySQL数据库提供程序 |
-| JWT Bearer | 7.0.14 | 身份认证 |
-| AutoMapper | 12.0.1 | 对象映射 |
-| Serilog | 7.0.0 | 日志记录 |
+| Pomelo.EntityFrameworkCore.MySql | 8.0.3 | MySQL数据库提供程序 |
+| JWT Bearer | 8.0.29 | 身份认证 |
+| AutoMapper | 15.1.3 | 对象映射 |
+| Serilog.AspNetCore | 8.0.3 | 日志记录 |
 | Swagger/OpenAPI | 6.5.0 | API文档 |
 
 ## 📁 项目结构
@@ -153,10 +153,10 @@ cd BackEnd/HailongConsulting.API
 cd ../../SQL
 
 # 创建数据库结构
-mysql -u root -p < hailong_consulting_schema.sql
+mysql -u root -p < 01_hailong_consulting_schema.sql
 
 # 导入初始数据
-mysql -u root -p < hailong_consulting_init_data.sql
+mysql -u root -p < 02_hailong_consulting_init_data.sql
 ```
 
 ### 5. 安装依赖
@@ -180,6 +180,12 @@ dotnet run
 
 - **Swagger UI**: http://localhost:5000 或 https://localhost:5001
 - **API Base URL**: http://localhost:5000/api
+
+首次启动且用户表为空时，会生成 `admin` 账号。随机密码仅写入运行目录的
+`logs/bootstrap/initial-admin-credentials.txt`；完成首次登录后请修改密码并删除该文件。
+
+门户每次页面导航会新增一条访问记录。旧版按日期和页面汇总的历史记录无法还原
+真实的独立访客和访问来源；这些指标从本次改动后的新增记录开始按访客 IP 统计。
 
 ## 📡 核心API端点
 

@@ -527,6 +527,7 @@ public class ConfigController : ControllerBase
     /// 记录访问
     /// </summary>
     [HttpPost("statistics/record")]
+    [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("visit")]
     public async Task<ActionResult<ApiResponse<bool>>> RecordVisit([FromBody] RecordVisitDto dto)
     {
         try

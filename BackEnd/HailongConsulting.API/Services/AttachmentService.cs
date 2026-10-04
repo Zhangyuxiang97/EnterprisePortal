@@ -30,35 +30,8 @@ public class AttachmentService : IAttachmentService
     {
         try
         {
-            // 构建查询条件
-            var allAttachments = await _unitOfWork.Attachments.FindAsync(a => a.IsDeleted == 0);
-            var query = allAttachments.AsQueryable();
-
-            // 分类筛选
-            if (!string.IsNullOrWhiteSpace(category))
-            {
-                query = query.Where(a => a.Category == category);
-            }
-
-            // 关联类型筛选
-            if (!string.IsNullOrWhiteSpace(relatedType))
-            {
-                query = query.Where(a => a.RelatedType == relatedType);
-            }
-
-            // 关键词搜索
-            if (!string.IsNullOrWhiteSpace(keyword))
-            {
-                query = query.Where(a => a.FileName.Contains(keyword));
-            }
-
-            var totalCount = query.Count();
-            var items = query
-                .OrderByDescending(a => a.CreatedAt)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
+            var (items, totalCount) = await _unitOfWork.Attachments.GetFilteredPagedAsync(
+                page, pageSize, category, relatedType, keyword);
             var dtoItems = _mapper.Map<List<AttachmentDto>>(items);
 
             return new PagedResult<AttachmentDto>

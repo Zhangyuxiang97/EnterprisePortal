@@ -87,8 +87,8 @@ public class InfoPublicationController : ControllerBase
                 return NotFound(ApiResponse<InfoPublicationDto>.FailResult("信息发布不存在"));
             }
 
-            // 增加浏览次数（同时更新业务表和统计表）
-            await _visitStatisticService.IncrementPublicationViewAsync(id, Request);
+            // 页面访问由门户路由统一记录，详情接口仅维护信息浏览数。
+            await _visitStatisticService.IncrementPublicationViewAsync(id);
 
             return Ok(ApiResponse<InfoPublicationDto>.SuccessResult(publication, "获取信息发布成功"));
         }

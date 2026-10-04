@@ -50,8 +50,8 @@ Protral/
 │   │   └── utils/                   # 工具函数
 │   └── package.json
 ├── SQL/                             # 数据库脚本
-│   ├── hailong_consulting_schema.sql      # 数据库结构
-│   ├── hailong_consulting_init_data.sql   # 初始数据
+│   ├── 01_hailong_consulting_schema.sql   # 数据库结构
+│   ├── 02_hailong_consulting_init_data.sql # 初始数据
 │   └── README.md                    # 数据库文档
 └── README.md                        # 项目说明（本文件）
 ```
@@ -63,11 +63,11 @@ Protral/
 | 技术 | 版本 | 用途 |
 |------|------|------|
 | .NET | 8.0 | Web API框架 |
-| Entity Framework Core | 8.0.0 | ORM框架 |
+| Entity Framework Core | 8.0.29 | ORM框架 |
 | MySQL | 8.0+ | 关系型数据库 |
 | JWT | 8.0.0 | 身份认证 |
-| AutoMapper | 13.0.1 | 对象映射 |
-| Serilog | 8.0.0 | 日志记录 |
+| AutoMapper | 15.1.3 | 对象映射 |
+| Serilog.AspNetCore | 8.0.3 | 日志记录 |
 | Swagger | 6.5.0 | API文档 |
 
 ### 前端技术
@@ -193,7 +193,7 @@ Protral/
 ### 环境要求
 
 - **Node.js** >= 18.0
-- **.NET SDK** >= 7.0
+- **.NET SDK** >= 8.0
 - **MySQL** >= 8.0
 - **Git**
 
@@ -211,10 +211,10 @@ cd Protral
 cd SQL
 
 # 创建数据库结构
-mysql -u root -p < hailong_consulting_schema.sql
+mysql -u root -p < 01_hailong_consulting_schema.sql
 
 # 导入初始数据
-mysql -u root -p < hailong_consulting_init_data.sql
+mysql -u root -p < 02_hailong_consulting_init_data.sql
 ```
 
 ### 3. 后端API启动
@@ -253,7 +253,7 @@ npm run dev
 
 # 访问后台管理系统
 # http://localhost:3000
-# 默认账号: admin / Admin@123456
+# 首次启动时会生成 admin 账号；密码见后端运行目录的 logs/bootstrap/initial-admin-credentials.txt
 ```
 
 ### 5. 前端门户启动
@@ -349,7 +349,7 @@ npm run dev
 ## 🔐 安全特性
 
 - ✅ JWT Token认证
-- ✅ 密码SHA256加密
+- ✅ ASP.NET Core PasswordHasher 密码哈希
 - ✅ SQL注入防护
 - ✅ XSS攻击防护
 - ✅ CSRF防护
@@ -374,7 +374,7 @@ npm run dev
 
 - **服务器**: CentOS 7+ / Ubuntu 20.04+
 - **Web服务器**: Nginx
-- **.NET Runtime**: 7.0
+- **.NET Runtime**: 8.0
 - **MySQL**: 8.0+
 - **Node.js**: 18.0+ (仅构建时需要)
 
@@ -384,8 +384,8 @@ npm run dev
 
 ```bash
 # 创建数据库
-mysql -u root -p < SQL/hailong_consulting_schema.sql
-mysql -u root -p < SQL/hailong_consulting_init_data.sql
+mysql -u root -p < SQL/01_hailong_consulting_schema.sql
+mysql -u root -p < SQL/02_hailong_consulting_init_data.sql
 ```
 
 #### 2. 后端API部署
@@ -488,10 +488,8 @@ chore: 构建/工具链相关
 
 ### 分支管理
 
-- `main` - 主分支（生产环境）
-- `develop` - 开发分支
-- `feature/*` - 功能分支
-- `hotfix/*` - 紧急修复分支
+- `master` - 当前远端基线
+- `feature/zyx-*` - 功能与修复分支
 
 ## 🐛 故障排查
 

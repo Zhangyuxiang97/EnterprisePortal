@@ -42,7 +42,6 @@ public static class InitialAdminBootstrapper
         Console.WriteLine();
         Console.WriteLine("========== 初始管理员账号（请立即保存） ==========");
         Console.WriteLine($"用户名: {username}");
-        Console.WriteLine($"密码: {password}");
         Console.WriteLine($"凭据文件: {credentialPath}");
         Console.WriteLine("首次登录后请删除该凭据文件，并修改密码。");
         Console.WriteLine("================================================");

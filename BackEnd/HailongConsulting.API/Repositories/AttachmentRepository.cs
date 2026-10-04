@@ -13,6 +13,32 @@ public class AttachmentRepository : Repository<Attachment>, IAttachmentRepositor
     {
     }
 
+    public async Task<(IEnumerable<Attachment> Items, int TotalCount)> GetFilteredPagedAsync(
+        int page, int pageSize, string? category, string? relatedType, string? keyword)
+    {
+        var query = _dbSet.AsNoTracking().Where(a => a.IsDeleted == 0);
+        if (!string.IsNullOrWhiteSpace(category))
+        {
+            query = query.Where(a => a.Category == category);
+        }
+        if (!string.IsNullOrWhiteSpace(relatedType))
+        {
+            query = query.Where(a => a.RelatedType == relatedType);
+        }
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            query = query.Where(a => a.FileName.Contains(keyword));
+        }
+
+        var totalCount = await query.CountAsync();
+        var items = await query.OrderByDescending(a => a.CreatedAt)
+            .ThenByDescending(a => a.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return (items, totalCount);
+    }
+
     public async Task<IEnumerable<Attachment>> GetByRelatedAsync(string relatedType, int relatedId)
     {
         return await _dbSet

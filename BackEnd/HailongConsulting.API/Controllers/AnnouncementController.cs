@@ -105,7 +105,7 @@ public class AnnouncementController : ControllerBase
             }
 
             // 增加浏览次数
-            await _visitStatisticService.IncrementAnnouncementViewAsync(id.Value, Request);
+            await _visitStatisticService.IncrementAnnouncementViewAsync(id.Value);
 
             return Ok(ApiResponse<AnnouncementDto>.SuccessResult(announcement, "获取公告成功"));
         }
@@ -131,8 +131,8 @@ public class AnnouncementController : ControllerBase
                 return NotFound(ApiResponse<AnnouncementDto>.FailResult("公告不存在"));
             }
 
-            // 增加浏览次数（同时更新业务表和统计表）
-            await _visitStatisticService.IncrementAnnouncementViewAsync(id, Request);
+            // 页面访问由门户路由统一记录，详情接口仅维护公告浏览数。
+            await _visitStatisticService.IncrementAnnouncementViewAsync(id);
 
             return Ok(ApiResponse<AnnouncementDto>.SuccessResult(announcement, "获取公告成功"));
         }

@@ -246,26 +246,7 @@ public class ConfigRepository : IConfigRepository
 
     public async Task RecordVisitAsync(VisitStatistic statistic)
     {
-        // 检查今天是否已有相同页面的访问记录
-        var existing = await _context.Set<VisitStatistic>()
-            .FirstOrDefaultAsync(v => 
-                v.VisitDate == statistic.VisitDate && 
-                v.PageUrl == statistic.PageUrl &&
-                v.IsDeleted == 0);
-
-        if (existing != null)
-        {
-            // 如果存在，增加访问次数
-            existing.VisitCount++;
-            existing.UpdatedAt = DateTime.Now;
-            _context.Set<VisitStatistic>().Update(existing);
-        }
-        else
-        {
-            // 如果不存在，创建新记录
-            await _context.Set<VisitStatistic>().AddAsync(statistic);
-        }
-
+        await _context.Set<VisitStatistic>().AddAsync(statistic);
         await _context.SaveChangesAsync();
     }
 
