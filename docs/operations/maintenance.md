@@ -1,6 +1,6 @@
 # Docker 日常维护
 
-当前部署使用根目录 Docker Compose。历史 systemd 运维示例已归档到 `legacy/maintenance.md`。
+在仓库根目录使用 Docker Compose 管理服务。
 
 ## 状态和日志
 

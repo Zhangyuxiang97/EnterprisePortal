@@ -1,740 +1,89 @@
-# 海隆咨询官网后端API
+# 海隆咨询后端 API
 
-基于 .NET 8 Web API 构建的海隆咨询官网后端服务系统。
+.NET 8 Web API，使用 EF Core 8、Pomelo MySQL、AutoMapper、JWT、Serilog、HtmlSanitizer 和 Swagger。依赖版本以 `HailongConsulting.API.csproj` 为准。
 
-## 📋 项目概述
+## 启动
 
-**项目名称**: 海隆咨询官网后端API (HailongConsulting.API)
+先按 [数据库说明](../../SQL/README.md) 导入编号 00–10 的 SQL，再配置数据库连接和 JWT 密钥。API 自动迁移不能替代首次基础表与业务数据初始化。
 
-**技术架构**: RESTful API + 分层架构
+从仓库根目录执行以下 PowerShell 示例，先替换占位值：
 
-**开发状态**: ✅ 已完成并投入使用
-
-## 🛠 技术栈
-
-| 技术 | 版本 | 用途 |
-|------|------|------|
-| .NET | 7.0 | Web API框架 |
-| Entity Framework Core | 7.0.14 | ORM框架 |
-| MySQL | 8.0+ | 关系型数据库 |
-| Pomelo.EntityFrameworkCore.MySql | 7.0.0 | MySQL数据库提供程序 |
-| JWT Bearer | 7.0.14 | 身份认证 |
-| AutoMapper | 12.0.1 | 对象映射 |
-| Serilog | 7.0.0 | 日志记录 |
-| Swagger/OpenAPI | 6.5.0 | API文档 |
-
-## 📁 项目结构
-
-```
-HailongConsulting.API/
-├── Controllers/              # API控制器层
-│   ├── AnnouncementController.cs       # 公告管理
-│   ├── AttachmentController.cs         # 附件管理
-│   ├── AuthController.cs               # 认证授权
-│   ├── ConfigController.cs             # 系统配置
-│   ├── HomeController.cs               # 首页数据
-│   ├── InfoPublicationController.cs    # 信息发布
-│   ├── RegionDictionaryController.cs   # 区域字典
-│   ├── SearchController.cs             # 全局搜索
-│   ├── StatisticsController.cs         # 统计分析
-│   ├── SystemLogController.cs          # 系统日志
-│   └── UserController.cs               # 用户管理
-├── Services/                 # 业务逻辑层
-│   ├── IAuthService.cs / AuthService.cs
-│   ├── IAnnouncementService.cs / AnnouncementService.cs
-│   ├── IAttachmentService.cs / AttachmentService.cs
-│   ├── IConfigService.cs / ConfigService.cs
-│   ├── IHomeService.cs / HomeService.cs
-│   ├── IInfoPublicationService.cs / InfoPublicationService.cs
-│   ├── IGlobalSearchService.cs / GlobalSearchService.cs
-│   ├── IRegionDictionaryService.cs / RegionDictionaryService.cs
-│   ├── IUserService.cs / UserService.cs
-│   ├── ISystemLogService.cs / SystemLogService.cs
-│   ├── IVisitStatisticService.cs / VisitStatisticService.cs
-│   └── FileUploadService.cs
-├── Repositories/             # 数据访问层
-│   ├── IRepository.cs / Repository.cs
-│   ├── IUnitOfWork.cs / UnitOfWork.cs
-│   ├── IAnnouncementRepository.cs / AnnouncementRepository.cs
-│   ├── IAttachmentRepository.cs / AttachmentRepository.cs
-│   ├── IConfigRepository.cs / ConfigRepository.cs
-│   ├── IGlobalSearchRepository.cs / GlobalSearchRepository.cs
-│   ├── IInfoPublicationRepository.cs / InfoPublicationRepository.cs
-│   ├── IRegionDictionaryRepository.cs / RegionDictionaryRepository.cs
-│   ├── IUserRepository.cs / UserRepository.cs
-│   ├── ISystemLogRepository.cs / SystemLogRepository.cs
-│   └── IVisitStatisticRepository.cs / VisitStatisticRepository.cs
-├── Models/
-│   ├── Entities/            # 数据库实体
-│   │   ├── User.cs
-│   │   ├── Announcement.cs
-│   │   ├── Attachment.cs
-│   │   ├── InfoPublication.cs
-│   │   ├── RegionDictionary.cs
-│   │   ├── SystemLog.cs
-│   │   ├── VisitStatistic.cs
-│   │   ├── CarouselBanner.cs
-│   │   ├── CompanyProfile.cs
-│   │   ├── BusinessScope.cs
-│   │   ├── CompanyQualification.cs
-│   │   ├── CompanyHonor.cs
-│   │   ├── MajorAchievement.cs
-│   │   └── FriendlyLink.cs
-│   └── DTOs/                # 数据传输对象
-│       ├── LoginDto.cs
-│       ├── UserDto.cs
-│       ├── AnnouncementDto.cs
-│       ├── AttachmentDto.cs
-│       ├── InfoPublicationDto.cs
-│       ├── ConfigDto.cs
-│       ├── GlobalSearchDto.cs
-│       ├── StatisticsDto.cs
-│       ├── SystemLogDto.cs
-│       └── RegionDictionaryDto.cs
-├── Data/
-│   └── ApplicationDbContext.cs    # EF Core数据库上下文
-├── Common/
-│   ├── ApiResponse.cs             # 统一响应格式
-│   ├── PagedResult.cs             # 分页结果
-│   ├── MappingProfile.cs          # AutoMapper配置
-│   └── Helpers/
-│       ├── JwtHelper.cs           # JWT工具类
-│       ├── PasswordHelper.cs      # 密码加密工具
-│       ├── FileHelper.cs          # 文件处理工具
-│       └── CustomDateTimeConverter.cs  # 日期时间转换器
-├── Middleware/
-│   ├── ExceptionHandlingMiddleware.cs  # 全局异常处理
-│   └── SystemLogMiddleware.cs          # 系统日志记录
-├── wwwroot/
-│   └── uploads/                   # 文件上传目录
-│       └── attachments/
-│           ├── image/             # 图片附件
-│           ├── document/          # 文档附件
-│           └── other/             # 其他附件
-├── logs/                          # 日志文件目录
-├── Program.cs                     # 应用程序入口
-├── appsettings.json              # 配置文件
-└── appsettings.Development.json  # 开发环境配置
+```powershell
+$env:ConnectionStrings__DefaultConnection = '<本机 MySQL 连接字符串，数据库为 hailong_consulting>'
+$env:Jwt__Key = '<至少 32 字节的本机随机密钥>'
+$env:ASPNETCORE_ENVIRONMENT = 'Development'
+dotnet run --project BackEnd/HailongConsulting.API --no-launch-profile --urls http://127.0.0.1:5000
 ```
 
-## 🚀 快速开始
+API 显式使用 5000 端口，与两个前端的默认代理一致。真实凭据通过本机环境注入，不写入已跟踪文件；同一环境复用运行密钥。
 
-### 1. 环境要求
+| 地址 | 用途 |
+| --- | --- |
+| `/api/...` | 业务接口 |
+| `/health` | 进程存活 |
+| `/health/ready` | 数据库及门户设置表读取成功，失败返回 503 |
+| `/` | Development 环境 Swagger UI |
+| `/swagger/v1/swagger.json` | Development 环境接口定义 |
+| `/uploads/...` | 上传文件与已恢复的初始化媒体 |
 
-- **.NET 8 SDK** - [下载地址](https://dotnet.microsoft.com/download/dotnet/8.0)
-- **MySQL 8.0+** - 数据库服务器
-- **Visual Studio 2022** 或 **VS Code** - 开发工具
+完整启动与部署说明见 [根 README](../../README.md) 和 [Ubuntu22 Docker 部署指南](../../docs/deployment/ubuntu22-docker.md)。
 
-### 2. 克隆项目
+## 目录
+
+```text
+Controllers/          路由、授权及请求入口
+Services/             业务、内容校验、附件引用、迁移与初始化
+Repositories/         数据访问和查询投影
+Data/                 EF Core 上下文
+Models/DTOs/          请求及响应模型
+Models/Entities/      业务实体与内容版本
+Common/               映射、分页、密码与错误辅助
+Middleware/           异常及操作日志
+DatabaseMigrations/   内嵌版本化 SQL 迁移
+SeedAssets/legacy/    已核验的旧站公开图片和 Word 附件
+SiteSettingsDefaults.json  API 和门户共用的展示默认值
+```
+
+## 初始账户与会话
+
+- 用户表为空时，首次启动生成 `admin` 及 12 位随机密码，写入进程工作目录下的 `logs/bootstrap/initial-admin-credentials.txt`。启动提示只给出用户名和文件位置，不输出密码。
+- 已有用户时不会重新生成初始账号。首次登录后修改密码并删除凭据文件，获取方式见 [初始管理员](../../README.md#初始管理员)。
+- 密码使用 ASP.NET Core Identity 的 PBKDF2 哈希。
+- 登录请求验证非空；创建、重置和修改新密码要求至少 6 位。
+- `/api/auth/login` 登录，`/api/auth/me` 查询当前用户，`/api/auth/refresh` 刷新令牌，`/api/auth/change-password` 修改密码，`/api/auth/logout` 撤销刷新令牌。退出不会立即撤销已经签发且仍有效的访问令牌。
+- 最后一名未删除且启用的管理员不能被删除、停用或降级，保护在后端事务内执行。
+
+## 查询与编辑约定
+
+- 公告、资讯和企业资料的公开接口只返回启用内容。管理读取使用 `/api/announcements/manage`、`/api/info-publications/manage` 和 `/api/config/manage/...`，按角色授权。
+- 后台查看详情不增加浏览量；列表只投影表格及摘要字段，正文在详情接口读取，地区批量查询。
+- 公告、资讯及企业资料采用独立 `version`。更新请求携带读取时版本，冲突返回 409；浏览次数独立原子递增，不修改内容版本。
+- `budgetAmount` 与 `awardAmount` 分别表示明确预算和最终中标 / 成交金额，单位为万元。金额字段省略时保留原值，显式 `null` 清空，0 为有效值。
+- 请求验证必填、长度、枚举、分页及字段组合。HTML 经统一过滤器清洗；扫描图片正文可保存。
+- 附件批量删除统一检查引用，任一文件在用则拒绝整批删除。上传选项通过 `/api/attachments/upload-options` 提供。
+- 门户设置公开读取、仅管理员整份保存，并携带版本号，详见 [门户设置](../../docs/portal-settings.md)。
+- 未知异常返回通用提示和 `traceId`，详细错误保留服务端；明确业务错误使用对应的 400 / 404 / 409。
+
+接口路径、请求模型、字段限制和响应结构以实际控制器、DTO 及 Development Swagger 为准。
+
+## 初始化、迁移与文件存储
+
+`SQL/` 是空库首次初始化入口。API 每次启动按顺序执行内嵌迁移，数据库命名锁控制并发，已成功版本登记于 `schema_migrations`。新增结构应提供可重入 SQL，并同步首次初始化表结构；当前项目使用自有 SQL 迁移器。
+
+启动时只将 `SeedAssets/legacy` 中缺失的文件补入 WebRoot 的 `uploads/legacy`，不覆盖已有文件。默认上传根目录为 `wwwroot`；Docker 将 `/app/wwwroot/uploads` 挂载到 `api-uploads`，与 Nginx 共享。日志位于 `logs`，Docker 使用 `api-logs` 卷。
+
+部署账号需要迁移所需的建表 / 修改结构权限。更新前保留数据库、上传卷及 `.runtime/secrets.env`；首次 SQL 不会在已有数据目录自动重导。
+
+## 测试
+
+从仓库根目录执行：
 
 ```bash
-git clone <repository-url>
-cd BackEnd/HailongConsulting.API
+dotnet test BackEnd/Protral.sln -c Release
 ```
 
-### 3. 配置数据库
+测试覆盖权限、输入、版本冲突、查询、HTML / 图片、初始化资源、管理员保护及附件引用。MySQL 集成用例需要显式设置 `LOCAL_MYSQL_TEST_CONNECTION`，未设置时跳过；只接受 localhost / 127.0.0.1，使用随机 `hailong_cleanup_test_*` 数据库并清理，不使用连接指定的业务库。
 
-修改 `appsettings.json` 中的数据库连接字符串：
+[CI 工作流](../../.github/workflows/verify.yml) 使用独立 MySQL 验证 SQL、跨连接保护和迁移重入，并启动隔离服务执行后台浏览器回归。本机未运行的测试或远端执行状态应按实际输出判断。
 
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Port=3306;Database=hailong_consulting;User=root;Password=your_password;CharSet=utf8mb4;"
-  }
-}
-```
-
-### 4. 创建数据库
-
-执行项目根目录下的SQL脚本：
-
-```bash
-# 进入SQL目录
-cd ../../SQL
-
-# 创建数据库结构
-mysql -u root -p < hailong_consulting_schema.sql
-
-# 导入初始数据
-mysql -u root -p < hailong_consulting_init_data.sql
-```
-
-### 5. 安装依赖
-
-```bash
-cd ../BackEnd/HailongConsulting.API
-dotnet restore
-```
-
-### 6. 运行项目
-
-```bash
-dotnet run
-```
-
-或使用 Visual Studio 直接运行（F5）。
-
-### 7. 访问API文档
-
-项目启动后，访问：
-
-- **Swagger UI**: http://localhost:5000 或 https://localhost:5001
-- **API Base URL**: http://localhost:5000/api
-
-## 📡 核心API端点
-
-### 认证模块 (`/api/auth`)
-
-| 方法 | 端点 | 描述 | 认证 |
-|------|------|------|------|
-| POST | `/api/auth/login` | 用户登录 | ❌ |
-| POST | `/api/auth/change-password` | 修改密码 | ✅ |
-| GET | `/api/auth/me` | 获取当前用户信息 | ✅ |
-
-### 公告管理 (`/api/announcements`)
-
-| 方法 | 端点 | 描述 | 认证 |
-|------|------|------|------|
-| GET | `/api/announcements` | 获取公告列表（分页） | ❌ |
-| GET | `/api/announcements/{id}` | 获取公告详情 | ❌ |
-| POST | `/api/announcements` | 创建公告 | ✅ |
-| PUT | `/api/announcements/{id}` | 更新公告 | ✅ |
-| DELETE | `/api/announcements/{id}` | 删除公告 | ✅ |
-
-**查询参数**:
-- `businessType`: 业务类型（GOV_PROCUREMENT/CONSTRUCTION）
-- `noticeType`: 公告类型
-- `province`: 省份
-- `city`: 城市
-- `keyword`: 关键词搜索
-- `pageIndex`: 页码（默认1）
-- `pageSize`: 每页大小（默认10）
-
-### 信息发布 (`/api/info-publications`)
-
-| 方法 | 端点 | 描述 | 认证 |
-|------|------|------|------|
-| GET | `/api/info-publications` | 获取信息列表 | ❌ |
-| GET | `/api/info-publications/{id}` | 获取信息详情 | ❌ |
-| POST | `/api/info-publications` | 创建信息 | ✅ |
-| PUT | `/api/info-publications/{id}` | 更新信息 | ✅ |
-| DELETE | `/api/info-publications/{id}` | 删除信息 | ✅ |
-
-**查询参数**:
-- `type`: 信息类型（COMPANY_NEWS/POLICY_REGULATION）
-- `category`: 二级分类
-- `keyword`: 关键词搜索
-
-### 附件管理 (`/api/attachments`)
-
-| 方法 | 端点 | 描述 | 认证 |
-|------|------|------|------|
-| POST | `/api/attachments/upload` | 上传附件 | ✅ |
-| GET | `/api/attachments/{id}` | 获取附件信息 | ❌ |
-| DELETE | `/api/attachments/{id}` | 删除附件 | ✅ |
-| GET | `/api/attachments/by-related` | 获取关联附件列表 | ❌ |
-
-**支持的文件类型**:
-- 图片: jpg, jpeg, png, gif, bmp, webp
-- 文档: pdf, doc, docx, xls, xlsx, ppt, pptx, txt
-- 其他: zip, rar, 7z
-
-### 系统配置 (`/api/config`)
-
-| 方法 | 端点 | 描述 | 认证 |
-|------|------|------|------|
-| GET | `/api/config/banners` | 获取轮播图列表 | ❌ |
-| GET | `/api/config/company-profile` | 获取企业简介 | ❌ |
-| GET | `/api/config/business-scope` | 获取业务范围 | ❌ |
-| GET | `/api/config/qualifications` | 获取企业资质 | ❌ |
-| GET | `/api/config/honors` | 获取企业荣誉 | ❌ |
-| GET | `/api/config/achievements` | 获取重要业绩 | ❌ |
-| GET | `/api/config/friendly-links` | 获取友情链接 | ❌ |
-| POST/PUT/DELETE | `/api/config/*` | 配置管理操作 | ✅ |
-
-### 全局搜索 (`/api/search`)
-
-| 方法 | 端点 | 描述 | 认证 |
-|------|------|------|------|
-| GET | `/api/search` | 全局搜索 | ❌ |
-
-**查询参数**:
-- `keyword`: 搜索关键词
-- `businessType`: 业务类型
-- `startDate`: 开始日期
-- `endDate`: 结束日期
-- `province`: 省份
-- `city`: 城市
-
-### 首页数据 (`/api/home`)
-
-| 方法 | 端点 | 描述 | 认证 |
-|------|------|------|------|
-| GET | `/api/home/statistics` | 获取首页统计数据 | ❌ |
-| GET | `/api/home/latest-announcements` | 获取最新公告 | ❌ |
-
-### 统计分析 (`/api/statistics`)
-
-| 方法 | 端点 | 描述 | 认证 |
-|------|------|------|------|
-| GET | `/api/statistics/dashboard` | 获取仪表盘数据 | ✅ |
-| GET | `/api/statistics/visits` | 获取访问统计 | ✅ |
-| GET | `/api/statistics/announcements` | 获取公告统计 | ✅ |
-
-### 区域字典 (`/api/regions`)
-
-| 方法 | 端点 | 描述 | 认证 |
-|------|------|------|------|
-| GET | `/api/regions` | 获取区域列表 | ❌ |
-| GET | `/api/regions/provinces` | 获取省份列表 | ❌ |
-| GET | `/api/regions/cities/{provinceCode}` | 获取城市列表 | ❌ |
-| GET | `/api/regions/districts/{cityCode}` | 获取区县列表 | ❌ |
-
-### 系统日志 (`/api/system-logs`)
-
-| 方法 | 端点 | 描述 | 认证 |
-|------|------|------|------|
-| GET | `/api/system-logs` | 获取系统日志列表 | ✅ |
-| GET | `/api/system-logs/{id}` | 获取日志详情 | ✅ |
-
-### 用户管理 (`/api/users`)
-
-| 方法 | 端点 | 描述 | 认证 |
-|------|------|------|------|
-| GET | `/api/users` | 获取用户列表 | ✅ |
-| GET | `/api/users/{id}` | 获取用户详情 | ✅ |
-| POST | `/api/users` | 创建用户 | ✅ |
-| PUT | `/api/users/{id}` | 更新用户 | ✅ |
-| DELETE | `/api/users/{id}` | 删除用户 | ✅ |
-
-## 📦 统一响应格式
-
-所有API响应都遵循统一格式：
-
-### 成功响应
-
-```json
-{
-  "success": true,
-  "message": "操作成功",
-  "data": {
-    // 实际数据
-  },
-  "timestamp": "2025-12-16 12:00:00"
-}
-```
-
-### 错误响应
-
-```json
-{
-  "success": false,
-  "message": "错误信息描述",
-  "data": null,
-  "timestamp": "2025-12-16 12:00:00"
-}
-```
-
-### 分页响应
-
-```json
-{
-  "success": true,
-  "message": "查询成功",
-  "data": {
-    "pageIndex": 1,
-    "pageSize": 10,
-    "totalCount": 100,
-    "totalPages": 10,
-    "hasPreviousPage": false,
-    "hasNextPage": true,
-    "items": [
-      // 数据列表
-    ]
-  },
-  "timestamp": "2025-12-16 12:00:00"
-}
-```
-
-## 🔐 认证授权
-
-### JWT Token认证
-
-API使用JWT Bearer Token进行身份认证。
-
-**获取Token**:
-
-```bash
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "username": "admin",
-  "password": "your_password"
-}
-```
-
-**响应**:
-
-```json
-{
-  "success": true,
-  "data": {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "refreshToken": "refresh_token_here",
-    "userId": 1,
-    "username": "admin",
-    "realName": "管理员",
-    "email": "admin@example.com",
-    "role": "admin"
-  }
-}
-```
-
-**使用Token**:
-
-在请求头中添加：
-
-```
-Authorization: Bearer {your_token}
-```
-
-### Token配置
-
-在 `appsettings.json` 中配置：
-
-```json
-{
-  "Jwt": {
-    "Key": "your-secret-key-at-least-32-characters-long",
-    "Issuer": "HailongConsulting.API",
-    "Audience": "HailongConsulting.Client",
-    "ExpireHours": 24
-  }
-}
-```
-
-## 📝 配置说明
-
-### appsettings.json
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Port=3306;Database=hailong_consulting;User=root;Password=your_password;CharSet=utf8mb4;"
-  },
-  "Jwt": {
-    "Key": "your-secret-key-at-least-32-characters-long",
-    "Issuer": "HailongConsulting.API",
-    "Audience": "HailongConsulting.Client",
-    "ExpireHours": 24
-  },
-  "FileUpload": {
-    "RootPath": "wwwroot",
-    "MaxFileSize": 10485760,
-    "AllowedExtensions": [".jpg", ".jpeg", ".png", ".gif", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".zip"]
-  },
-  "Serilog": {
-    "MinimumLevel": {
-      "Default": "Information",
-      "Override": {
-        "Microsoft": "Warning",
-        "Microsoft.EntityFrameworkCore": "Warning"
-      }
-    }
-  }
-}
-```
-
-### CORS配置
-
-默认配置允许所有来源。生产环境建议修改：
-
-```csharp
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowSpecificOrigin", policy =>
-    {
-        policy.WithOrigins("https://yourdomain.com")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
-    });
-});
-```
-
-## 📊 日志管理
-
-### 日志配置
-
-使用Serilog进行日志记录，日志文件位于 `logs/` 目录。
-
-**日志级别**:
-- `Debug`: 调试信息
-- `Information`: 一般信息
-- `Warning`: 警告信息
-- `Error`: 错误信息
-- `Fatal`: 致命错误
-
-**日志文件**:
-- 文件名格式: `log-{Date}.txt`
-- 滚动策略: 每天一个文件
-- 保留时间: 建议保留30天
-
-### 系统日志
-
-系统自动记录以下操作：
-- 用户登录/登出
-- 数据创建/更新/删除
-- API请求（可选）
-- 异常错误
-
-查询系统日志：
-
-```bash
-GET /api/system-logs?pageIndex=1&pageSize=20
-```
-
-## 🔧 开发指南
-
-### 添加新的API端点
-
-1. **创建DTO**:
-
-```csharp
-// Models/DTOs/YourDto.cs
-public class YourDto
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
-}
-```
-
-2. **创建实体**:
-
-```csharp
-// Models/Entities/YourEntity.cs
-public class YourEntity
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public DateTime CreatedAt { get; set; }
-}
-```
-
-3. **创建仓储接口和实现**:
-
-```csharp
-// Repositories/IYourRepository.cs
-public interface IYourRepository : IRepository<YourEntity>
-{
-    Task<YourEntity> GetByNameAsync(string name);
-}
-
-// Repositories/YourRepository.cs
-public class YourRepository : Repository<YourEntity>, IYourRepository
-{
-    public YourRepository(ApplicationDbContext context) : base(context) { }
-    
-    public async Task<YourEntity> GetByNameAsync(string name)
-    {
-        return await _dbSet.FirstOrDefaultAsync(x => x.Name == name);
-    }
-}
-```
-
-4. **创建服务接口和实现**:
-
-```csharp
-// Services/IYourService.cs
-public interface IYourService
-{
-    Task<ApiResponse<YourDto>> GetByIdAsync(int id);
-}
-
-// Services/YourService.cs
-public class YourService : IYourService
-{
-    private readonly IYourRepository _repository;
-    private readonly IMapper _mapper;
-    
-    public YourService(IYourRepository repository, IMapper mapper)
-    {
-        _repository = repository;
-        _mapper = mapper;
-    }
-    
-    public async Task<ApiResponse<YourDto>> GetByIdAsync(int id)
-    {
-        var entity = await _repository.GetByIdAsync(id);
-        var dto = _mapper.Map<YourDto>(entity);
-        return ApiResponse<YourDto>.SuccessResponse(dto);
-    }
-}
-```
-
-5. **创建控制器**:
-
-```csharp
-// Controllers/YourController.cs
-[ApiController]
-[Route("api/[controller]")]
-public class YourController : ControllerBase
-{
-    private readonly IYourService _service;
-    
-    public YourController(IYourService service)
-    {
-        _service = service;
-    }
-    
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
-    {
-        var response = await _service.GetByIdAsync(id);
-        return Ok(response);
-    }
-}
-```
-
-6. **注册服务**:
-
-```csharp
-// Program.cs
-builder.Services.AddScoped<IYourRepository, YourRepository>();
-builder.Services.AddScoped<IYourService, YourService>();
-```
-
-### 数据库迁移
-
-使用EF Core Migrations管理数据库变更：
-
-```bash
-# 添加迁移
-dotnet ef migrations add MigrationName
-
-# 更新数据库
-dotnet ef database update
-
-# 回滚迁移
-dotnet ef database update PreviousMigrationName
-
-# 删除最后一个迁移
-dotnet ef migrations remove
-```
-
-## 🚀 部署
-
-### 发布应用
-
-```bash
-# 发布Release版本
-dotnet publish -c Release -o ./publish
-
-# 发布到指定运行时
-dotnet publish -c Release -r linux-x64 --self-contained -o ./publish
-```
-
-### Docker部署
-
-创建 `Dockerfile`:
-
-```dockerfile
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
-WORKDIR /app
-EXPOSE 80
-EXPOSE 443
-
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-WORKDIR /src
-COPY ["HailongConsulting.API.csproj", "./"]
-RUN dotnet restore
-COPY . .
-RUN dotnet build -c Release -o /app/build
-
-FROM build AS publish
-RUN dotnet publish -c Release -o /app/publish
-
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "HailongConsulting.API.dll"]
-```
-
-构建和运行：
-
-```bash
-# 构建镜像
-docker build -t hailong-api .
-
-# 运行容器
-docker run -d -p 5000:80 --name hailong-api hailong-api
-```
-
-### 生产环境配置
-
-1. **修改连接字符串**（使用环境变量）
-2. **更新JWT密钥**（至少32字符）
-3. **配置HTTPS证书**
-4. **设置CORS策略**
-5. **配置日志级别**
-6. **启用健康检查**
-
-## 🐛 故障排查
-
-### 常见问题
-
-**1. 数据库连接失败**
-
-```
-检查项：
-- MySQL服务是否运行
-- 连接字符串是否正确
-- 数据库用户权限
-- 防火墙设置
-```
-
-**2. JWT认证失败**
-
-```
-检查项：
-- Token是否过期
-- JWT配置是否正确
-- Authorization头格式: Bearer {token}
-- 密钥长度是否足够（至少32字符）
-```
-
-**3. 文件上传失败**
-
-```
-检查项：
-- wwwroot目录是否存在
-- 文件大小是否超限
-- 文件类型是否允许
-- 目录写入权限
-```
-
-**4. CORS错误**
-
-```
-检查项：
-- CORS策略配置
-- 前端请求Origin
-- 是否包含凭据
-```
-
-## 📚 相关文档
-
-- [项目总体说明](../../README.md)
-- [数据库设计文档](../../SQL/README.md)
-- [前端门户文档](../../hailong-protral/README.md)
-- [后台管理文档](../../hailong-admin/README.md)
-
-## 📄 许可证
-
-Copyright © 2025 河南海隆工程咨询有限公司
-
----
-
-**最后更新**: 2025年12月16日  
-**维护团队**: 海隆咨询技术部
+最后更新：2026-10-05。

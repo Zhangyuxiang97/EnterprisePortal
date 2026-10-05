@@ -1,6 +1,6 @@
 # Docker 故障排查
 
-当前部署入口为 `deploy-ubuntu22-docker.sh`，历史宿主机服务排查内容位于 `legacy/troubleshooting.md`。
+部署入口为根目录 `deploy-ubuntu22-docker.sh`。
 
 ## 门户无法访问
 

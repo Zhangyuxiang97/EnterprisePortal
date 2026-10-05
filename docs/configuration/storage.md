@@ -10,7 +10,7 @@
 | 前端 API 地址等构建参数 | 各前端现有 `.env*` | 构建时读取 |
 | 后端非敏感配置 | API `appsettings*.json` | API 重启读取 |
 
-根目录 `docker-compose.yml` 与 `deploy-ubuntu22-docker.sh` 是部署入口，保留在根目录。两个前端拥有各自的 package.json 和锁文件；根目录不需要空的 npm 锁文件。
+根目录 `docker-compose.yml` 与 `deploy-ubuntu22-docker.sh` 是部署入口。两个前端拥有各自的 package.json 和锁文件，依赖在对应项目目录安装。
 
 浏览器地图 Key 属于公开展示配置。门户把最近一次有效展示配置缓存到 localStorage，最多使用七天，每次完整打开页面仍优先请求服务器；请求失败最多尝试三次。缓存不包含管理员凭据、导航或部署参数。
 
