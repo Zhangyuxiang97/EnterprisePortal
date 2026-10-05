@@ -15,6 +15,8 @@ public class HomeStatisticsDto
     /// </summary>
     public decimal TotalAmount { get; set; }
 
+    public int KnownAwardAmountCount { get; set; }
+
     /// <summary>
     /// 交易类型占比
     /// </summary>

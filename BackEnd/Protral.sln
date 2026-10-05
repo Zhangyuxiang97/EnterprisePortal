@@ -4,6 +4,8 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HailongConsulting.API", "HailongConsulting.API\HailongConsulting.API.csproj", "{2ACB2276-C7F5-B3A0-62D7-2BE910EDE84F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HailongConsulting.API.Tests", "HailongConsulting.API.Tests\HailongConsulting.API.Tests.csproj", "{156ACF1B-F428-4D0D-A3E9-1D3A6C5D40CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,6 +16,10 @@ Global
 		{2ACB2276-C7F5-B3A0-62D7-2BE910EDE84F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2ACB2276-C7F5-B3A0-62D7-2BE910EDE84F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2ACB2276-C7F5-B3A0-62D7-2BE910EDE84F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{156ACF1B-F428-4D0D-A3E9-1D3A6C5D40CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{156ACF1B-F428-4D0D-A3E9-1D3A6C5D40CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{156ACF1B-F428-4D0D-A3E9-1D3A6C5D40CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{156ACF1B-F428-4D0D-A3E9-1D3A6C5D40CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

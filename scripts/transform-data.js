@@ -668,4 +668,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { extractRegion };
+module.exports = { extractRegion, transformItem };

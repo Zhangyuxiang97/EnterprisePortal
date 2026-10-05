@@ -4,10 +4,10 @@
       <template #header>
         <div class="card-header">
           <span>企业资质管理</span>
-          <el-button type="primary" icon="Plus" @click="handleAdd">新增资质</el-button>
+          <el-button v-if="canManage" type="primary" icon="Plus" @click="handleAdd">新增资质</el-button>
         </div>
       </template>
-      
+
       <!-- 表格 -->
       <el-table :data="tableData" v-loading="loading" border stripe>
         <el-table-column type="index" label="序号" width="60" />
@@ -24,61 +24,65 @@
             {{ formatDate(row.expiryDate) }}
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="100" align="center">
+        <el-table-column prop="status" label="展示状态" width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="row.status ? 'success' : 'danger'">
-              {{ row.status ? '有效' : '失效' }}
+              {{ row.status ? '显示' : '隐藏' }}
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="证书有效期" min-width="155"><template #default="{ row }">{{ certificateValidity(row) }}</template></el-table-column>
         <el-table-column label="操作" width="150" fixed="right" align="center">
           <template #default="{ row }">
-            <el-button type="primary" size="small" link @click="handleEdit(row)">编辑</el-button>
-            <el-button type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
+            <el-button v-if="canManage" type="primary" size="small" link @click="handleEdit(row)">编辑</el-button>
+            <el-button v-if="canManage" type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
-    
+
     <!-- 新增/编辑对话框 -->
     <el-dialog
       v-model="dialogVisible"
+      class="editor-dialog"
+      :before-close="beforeEditorClose"
       :title="isEdit ? '编辑资质' : '新增资质'"
       width="700px"
       destroy-on-close
       :close-on-click-modal="false"
     >
-      <el-form 
-        ref="formRef" 
-        :model="formData" 
-        :rules="formRules" 
+      <p class="form-tip">编号、日期不详可留空；长期证书请在描述中注明，不填写推测日期。展示状态仅控制门户是否显示。</p>
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
         label-width="100px"
       >
         <el-form-item label="资质名称" prop="name">
-          <el-input 
-            v-model="formData.name" 
-            placeholder="请输入资质名称（最多200个字符）" 
+          <el-input
+            v-model="formData.name"
+            placeholder="请输入资质名称（最多200个字符）"
             maxlength="200"
             show-word-limit
           />
         </el-form-item>
-        
+
         <el-form-item label="证书编号" prop="certificateNumber">
-          <el-input 
-            v-model="formData.certificateNumber" 
+          <el-input
+            v-model="formData.certificateNumber"
             placeholder="请输入证书编号（最多100个字符）"
             maxlength="100"
           />
         </el-form-item>
-        
+
         <el-form-item label="颁发机构">
-          <el-input 
-            v-model="formData.issuingAuthority" 
+          <el-input
+            v-model="formData.issuingAuthority"
             placeholder="请输入颁发机构（最多200个字符）"
             maxlength="200"
           />
         </el-form-item>
-        
+
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="颁发日期" prop="issueDate">
@@ -103,7 +107,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        
+
         <el-form-item label="证书图片">
           <FileUpload
             v-model="formData.certificateImageId"
@@ -116,7 +120,7 @@
           />
           <div class="form-tip">建议上传清晰的证书扫描件或照片</div>
         </el-form-item>
-        
+
         <el-form-item label="资质描述">
           <el-input
             v-model="formData.description"
@@ -139,23 +143,27 @@
           <div class="form-tip">数字越小越靠前，相同数字按颁发日期排序</div>
         </el-form-item>
 
-        <el-form-item label="状态">
+        <el-form-item label="展示状态">
           <el-radio-group v-model="formData.status">
-            <el-radio :value="true">有效</el-radio>
-            <el-radio :value="false">失效</el-radio>
+            <el-radio :value="true">显示</el-radio>
+            <el-radio :value="false">隐藏</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
-      
+
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSubmit" :loading="submitting">提交</el-button>
+        <el-button @click="handleCancel">取消</el-button>
+        <el-button type="primary" @click="handleSubmit" :loading="submitting" :disabled="activeUploads > 0">提交</el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
+import { notifyError } from '@/utils/errors'
+import { createLatestRequest } from '@/utils/latestRequest'
+import { useEditorForm } from '@/composables/useEditorForm'
+import { certificateValidity } from '@/utils/form'
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { systemConfigApi } from '@/api'
@@ -184,6 +192,8 @@ const formData = reactive({
   sortOrder: 0,
   status: true
 })
+const { markSaved, handleCancel, beforeEditorClose, canManage, activeUploads } = useEditorForm(formData, dialogVisible, submitting)
+
 
 // 表单验证规则
 const formRules = {
@@ -192,15 +202,12 @@ const formRules = {
     { max: 200, message: '资质名称长度不能超过200个字符', trigger: 'blur' }
   ],
   certificateNumber: [
-    { required: true, message: '请输入证书编号', trigger: 'blur' },
     { max: 100, message: '证书编号长度不能超过100个字符', trigger: 'blur' }
   ],
-  issueDate: [
-    { required: true, message: '请选择颁发日期', trigger: 'change' }
-  ],
-  expiryDate: [
-    { required: true, message: '请选择有效期', trigger: 'change' }
-  ]
+  expiryDate: [{ validator: (_rule, value, done) => {
+    done(value && formData.issueDate && value < formData.issueDate ? new Error('到期日不能早于颁发日') : undefined)
+  }, trigger: 'change' }]
+
 }
 
 /**
@@ -214,21 +221,25 @@ const formatDate = (dateStr) => {
 /**
  * 加载数据
  */
+const listRequests = createLatestRequest()
 const loadData = async () => {
+  const requestId = listRequests.begin()
   loading.value = true
   try {
     const res = await systemConfigApi.qualifications.getList()
-    
+    if (!listRequests.isCurrent(requestId)) return
+
     if (res.success && res.data) {
       tableData.value = res.data
     } else {
       ElMessage.error(res.message || '加载数据失败')
     }
   } catch (error) {
-    console.error('加载数据失败:', error)
-    ElMessage.error('加载数据失败，请稍后重试')
+    if (!listRequests.isCurrent(requestId)) return
+
+    notifyError(error, '加载数据失败，请稍后重试')
   } finally {
-    loading.value = false
+    if (listRequests.isCurrent(requestId)) loading.value = false
   }
 }
 
@@ -262,6 +273,7 @@ const handleEdit = async (row) => {
     if (res.success && res.data) {
       Object.assign(formData, {
         id: res.data.id,
+        version: res.data.version,
         name: res.data.name,
         certificateNumber: res.data.certificateNumber,
         issuingAuthority: res.data.issuingAuthority || '',
@@ -277,8 +289,8 @@ const handleEdit = async (row) => {
       ElMessage.error(res.message || '获取详情失败')
     }
   } catch (error) {
-    console.error('获取详情失败:', error)
-    ElMessage.error('获取详情失败，请稍后重试')
+
+    notifyError(error, '获取详情失败，请稍后重试')
   }
 }
 
@@ -296,7 +308,7 @@ const handleDelete = async (row) => {
         type: 'warning'
       }
     )
-    
+
     const res = await systemConfigApi.qualifications.delete(row.id)
     if (res.success) {
       ElMessage.success(res.message || '删除成功')
@@ -306,8 +318,8 @@ const handleDelete = async (row) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('删除失败:', error)
-      ElMessage.error('删除失败，请稍后重试')
+
+      notifyError(error, '删除失败，请稍后重试')
     }
   }
 }
@@ -317,22 +329,23 @@ const handleDelete = async (row) => {
  */
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   try {
     await formRef.value.validate()
   } catch (error) {
     ElMessage.warning('请正确填写表单')
     return
   }
-  
+
   submitting.value = true
   try {
     const submitData = {
+      version: formData.version,
       name: formData.name,
-      certificateNumber: formData.certificateNumber,
+      certificateNumber: formData.certificateNumber || null,
       issuingAuthority: formData.issuingAuthority || null,
-      issueDate: formData.issueDate,
-      expiryDate: formData.expiryDate,
+      issueDate: formData.issueDate || null,
+      expiryDate: formData.expiryDate || null,
       certificateImageId: formData.certificateImageId && formData.certificateImageId.length > 0
         ? formData.certificateImageId[0]
         : null,
@@ -340,24 +353,25 @@ const handleSubmit = async () => {
       sortOrder: formData.sortOrder || 0,
       status: formData.status
     }
-    
+
     let res
     if (isEdit.value) {
       res = await systemConfigApi.qualifications.update(formData.id, submitData)
     } else {
       res = await systemConfigApi.qualifications.create(submitData)
     }
-    
+
     if (res.success) {
       ElMessage.success(res.message || (isEdit.value ? '更新成功' : '创建成功'))
+      markSaved()
       dialogVisible.value = false
       loadData()
     } else {
       ElMessage.error(res.message || (isEdit.value ? '更新失败' : '创建失败'))
     }
   } catch (error) {
-    console.error('提交失败:', error)
-    ElMessage.error(isEdit.value ? '更新失败，请稍后重试' : '创建失败，请稍后重试')
+
+    notifyError(error, isEdit.value ? '更新失败，请稍后重试' : '创建失败，请稍后重试')
   } finally {
     submitting.value = false
   }

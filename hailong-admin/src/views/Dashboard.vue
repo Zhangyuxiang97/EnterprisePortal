@@ -9,7 +9,7 @@
               <el-icon :size="32"><Document /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-label">代理项目总数</div>
+              <div class="stat-label">公告总数</div>
               <div class="stat-value">{{ statistics.totalProjects || 0 }}</div>
             </div>
           </div>
@@ -23,8 +23,8 @@
               <el-icon :size="32"><Money /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-label">代理总额</div>
-              <div class="stat-value">{{ formatAmount(statistics.totalAmount) }}</div>
+              <div class="stat-label">已记录中标金额</div>
+              <div class="stat-value" :title="`${statistics.totalAmount?.toLocaleString()} 万元`">{{ formatAmount(statistics.totalAmount) }}</div>
             </div>
           </div>
         </el-card>
@@ -37,7 +37,7 @@
               <el-icon :size="32"><ShoppingCart /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-label">政府采购项目</div>
+              <div class="stat-label">政府采购公告</div>
               <div class="stat-value">{{ getProjectTypeCount('政府采购') }}</div>
             </div>
           </div>
@@ -51,7 +51,7 @@
               <el-icon :size="32"><OfficeBuilding /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-label">建设工程项目</div>
+              <div class="stat-label">建设工程公告</div>
               <div class="stat-value">{{ getProjectTypeCount('建设工程') }}</div>
             </div>
           </div>
@@ -59,14 +59,15 @@
       </el-col>
     </el-row>
 
+    <p class="statistics-note">按公告记录统计，同一项目可能包含多条公告。中标 / 成交金额覆盖 {{ statistics.knownAwardAmountCount || 0 }} 条结果公告，按已记录金额汇总。</p>
     <!-- 图表区域 -->
     <el-row :gutter="20" style="margin-top: 20px">
       <!-- 交易类型饼图 -->
       <el-col :xs="24" :sm="24" :md="12" :lg="12">
         <el-card shadow="hover" class="chart-card">
-          <v-chart 
-            class="chart" 
-            :option="pieChartOption" 
+          <v-chart
+            class="chart"
+            :option="pieChartOption"
             :autoresize="true"
           />
         </el-card>
@@ -75,9 +76,9 @@
       <!-- 地区排行柱状图 -->
       <el-col :xs="24" :sm="24" :md="12" :lg="12">
         <el-card shadow="hover" class="chart-card">
-          <v-chart 
-            class="chart" 
-            :option="barChartOption" 
+          <v-chart
+            class="chart"
+            :option="barChartOption"
             :autoresize="true"
           />
         </el-card>
@@ -87,6 +88,7 @@
 </template>
 
 <script setup>
+import { notifyError } from '@/utils/errors'
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { Document, Money, ShoppingCart, OfficeBuilding } from '@element-plus/icons-vue'
 import VChart from 'vue-echarts'
@@ -131,6 +133,9 @@ const pieChartOption = computed(() => {
   const filteredTypes = statistics.value.projectTypes.filter(
     item => item.type !== '政府采购'
   )
+  const gov = statistics.value.projectTypes.find(item => item.type === '政府采购')?.count || 0
+  const classified = filteredTypes.filter(item => item.type.startsWith('政府采购-')).reduce((sum, item) => sum + item.count, 0)
+  if (gov > classified) filteredTypes.push({ type: '政府采购-待确认', count: gov - classified, percentage: (gov - classified) / statistics.value.totalProjects * 100 })
   return getPieChartOption(filteredTypes)
 })
 
@@ -146,7 +151,7 @@ const formatAmount = (amount) => {
   if (!amount || amount === 0) {
     return '暂无数据'
   }
-  return `${amount.toLocaleString()}万元`
+  return amount >= 10000 ? `${(amount / 10000).toFixed(2)}亿元` : `${amount.toLocaleString()}万元`
 }
 
 /**
@@ -169,8 +174,8 @@ const loadStatistics = async () => {
       ElMessage.error(response.message || '获取统计数据失败')
     }
   } catch (error) {
-    console.error('加载统计数据失败:', error)
-    ElMessage.error('加载统计数据失败，请稍后重试')
+
+    notifyError(error, '加载统计数据失败，请稍后重试')
   }
 }
 
@@ -205,6 +210,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.statistics-note { color: #64748b; font-size: 13px; line-height: 1.8; }
 .dashboard-container {
   padding: 20px;
   background-color: #f0f2f5;
@@ -213,49 +219,53 @@ onUnmounted(() => {
 
 /* 统计卡片样式 */
 .stat-card {
-  cursor: pointer;
-  transition: all 0.3s;
+  min-height: 106px;
   margin-bottom: 20px;
 }
 
 .stat-card:hover {
-  transform: translateY(-5px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .stat-content {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
 }
 
 .stat-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  height: 60px;
+  width: 48px;
+  flex-shrink: 0;
+  height: 48px;
   border-radius: 12px;
   color: white;
 }
 
 .stat-icon.total-projects {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #edf3f8;
+  color: #245b85;
 }
 
 .stat-icon.total-amount {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: #edf3f8;
+  color: #245b85;
 }
 
 .stat-icon.gov-procurement {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  background: #edf3f8;
+  color: #245b85;
 }
 
 .stat-icon.construction {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  background: #edf3f8;
+  color: #245b85;
 }
 
 .stat-info {
+  min-width: 0;
   flex: 1;
 }
 
@@ -266,6 +276,8 @@ onUnmounted(() => {
 }
 
 .stat-value {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
   font-size: 24px;
   font-weight: bold;
   color: #303133;
@@ -305,6 +317,8 @@ onUnmounted(() => {
   }
 
   .stat-value {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
     font-size: 20px;
   }
 

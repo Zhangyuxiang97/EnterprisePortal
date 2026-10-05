@@ -1,4 +1,5 @@
 using HailongConsulting.API.Models.Entities;
+using HailongConsulting.API.Common;
 
 namespace HailongConsulting.API.Services;
 
@@ -35,6 +36,7 @@ public interface IVisitStatisticService : IVisitStatisticsExtension
     /// 获取指定日期范围的访问统计
     /// </summary>
     Task<IEnumerable<VisitStatistic>> GetVisitStatisticsAsync(DateOnly startDate, DateOnly endDate);
+    Task<PagedResult<VisitStatistic>> GetVisitStatisticsPageAsync(DateOnly startDate, DateOnly endDate, string? pagePath, int page, int pageSize);
 
     /// <summary>
     /// 获取热门页面统计

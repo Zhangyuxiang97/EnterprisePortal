@@ -8,8 +8,13 @@ namespace HailongConsulting.API.Models.Entities;
 /// 重要业绩实体
 /// </summary>
 [Table("major_achievements")]
-public class MajorAchievement
+public class MajorAchievement : IVersionedContent
 {
+    [ConcurrencyCheck]
+    [Column("version")]
+    [MaxLength(32)]
+    public string Version { get; set; } = Guid.NewGuid().ToString("N");
+
     /// <summary>
     /// 业绩ID
     /// </summary>

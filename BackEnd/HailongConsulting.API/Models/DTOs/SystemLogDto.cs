@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 namespace HailongConsulting.API.Models.DTOs;
 
 /// <summary>
@@ -22,8 +23,9 @@ public class SystemLogDto
 /// <summary>
 /// 系统日志查询参数 DTO
 /// </summary>
-public class SystemLogQueryDto
+public class SystemLogQueryDto : IValidatableObject
 {
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) => HailongConsulting.API.Common.PaginationValidation.Validate(Page, PageSize, StartDate, EndDate);
     public string? Action { get; set; }
     public string? Module { get; set; }
     public string? Username { get; set; }

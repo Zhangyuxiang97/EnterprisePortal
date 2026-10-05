@@ -1,3 +1,4 @@
+using HailongConsulting.API.Data;
 using HailongConsulting.API.Common;
 using HailongConsulting.API.Common.Helpers;
 using HailongConsulting.API.Models.DTOs;
@@ -37,6 +38,23 @@ public class AttachmentController : ControllerBase
         _environment = environment;
         _unitOfWork = unitOfWork;
         _fileHelper = fileHelper;
+    }
+
+    [HttpGet("{id:int}/references")]
+    [Authorize(Roles = "admin")]
+    public async Task<IActionResult> GetReferences(int id, [FromServices] ApplicationDbContext db) =>
+        Ok(ApiResponse<List<AttachmentReference>>.SuccessResult(await AttachmentReferences.FindAsync(db, id)));
+
+    [HttpGet("upload-options")]
+    [Authorize]
+    public IActionResult GetUploadOptions([FromServices] IConfiguration configuration)
+    {
+        string[] Extensions(string kind) => (configuration[$"FileUpload:Allowed{kind}Extensions"] ?? "")
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        return Ok(ApiResponse<object>.SuccessResult(new {
+            maxFileSize = configuration.GetValue<long>("FileUpload:MaxFileSize", 10 * 1024 * 1024),
+            image = Extensions("Image"), document = Extensions("Document"), video = Extensions("Video")
+        }));
     }
 
     /// <summary>
@@ -113,10 +131,10 @@ public class AttachmentController : ControllerBase
             
             return Ok(ApiResponse<AttachmentDto>.SuccessResult(attachmentDto, "上传附件成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "上传附件失败");
-            return StatusCode(500, ApiResponse<AttachmentDto>.FailResult($"上传附件失败: {ex.Message}"));
+            throw;
         }
     }
 
@@ -207,10 +225,10 @@ public class AttachmentController : ControllerBase
 
             return Ok(ApiResponse<List<AttachmentDto>>.SuccessResult(attachments, $"成功上传 {attachments.Count} 个附件"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "批量上传附件失败");
-            return StatusCode(500, ApiResponse<List<AttachmentDto>>.FailResult($"批量上传附件失败: {ex.Message}"));
+            throw;
         }
     }
 
@@ -235,10 +253,10 @@ public class AttachmentController : ControllerBase
             var result = await _attachmentService.GetPagedAsync(page, pageSize, category, relatedType, keyword);
             return Ok(ApiResponse<PagedResult<AttachmentDto>>.SuccessResult(result, "获取附件列表成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取附件列表失败");
-            return StatusCode(500, ApiResponse<PagedResult<AttachmentDto>>.FailResult("获取附件列表失败"));
+            throw;
         }
     }
 
@@ -258,10 +276,10 @@ public class AttachmentController : ControllerBase
             }
             return Ok(ApiResponse<AttachmentDto>.SuccessResult(attachment, "获取附件成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取附件失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<AttachmentDto>.FailResult("获取附件失败"));
+            throw;
         }
     }
 
@@ -280,10 +298,10 @@ public class AttachmentController : ControllerBase
             var attachments = await _attachmentService.GetByRelatedAsync(relatedType, relatedId);
             return Ok(ApiResponse<List<AttachmentDto>>.SuccessResult(attachments.ToList(), "获取附件列表成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取附件列表失败，RelatedType: {RelatedType}, RelatedId: {RelatedId}", relatedType, relatedId);
-            return StatusCode(500, ApiResponse<List<AttachmentDto>>.FailResult("获取附件列表失败"));
+            throw;
         }
     }
 
@@ -315,10 +333,10 @@ public class AttachmentController : ControllerBase
             var attachments = await _attachmentService.GetByIdsAsync(idList);
             return Ok(ApiResponse<List<AttachmentDto>>.SuccessResult(attachments.ToList(), "获取附件列表成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "批量获取附件失败，IDs: {Ids}", ids);
-            return StatusCode(500, ApiResponse<List<AttachmentDto>>.FailResult("批量获取附件失败"));
+            throw;
         }
     }
 
@@ -339,10 +357,11 @@ public class AttachmentController : ControllerBase
             }
             return Ok(ApiResponse<bool>.SuccessResult(true, "删除附件成功"));
         }
-        catch (Exception ex)
+        catch (InvalidOperationException ex) { return Conflict(ApiResponse<bool>.FailResult(ex.Message)); }
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "删除附件失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("删除附件失败"));
+            throw;
         }
     }
 
@@ -362,12 +381,14 @@ public class AttachmentController : ControllerBase
             }
 
             var result = await _attachmentService.DeleteRangeAsync(ids);
+            if (!result) return NotFound(ApiResponse<bool>.FailResult("部分附件不存在，未完成删除"));
             return Ok(ApiResponse<bool>.SuccessResult(result, $"成功删除 {ids.Count} 个附件"));
         }
-        catch (Exception ex)
+        catch (InvalidOperationException ex) { return Conflict(ApiResponse<bool>.FailResult(ex.Message)); }
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "批量删除附件失败");
-            return StatusCode(500, ApiResponse<bool>.FailResult("批量删除附件失败"));
+            throw;
         }
     }
 
@@ -395,7 +416,7 @@ public class AttachmentController : ControllerBase
             var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
             return File(fileBytes, attachment.FileType ?? "application/octet-stream", attachment.FileName);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "下载附件失败，ID: {Id}", id);
             return StatusCode(500);

@@ -1,6 +1,7 @@
 using HailongConsulting.API.Data;
 using HailongConsulting.API.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using HailongConsulting.API.Common;
 
 namespace HailongConsulting.API.Repositories;
 
@@ -48,6 +49,18 @@ public class VisitStatisticRepository : Repository<VisitStatistic>, IVisitStatis
             };
             await _dbSet.AddAsync(newRecord);
         }
+    }
+
+    public async Task<PagedResult<VisitStatistic>> GetPageAsync(DateOnly startDate, DateOnly endDate, string? pagePath, int page, int pageSize)
+    {
+        var query = _dbSet.AsNoTracking()
+            .Where(v => v.VisitDate >= startDate && v.VisitDate <= endDate && v.IsDeleted == 0);
+        if (!string.IsNullOrWhiteSpace(pagePath))
+            query = query.Where(v => v.PageUrl != null && v.PageUrl.Contains(pagePath));
+        var total = await query.CountAsync();
+        var items = await query.OrderByDescending(v => v.CreatedAt).ThenByDescending(v => v.Id)
+            .Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+        return PagedResult<VisitStatistic>.Create(items, total, page, pageSize);
     }
 
     public async Task<IEnumerable<VisitStatistic>> GetByDateRangeAsync(DateOnly startDate, DateOnly endDate)

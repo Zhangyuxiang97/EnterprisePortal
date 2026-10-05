@@ -43,8 +43,9 @@ export const getAttachmentDetail = (id) => {
  * @param {string} relatedType - 关联类型（可选）
  * @param {number} relatedId - 关联ID（可选）
  */
-export const uploadAttachment = (formData) => {
+export const uploadAttachment = (formData, options = {}) => {
   return request({
+    ...options,
     url: '/attachments/upload',
     method: 'post',
     data: formData,
@@ -60,7 +61,7 @@ export const uploadAttachment = (formData) => {
  */
 export const batchUploadAttachments = (formData) => {
   return request({
-    url: '/attachments/batch-upload',
+    url: '/attachments/upload/batch',
     method: 'post',
     data: formData,
     headers: {

@@ -1,6 +1,8 @@
 using System.Reflection;
 using HailongConsulting.API.Data;
 using Microsoft.EntityFrameworkCore;
+using MySqlConnector;
+using System.Data;
 
 namespace HailongConsulting.API.Services;
 
@@ -13,11 +15,22 @@ public static class DatabaseMigrationRunner
     {
         await using var scope = serviceProvider.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var connection = dbContext.Database.GetDbConnection();
+        // 迁移中的 SET/PREPARE 使用会话变量。独立连接避免改变业务连接的选项。
+        var settings = new MySqlConnectionStringBuilder(dbContext.Database.GetConnectionString()
+            ?? throw new InvalidOperationException("数据库连接未配置")) { AllowUserVariables = true };
+        await using var connection = new MySqlConnection(settings.ConnectionString);
 
         await connection.OpenAsync();
+        var locked = false;
         try
         {
+            await using (var acquire = connection.CreateCommand())
+            {
+                acquire.CommandTimeout = 70;
+                acquire.CommandText = "SELECT GET_LOCK(SHA2(CONCAT(DATABASE(), ':hailong-migrations'), 256), 60)";
+                locked = Convert.ToInt32(await acquire.ExecuteScalarAsync()) == 1;
+                if (!locked) throw new InvalidOperationException("其他实例正在升级数据库，请稍后重新启动。");
+            }
             await using (var command = connection.CreateCommand())
             {
                 command.CommandText = """
@@ -53,38 +66,34 @@ public static class DatabaseMigrationRunner
                 using var reader = new StreamReader(stream);
                 var sql = await reader.ReadToEndAsync();
 
-                await using var transaction = await connection.BeginTransactionAsync();
-                try
+                // MySQL DDL 隐式提交：采用串行锁和可重入脚本，全部成功后才登记版本。
+                await using (var migrationCommand = connection.CreateCommand())
                 {
-                    await using (var migrationCommand = connection.CreateCommand())
-                    {
-                        migrationCommand.Transaction = transaction;
-                        migrationCommand.CommandText = sql;
-                        await migrationCommand.ExecuteNonQueryAsync();
-                    }
-
-                    await using (var recordCommand = connection.CreateCommand())
-                    {
-                        recordCommand.Transaction = transaction;
-                        recordCommand.CommandText = "INSERT INTO schema_migrations (version) VALUES (@version)";
-                        var parameter = recordCommand.CreateParameter();
-                        parameter.ParameterName = "@version";
-                        parameter.Value = version;
-                        recordCommand.Parameters.Add(parameter);
-                        await recordCommand.ExecuteNonQueryAsync();
-                    }
-
-                    await transaction.CommitAsync();
+                    migrationCommand.CommandTimeout = 300;
+                    migrationCommand.CommandText = sql;
+                    await migrationCommand.ExecuteNonQueryAsync();
                 }
-                catch
+
+                await using (var recordCommand = connection.CreateCommand())
                 {
-                    await transaction.RollbackAsync();
-                    throw;
+                    recordCommand.CommandText = "INSERT INTO schema_migrations (version) VALUES (@version)";
+                    recordCommand.Parameters.AddWithValue("@version", version);
+                    await recordCommand.ExecuteNonQueryAsync();
                 }
             }
         }
         finally
         {
+            if (locked && connection.State == ConnectionState.Open)
+            {
+                try
+                {
+                    await using var release = connection.CreateCommand();
+                    release.CommandText = "SELECT RELEASE_LOCK(SHA2(CONCAT(DATABASE(), ':hailong-migrations'), 256))";
+                    await release.ExecuteScalarAsync();
+                }
+                catch { /* 关闭连接也会释放锁，不覆盖原始迁移异常。 */ }
+            }
             await connection.CloseAsync();
         }
     }

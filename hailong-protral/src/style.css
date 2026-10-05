@@ -2,6 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 门户操作入口：纯色、细边框和轻量状态反馈。尺寸由具体场景控制。 */
+.portal-button,
+.portal-choice {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  line-height: 1.5;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.portal-button { min-height: 44px; }
+.portal-button--primary { background-color: #245b85; color: #fff; }
+.portal-button--primary:hover:enabled,
+a.portal-button--primary:hover { background-color: #1d4d70; }
+.portal-button--primary:active:enabled,
+a.portal-button--primary:active { background-color: #193f5c; }
+
+.portal-button--secondary {
+  background-color: #fff;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+.portal-button--secondary:hover:enabled,
+a.portal-button--secondary:hover { background-color: #f1f5f9; border-color: #94a3b8; }
+
+.portal-button--on-dark {
+  background-color: transparent;
+  border-color: rgb(255 255 255 / .35);
+  color: #f8fafc;
+}
+.portal-button--on-dark:hover:enabled,
+a.portal-button--on-dark:hover { background-color: rgb(255 255 255 / .08); border-color: rgb(255 255 255 / .65); }
+
+.portal-choice { background-color: #f8fafc; color: #475569; }
+.portal-choice:hover:enabled { background-color: #eef2f6; }
+.portal-choice--selected,
+.portal-choice--selected:hover:enabled { background-color: #e8eff5; border-color: #b5cbdd; color: #204f73; }
+
+.portal-button:focus-visible,
+.portal-choice:focus-visible { outline: 2px solid #4f83b1; outline-offset: 3px; }
+.portal-button--on-dark:focus-visible { outline-color: #cbd5e1; }
+.portal-button:disabled,
+.portal-choice:disabled { opacity: .5; cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) {
+  .portal-button, .portal-choice { transition: none; }
+}
+
 /* 全局样式 */
 * {
   margin: 0;

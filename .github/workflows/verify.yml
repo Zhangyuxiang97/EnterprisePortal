@@ -1,0 +1,76 @@
+name: 项目验证
+on:
+  push:
+  pull_request:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: |
+            hailong-admin/package-lock.json
+            hailong-protral/package-lock.json
+            scripts/package-lock.json
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: node scripts/check-project-config.mjs
+      - run: bash -n deploy-ubuntu22-docker.sh
+      - run: bash scripts/tests/deployment-readiness.test.sh
+      - run: npm ci && node --test tests/*.test.js
+        working-directory: scripts
+      - run: npm ci && npm run build
+        working-directory: hailong-protral
+      - run: node --test hailong-protral/tests/*.test.mjs
+      - run: npm ci && npm test && npm run build
+        working-directory: hailong-admin
+      - run: dotnet test BackEnd/Protral.sln -c Release
+      - name: 验证 Compose 配置（仅生成临时测试凭据）
+        run: |
+          mkdir -p .runtime
+          printf 'MYSQL_ROOT_PASSWORD=ci-only-unused\nMYSQL_PASSWORD=ci-only-unused\nConnectionStrings__DefaultConnection=unused\nJwt__Key=ci-only-unused\n' > .runtime/secrets.env
+          docker compose --env-file .runtime/secrets.env config --quiet
+  initial-data:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ci-only-unused
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 --silent"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: 按首次部署顺序导入空库
+        run: |
+          for sql in SQL/[0-9][0-9]_*.sql; do
+            docker exec -i -e MYSQL_PWD=ci-only-unused ${{ job.services.mysql.id }} mysql --default-character-set=utf8mb4 < "$sql"
+          done
+      - name: 核验公告、资讯、企业简介及链接
+        run: docker exec -i -e MYSQL_PWD=ci-only-unused ${{ job.services.mysql.id }} mysql --default-character-set=utf8mb4 < scripts/tests/verify-initial-data.sql
+      - run: dotnet build BackEnd/HailongConsulting.API/HailongConsulting.API.csproj -c Release
+      - name: MySQL 并发管理员保护与迁移重入
+        env:
+          LOCAL_MYSQL_TEST_CONNECTION: Server=127.0.0.1;Port=3306;User=root;Password=ci-only-unused
+        run: dotnet test BackEnd/HailongConsulting.API.Tests/HailongConsulting.API.Tests.csproj --filter FullyQualifiedName~MySqlCleanupTests
+      - run: npm ci && npx playwright install --with-deps chromium
+        working-directory: hailong-admin
+      - name: 本机隔离服务的登录、编辑、上传、会话与冲突回归
+        env:
+          CI_DATABASE_CONNECTION: Server=127.0.0.1;Port=3306;Database=hailong_consulting;User=root;Password=ci-only-unused;CharSet=utf8mb4
+        run: node scripts/run-ci-browser.mjs

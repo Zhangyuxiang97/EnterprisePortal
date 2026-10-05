@@ -4,10 +4,10 @@
       <template #header>
         <div class="card-header">
           <span>政府采购公告管理</span>
-          <el-button type="primary" icon="Plus" @click="handleAdd">新增公告</el-button>
+          <el-button v-if="canManage" type="primary" icon="Plus" @click="handleAdd">新增公告</el-button>
         </div>
       </template>
-      
+
       <!-- 搜索区域 -->
       <el-form :model="searchForm" inline class="search-form">
         <el-form-item label="关键词">
@@ -47,7 +47,7 @@
           <el-button icon="Refresh" @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
-      
+
       <!-- 表格 -->
       <el-table :data="tableData" v-loading="loading" border stripe>
         <el-table-column type="index" label="序号" width="60" />
@@ -59,6 +59,12 @@
         </el-table-column>
         <el-table-column prop="bidder" label="采购人" min-width="150" show-overflow-tooltip />
         <el-table-column prop="winner" label="中标人" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="budgetAmount" label="预算（万元）" width="125" align="right">
+          <template #default="{ row }">{{ row.budgetAmount ?? '—' }}</template>
+        </el-table-column>
+        <el-table-column prop="awardAmount" label="中标（万元）" width="125" align="right">
+          <template #default="{ row }">{{ row.awardAmount ?? '—' }}</template>
+        </el-table-column>
         <el-table-column prop="projectRegion" label="项目区域" width="180" align="center" show-overflow-tooltip />
         <el-table-column prop="publishTime" label="发布时间" width="110" align="center">
           <template #default="{ row }">
@@ -68,12 +74,12 @@
         <el-table-column prop="viewCount" label="访问量" width="80" align="center" />
         <el-table-column label="操作" width="150" fixed="right" align="center">
           <template #default="{ row }">
-            <el-button type="primary" size="small" link @click="handleEdit(row)">编辑</el-button>
-            <el-button type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
+            <el-button type="primary" size="small" link @click="handleEdit(row)">{{ canManage ? '编辑' : '查看' }}</el-button>
+            <el-button v-if="canManage" type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
-      
+
       <!-- 分页 -->
       <el-pagination
         v-model:current-page="pagination.pageIndex"
@@ -86,29 +92,31 @@
         style="margin-top: 20px; justify-content: flex-end;"
       />
     </el-card>
-    
+
     <!-- 新增/编辑对话框 -->
     <el-dialog
       v-model="dialogVisible"
+      class="editor-dialog"
+      :before-close="beforeEditorClose"
       :title="isEdit ? '编辑公告' : '新增公告'"
       width="900px"
       :close-on-click-modal="false"
     >
-      <el-form 
-        ref="formRef" 
-        :model="formData" 
-        :rules="formRules" 
+      <el-form :disabled="!canManage"
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
         label-width="100px"
       >
         <el-form-item label="公告标题" prop="title">
-          <el-input 
-            v-model="formData.title" 
-            placeholder="请输入公告标题（最多255个字符）" 
+          <el-input
+            v-model="formData.title"
+            placeholder="请输入公告标题（最多255个字符）"
             maxlength="255"
             show-word-limit
           />
         </el-form-item>
-        
+
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="公告类型" prop="noticeType">
@@ -129,7 +137,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        
+
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="项目区域" prop="regionPath">
@@ -137,7 +145,7 @@
                 v-if="dialogVisible"
                 ref="regionCascaderRef"
                 v-model="formData.regionPath"
-                placeholder="请选择省/市/区"
+                placeholder="可选到已确认的省或市，未知可留空"
                 @change="handleFormRegionChange"
                 :width="'100%'"
               />
@@ -153,7 +161,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        
+
         <el-row :gutter="20" v-if="formData.noticeType === 'result'">
           <el-col :span="12">
             <el-form-item label="中标人" prop="winner">
@@ -165,7 +173,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        
+
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="预算金额" prop="budgetAmount">
@@ -191,7 +199,11 @@
             </el-form-item>
           </el-col>
         </el-row>
-        
+
+        <el-form-item v-if="formData.noticeType === 'result'" label="中标金额" prop="awardAmount">
+          <el-input-number v-model="formData.awardAmount" :min="0" :precision="2" :controls="false" placeholder="中标/成交金额（万元）" style="width: 100%;" />
+        </el-form-item>
+
         <el-form-item label="发布时间" prop="publishTime">
           <el-date-picker
             v-model="formData.publishTime"
@@ -201,11 +213,11 @@
             style="width: 100%;"
           />
         </el-form-item>
-        
+
         <el-form-item label="公告内容" prop="content">
-          <RichEditor v-model="formData.content" />
+          <RichEditor :disabled="!canManage" v-model="formData.content" />
         </el-form-item>
-        
+
         <el-form-item label="附件" prop="attachmentIds">
           <FileUpload
             v-model="formData.attachmentIds"
@@ -218,16 +230,21 @@
           <div class="form-tip">支持上传PDF、Word、Excel等文档，最多10个附件</div>
         </el-form-item>
       </el-form>
-      
+
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSubmit" :loading="submitting">提交</el-button>
+        <el-button @click="handleCancel">取消</el-button>
+        <el-button v-if="canManage" type="primary" @click="handleSubmit" :loading="submitting" :disabled="activeUploads > 0">提交</el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
+import { useContentSubmit } from '@/composables/useContentSubmit'
+import { notifyError } from '@/utils/errors'
+import { createLatestRequest } from '@/utils/latestRequest'
+import { useEditorForm } from '@/composables/useEditorForm'
+import { localDateTime, richContentRule } from '@/utils/form'
 import { ref, reactive, onMounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { announcementApi } from '@/api'
@@ -294,9 +311,12 @@ const formData = reactive({
   projectRegion: '',
   publishTime: '',
   budgetAmount: null,
+  awardAmount: null,
   deadline: '',
-  attachmentIds: []
+  attachmentIds: [], status: 1, isTop: false
 })
+const { markSaved, handleCancel, beforeEditorClose, canManage, activeUploads } = useEditorForm(formData, dialogVisible, submitting)
+
 
 // 表单验证规则
 const formRules = {
@@ -307,15 +327,7 @@ const formRules = {
   noticeType: [
     { required: true, message: '请选择公告类型', trigger: 'change' }
   ],
-  procurementType: [
-    { required: true, message: '请选择采购类型', trigger: 'change' }
-  ],
-  content: [
-    { required: true, message: '请输入公告内容', trigger: 'blur' }
-  ],
-  regionPath: [
-    { required: true, message: '请选择区域', trigger: 'change' }
-  ],
+  content: [richContentRule],
   publishTime: [
     { required: true, message: '请选择发布日期', trigger: 'change' }
   ]
@@ -331,7 +343,9 @@ const formatNoticeType = (type) => {
 /**
  * 加载数据
  */
+const listRequests = createLatestRequest()
 const loadData = async () => {
+  const requestId = listRequests.begin()
   loading.value = true
   try {
     // 处理时间范围
@@ -342,7 +356,7 @@ const loadData = async () => {
       searchForm.startDate = ''
       searchForm.endDate = ''
     }
-    
+
     const params = {
       keyword: searchForm.keyword || undefined,
       businessType: 'GOV_PROCUREMENT', // 固定为政府采购
@@ -355,9 +369,10 @@ const loadData = async () => {
       pageNumber: pagination.pageIndex,
       pageSize: pagination.pageSize
     }
-    
+
     const res = await announcementApi.getAnnouncementList(params)
-    
+    if (!listRequests.isCurrent(requestId)) return
+
     if (res.success && res.data) {
       tableData.value = res.data.items || []
       pagination.total = res.data.totalCount || 0
@@ -365,10 +380,11 @@ const loadData = async () => {
       ElMessage.error(res.message || '加载数据失败')
     }
   } catch (error) {
-    console.error('加载数据失败:', error)
-    ElMessage.error('加载数据失败，请稍后重试')
+    if (!listRequests.isCurrent(requestId)) return
+
+    notifyError(error, '加载数据失败，请稍后重试')
   } finally {
-    loading.value = false
+    if (listRequests.isCurrent(requestId)) loading.value = false
   }
 }
 
@@ -421,7 +437,7 @@ const handleAdd = () => {
   const minutes = String(now.getMinutes()).padStart(2, '0')
   const seconds = String(now.getSeconds()).padStart(2, '0')
   const dateTimeString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
-  
+
   Object.assign(formData, {
     id: null,
     title: '',
@@ -438,8 +454,9 @@ const handleAdd = () => {
     projectRegion: '',
     publishTime: dateTimeString,
     budgetAmount: null,
+    awardAmount: null,
     deadline: '',
-    attachmentIds: []
+    attachmentIds: [], status: 1, isTop: false
   })
   dialogVisible.value = true
 }
@@ -455,6 +472,7 @@ const handleEdit = async (row) => {
       // 先设置基本表单数据（不包括 regionPath）
       Object.assign(formData, {
         id: res.data.id,
+        version: res.data.version,
         title: res.data.title,
         businessType: res.data.businessType,
         noticeType: res.data.noticeType,
@@ -469,58 +487,35 @@ const handleEdit = async (row) => {
         projectRegion: res.data.projectRegion || '',
         publishTime: res.data.publishTime,
         budgetAmount: res.data.budgetAmount,
+        awardAmount: res.data.awardAmount,
         deadline: res.data.deadline || '',
-        attachmentIds: res.data.attachmentIds || []
+        attachmentIds: res.data.attachmentIds || [],
+        status: res.data.status, isTop: res.data.isTop
       })
-      
+
       // 打开对话框
       dialogVisible.value = true
-      
+
       // 等待 RegionCascader 组件挂载并加载数据
       await nextTick()
-      
-      // 等待区域数据加载完成
-      let retryCount = 0
-      const maxRetries = 20
-      while (retryCount < maxRetries) {
-        if (regionCascaderRef.value && regionCascaderRef.value.isDataLoaded()) {
-          break
-        }
-        await new Promise(resolve => setTimeout(resolve, 100))
-        retryCount++
-      }
-      
-      // 如果后端返回的是中文名称，需要转换为代码
-      const regionPath = []
-      if (res.data.province && regionCascaderRef.value) {
-        const provinceCode = regionCascaderRef.value.findCodeByName(res.data.province)
-        if (provinceCode) {
-          regionPath.push(provinceCode)
-          
-          if (res.data.city) {
-            const cityCode = regionCascaderRef.value.findCodeByName(res.data.city)
-            if (cityCode) {
-              regionPath.push(cityCode)
-              
-              if (res.data.district) {
-                const districtCode = regionCascaderRef.value.findCodeByName(res.data.district)
-                if (districtCode) {
-                  regionPath.push(districtCode)
-                }
-              }
-            }
-          }
-        }
-      }
-      
-      // 设置区域路径
+
+      const regionPath = await regionCascaderRef.value.resolvePath([
+        res.data.provinceCode || res.data.province,
+        res.data.cityCode || res.data.city,
+        res.data.districtCode || res.data.district
+      ])
       formData.regionPath = regionPath
+      formData.province = regionPath[0] || ''
+      formData.city = regionPath[1] || ''
+      formData.district = regionPath[2] || ''
+      await nextTick()
+      markSaved()
     } else {
       ElMessage.error(res.message || '获取公告详情失败')
     }
   } catch (error) {
-    console.error('获取公告详情失败:', error)
-    ElMessage.error('获取公告详情失败，请稍后重试')
+
+    notifyError(error, dialogVisible.value ? (error.message || '表单初始化失败，请关闭后重试') : '获取公告详情失败，请稍后重试')
   }
 }
 
@@ -530,15 +525,15 @@ const handleEdit = async (row) => {
 const handleDelete = async (row) => {
   try {
     await ElMessageBox.confirm(
-      `确定要删除公告"${row.title}"吗？删除后将无法恢复。`, 
-      '删除确认', 
+      `确定要删除公告"${row.title}"吗？删除后将无法恢复。`,
+      '删除确认',
       {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }
     )
-    
+
     const res = await announcementApi.deleteAnnouncement(row.id)
     if (res.success) {
       ElMessage.success(res.message || '删除成功')
@@ -552,8 +547,8 @@ const handleDelete = async (row) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('删除失败:', error)
-      ElMessage.error('删除失败，请稍后重试')
+
+      notifyError(error, '删除失败，请稍后重试')
     }
   }
 }
@@ -561,19 +556,10 @@ const handleDelete = async (row) => {
 /**
  * 提交表单
  */
-const handleSubmit = async () => {
-  if (!formRef.value) return
-  
-  try {
-    await formRef.value.validate()
-  } catch (error) {
-    ElMessage.warning('请正确填写表单')
-    return
-  }
-  
-  submitting.value = true
-  try {
-    const submitData = {
+const handleSubmit = useContentSubmit({
+  formRef, submitting, isEdit, formData,
+  buildPayload: () => ({
+      version: formData.version,
       title: formData.title,
       businessType: formData.businessType,
       noticeType: formData.noticeType,
@@ -581,39 +567,21 @@ const handleSubmit = async () => {
       content: formData.content,
       bidder: formData.bidder || null,
       winner: formData.winner || null,
-      province: formData.province || null,
-      city: formData.city || null,
-      district: formData.district || null,
+      province: formData.province || '',
+      city: formData.city || '',
+      district: formData.district || '',
       projectRegion: formData.projectRegion,
       publishTime: formData.publishTime,
-      budgetAmount: formData.budgetAmount,
+      budgetAmount: formData.budgetAmount ?? null,
+      awardAmount: formData.noticeType === 'result' ? (formData.awardAmount ?? null) : null,
       deadline: formData.deadline || null,
       attachmentIds: formData.attachmentIds,
-      status: 1,
-      isTop: false
-    }
-    
-    let res
-    if (isEdit.value) {
-      res = await announcementApi.updateAnnouncement(formData.id, submitData)
-    } else {
-      res = await announcementApi.createAnnouncement(submitData)
-    }
-    
-    if (res.success) {
-      ElMessage.success(res.message || (isEdit.value ? '更新成功' : '创建成功'))
-      dialogVisible.value = false
-      loadData()
-    } else {
-      ElMessage.error(res.message || (isEdit.value ? '更新失败' : '创建失败'))
-    }
-  } catch (error) {
-    console.error('提交失败:', error)
-    ElMessage.error(isEdit.value ? '更新失败，请稍后重试' : '创建失败，请稍后重试')
-  } finally {
-    submitting.value = false
-  }
-}
+      status: formData.status,
+      isTop: formData.isTop
+    }),
+  create: announcementApi.createAnnouncement, update: announcementApi.updateAnnouncement,
+  onSaved: () => { markSaved(); dialogVisible.value = false; return loadData() }
+})
 
 /**
  * 表单区域变化

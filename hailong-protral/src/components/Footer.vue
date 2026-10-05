@@ -1,5 +1,5 @@
 <template>
-  <footer class="bg-hailong-dark text-white py-12 border-t border-hailong-cyan/20">
+  <footer class="bg-hailong-dark text-white py-12">
     <div class="container-wide">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
         <div>
@@ -16,7 +16,7 @@
             </li>
           </ul>
           <ul v-else class="space-y-2 text-sm text-gray-400">
-            <li v-for="item in section.items" :key="item.label">
+            <li v-for="item in footerContactItems" :key="item.label">
               {{ item.label }}: {{ item.value }}
             </li>
           </ul>
@@ -31,7 +31,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { getCompanyInfo, getNavigation } from '@/utils/config'
+import { getCompanyInfo, getContactInfo, getNavigation } from '@/utils/config'
 
 // 获取公司信息
 const companyInfo = computed(() => getCompanyInfo())
@@ -39,6 +39,14 @@ const companyInfo = computed(() => getCompanyInfo())
 // 获取页脚配置
 const navigation = computed(() => getNavigation())
 const footerSections = computed(() => navigation.value.footer.sections)
+const footerContactItems = computed(() => {
+  const contact = getContactInfo()
+  return [
+    { label: '电话', value: contact.phone },
+    { label: '邮箱', value: contact.email },
+    { label: '地址', value: contact.address.fullAddress }
+  ]
+})
 const footerCopyright = computed(() => {
   const currentYear = new Date().getFullYear()
   return `© ${currentYear} ${companyInfo.value.fullName} 版权所有`

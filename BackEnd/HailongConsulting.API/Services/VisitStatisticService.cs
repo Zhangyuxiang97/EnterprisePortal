@@ -4,6 +4,7 @@ using HailongConsulting.API.Repositories;
 using HailongConsulting.API.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using HailongConsulting.API.Common;
 
 namespace HailongConsulting.API.Services;
 
@@ -102,6 +103,9 @@ public class VisitStatisticService : IVisitStatisticService
             throw;
         }
     }
+
+    public Task<PagedResult<VisitStatistic>> GetVisitStatisticsPageAsync(DateOnly startDate, DateOnly endDate, string? pagePath, int page, int pageSize)
+        => _visitStatisticRepository.GetPageAsync(startDate, endDate, pagePath, page, pageSize);
 
     public async Task<IEnumerable<VisitStatistic>> GetVisitStatisticsAsync(DateOnly startDate, DateOnly endDate)
     {

@@ -45,6 +45,15 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 // Add services to the container
+builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context => new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(new {
+        success = false, code = "VALIDATION_ERROR", traceId = context.HttpContext.TraceIdentifier,
+        message = string.Join("；", context.ModelState.Values.SelectMany(v => v.Errors).Select(e =>
+            string.IsNullOrWhiteSpace(e.ErrorMessage) ? "请求参数格式不正确" : e.ErrorMessage).Distinct())
+    });
+});
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -78,7 +87,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     // 在开发环境启用详细错误信息
     if (builder.Environment.IsDevelopment())
     {
-        options.EnableSensitiveDataLogging();
         options.EnableDetailedErrors();
     }
 });
@@ -274,6 +282,10 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+var restoredAssets = SeedAssetBootstrapper.CopyMissing(
+    Path.Combine(AppContext.BaseDirectory, "SeedAssets", "legacy"), app.Environment.WebRootPath);
+Log.Information("初始化公开图片补充完成，新增 {Count} 个文件", restoredAssets);
 
 await app.Services.ApplyDatabaseMigrationsAsync();
 await app.Services.BootstrapInitialAdminAsync(app.Configuration);

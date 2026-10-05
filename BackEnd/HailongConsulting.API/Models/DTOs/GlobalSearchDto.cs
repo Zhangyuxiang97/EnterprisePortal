@@ -1,10 +1,12 @@
+using System.ComponentModel.DataAnnotations;
 namespace HailongConsulting.API.Models.DTOs;
 
 /// <summary>
 /// 全局搜索请求DTO
 /// </summary>
-public class GlobalSearchRequestDto
+public class GlobalSearchRequestDto : IValidatableObject
 {
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) => HailongConsulting.API.Common.PaginationValidation.Validate(PageIndex, PageSize, StartDate, EndDate);
     /// <summary>
     /// 搜索关键词（匹配标题、招标人、中标人字段）
     /// </summary>

@@ -94,6 +94,7 @@ CREATE TABLE `user_refresh_tokens` (
 
 -- 2.1 统一公告表
 CREATE TABLE `announcements` (
+  `version` VARCHAR(32) NOT NULL DEFAULT 'initial' COMMENT '内容并发版本',
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '公告ID',
   `title` VARCHAR(255) NOT NULL COMMENT '公告标题',
   `business_type` VARCHAR(50) NOT NULL COMMENT '业务类型：GOV_PROCUREMENT-政府采购, CONSTRUCTION-建设工程',
@@ -102,6 +103,7 @@ CREATE TABLE `announcements` (
   `bidder` VARCHAR(255) DEFAULT NULL COMMENT '招标人',
   `winner` VARCHAR(255) DEFAULT NULL COMMENT '中标人',
   `budget_amount` DECIMAL(15,2) DEFAULT NULL COMMENT '预算金额（单位：万元）',
+  `award_amount` DECIMAL(15,2) DEFAULT NULL COMMENT '中标/成交金额（单位：万元，不含候选人报价）',
   `deadline` DATETIME DEFAULT NULL COMMENT '截止时间',
   `province` VARCHAR(50) DEFAULT NULL COMMENT '省级行政区划编码',
   `city` VARCHAR(50) DEFAULT NULL COMMENT '市级行政区划编码',
@@ -138,10 +140,12 @@ CREATE TABLE `announcements` (
 
 -- 3.1 统一信息发布表（新闻中心、政策法规）
 CREATE TABLE `info_publications` (
+  `version` VARCHAR(32) NOT NULL DEFAULT 'initial' COMMENT '内容并发版本',
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '信息ID',
   `type` VARCHAR(50) NOT NULL COMMENT '信息类型：COMPANY_NEWS-新闻中心, POLICY_REGULATION-政策法规',
   `category` VARCHAR(100) DEFAULT NULL COMMENT '二级分类：公司新闻/行业动态/通知公告（新闻）；法律法规/行政法规/地方政策（政策）',
   `title` VARCHAR(255) NOT NULL COMMENT '标题',
+  `document_number` VARCHAR(100) NULL COMMENT '政策发文字号',
   `summary` VARCHAR(500) DEFAULT NULL COMMENT '摘要',
   `content` LONGTEXT NOT NULL COMMENT '内容（富文本）',
   `cover_image_id` INT UNSIGNED DEFAULT NULL COMMENT '封面图片ID（关联attachments表）',
@@ -171,6 +175,7 @@ CREATE TABLE `info_publications` (
 
 -- 4.1 企业简介表
 CREATE TABLE `company_profile` (
+  `version` VARCHAR(32) NOT NULL DEFAULT 'initial' COMMENT '内容并发版本',
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '简介ID',
   `title` VARCHAR(255) NOT NULL COMMENT '简介标题',
   `content` LONGTEXT NOT NULL COMMENT '简介内容（富文本）',
@@ -186,6 +191,7 @@ CREATE TABLE `company_profile` (
 
 -- 4.2 业务范围表
 CREATE TABLE `business_scope` (
+  `version` VARCHAR(32) NOT NULL DEFAULT 'initial' COMMENT '内容并发版本',
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '业务ID',
   `name` VARCHAR(255) NOT NULL COMMENT '业务名称',
   `description` TEXT DEFAULT NULL COMMENT '业务描述',
@@ -204,6 +210,7 @@ CREATE TABLE `business_scope` (
 
 -- 4.3 企业资质表
 CREATE TABLE `company_qualifications` (
+  `version` VARCHAR(32) NOT NULL DEFAULT 'initial' COMMENT '内容并发版本',
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '资质ID',
   `name` VARCHAR(255) NOT NULL COMMENT '资质名称',
   `description` TEXT DEFAULT NULL COMMENT '资质描述',
@@ -225,6 +232,7 @@ CREATE TABLE `company_qualifications` (
 
 -- 4.4 重要业绩表
 CREATE TABLE `major_achievements` (
+  `version` VARCHAR(32) NOT NULL DEFAULT 'initial' COMMENT '内容并发版本',
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '业绩ID',
   `project_name` VARCHAR(255) NOT NULL COMMENT '项目名称',
   `project_type` VARCHAR(50) NOT NULL COMMENT '项目类型：工程、服务、货物',
@@ -247,6 +255,7 @@ CREATE TABLE `major_achievements` (
 
 -- 4.5 企业荣誉表
 CREATE TABLE `company_honors` (
+  `version` VARCHAR(32) NOT NULL DEFAULT 'initial' COMMENT '内容并发版本',
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '荣誉ID',
   `name` VARCHAR(255) NOT NULL COMMENT '荣誉名称',
   `description` TEXT DEFAULT NULL COMMENT '荣誉描述',
@@ -269,6 +278,7 @@ CREATE TABLE `company_honors` (
 
 -- 4.6 轮播图表
 CREATE TABLE `carousel_banners` (
+  `version` VARCHAR(32) NOT NULL DEFAULT 'initial' COMMENT '内容并发版本',
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '轮播图ID',
   `title` VARCHAR(255) NOT NULL COMMENT '轮播图标题',
   `description` VARCHAR(500) DEFAULT NULL COMMENT '轮播图描述',
@@ -286,6 +296,7 @@ CREATE TABLE `carousel_banners` (
 
 -- 4.7 友情链接表
 CREATE TABLE `friendly_links` (
+  `version` VARCHAR(32) NOT NULL DEFAULT 'initial' COMMENT '内容并发版本',
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '链接ID',
   `name` VARCHAR(255) NOT NULL COMMENT '链接名称',
   `url` VARCHAR(500) NOT NULL COMMENT '链接地址',

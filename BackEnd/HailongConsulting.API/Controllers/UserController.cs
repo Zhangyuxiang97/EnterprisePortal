@@ -34,10 +34,10 @@ public class UserController : ControllerBase
             var result = await _userService.GetPagedListAsync(query);
             return Ok(ApiResponse<PagedResult<UserDto>>.SuccessResult(result));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "Failed to get user list");
-            return StatusCode(500, ApiResponse<PagedResult<UserDto>>.FailResult("获取用户列表失败"));
+            throw;
         }
     }
 
@@ -57,10 +57,10 @@ public class UserController : ControllerBase
 
             return Ok(ApiResponse<UserDto>.SuccessResult(user));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "Failed to get user by id: {Id}", id);
-            return StatusCode(500, ApiResponse<UserDto>.FailResult("获取用户信息失败"));
+            throw;
         }
     }
 
@@ -84,10 +84,10 @@ public class UserController : ControllerBase
         {
             return BadRequest(ApiResponse<UserDto>.FailResult(ex.Message));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "Failed to create user");
-            return StatusCode(500, ApiResponse<UserDto>.FailResult("创建用户失败"));
+            throw;
         }
     }
 
@@ -111,10 +111,10 @@ public class UserController : ControllerBase
         {
             return BadRequest(ApiResponse<UserDto>.FailResult(ex.Message));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "Failed to update user: {Id}", id);
-            return StatusCode(500, ApiResponse<UserDto>.FailResult("更新用户失败"));
+            throw;
         }
     }
 
@@ -134,10 +134,10 @@ public class UserController : ControllerBase
 
             return Ok(ApiResponse<bool>.SuccessResult(true, "用户删除成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "Failed to delete user: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("删除用户失败"));
+            throw;
         }
     }
 
@@ -162,10 +162,10 @@ public class UserController : ControllerBase
 
             return Ok(ApiResponse<bool>.SuccessResult(true, "密码重置成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "Failed to reset password for user: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("重置密码失败"));
+            throw;
         }
     }
 
@@ -185,10 +185,10 @@ public class UserController : ControllerBase
 
             return Ok(ApiResponse<bool>.SuccessResult(true, "用户状态更新成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "Failed to toggle status for user: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("更新用户状态失败"));
+            throw;
         }
     }
 }

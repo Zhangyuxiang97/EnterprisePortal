@@ -1,5 +1,10 @@
 import request from './request'
 
+export const siteSettings = {
+  get: () => request({ url: '/config/site-settings', method: 'get' }),
+  update: data => request({ url: '/config/site-settings', method: 'put', data })
+}
+
 /**
  * 系统配置 API
  * 包含：企业简介、业务范围、企业资质、重要业绩、企业荣誉、轮播图、友情链接
@@ -8,7 +13,7 @@ import request from './request'
 // ==================== 企业简介 ====================
 export const companyProfile = {
   get: () => request({
-    url: '/config/company-intro',
+    url: '/config/manage/company-intro',
     method: 'get'
   }),
   update: (data) => request({
@@ -21,12 +26,12 @@ export const companyProfile = {
 // ==================== 业务范围 ====================
 export const businessScope = {
   getList: (params) => request({
-    url: '/config/business-scope',
+    url: '/config/manage/business-scope',
     method: 'get',
     params
   }),
   getDetail: (id) => request({
-    url: `/config/business-scope/${id}`,
+    url: `/config/manage/business-scope/${id}`,
     method: 'get'
   }),
   create: (data) => request({
@@ -48,12 +53,12 @@ export const businessScope = {
 // ==================== 企业资质 ====================
 export const qualifications = {
   getList: (params) => request({
-    url: '/config/qualifications',
+    url: '/config/manage/qualifications',
     method: 'get',
     params
   }),
   getDetail: (id) => request({
-    url: `/config/qualifications/${id}`,
+    url: `/config/manage/qualifications/${id}`,
     method: 'get'
   }),
   create: (data) => request({
@@ -75,12 +80,12 @@ export const qualifications = {
 // ==================== 重要业绩 ====================
 export const achievements = {
   getList: (params) => request({
-    url: '/config/achievements',
+    url: '/config/manage/achievements',
     method: 'get',
     params
   }),
   getDetail: (id) => request({
-    url: `/config/achievements/${id}`,
+    url: `/config/manage/achievements/${id}`,
     method: 'get'
   }),
   create: (data) => request({
@@ -107,12 +112,12 @@ export const achievements = {
 // ==================== 企业荣誉 ====================
 export const honors = {
   getList: (params) => request({
-    url: '/config/honors',
+    url: '/config/manage/honors',
     method: 'get',
     params
   }),
   getDetail: (id) => request({
-    url: `/config/honors/${id}`,
+    url: `/config/manage/honors/${id}`,
     method: 'get'
   }),
   create: (data) => request({
@@ -134,12 +139,12 @@ export const honors = {
 // ==================== 轮播图 ====================
 export const banners = {
   getList: (params) => request({
-    url: '/config/banners',
+    url: '/config/manage/banners',
     method: 'get',
     params
   }),
   getDetail: (id) => request({
-    url: `/config/banners/${id}`,
+    url: `/config/manage/banners/${id}`,
     method: 'get'
   }),
   create: (data) => request({
@@ -166,12 +171,12 @@ export const banners = {
 // ==================== 友情链接 ====================
 export const friendlyLinks = {
   getList: (params) => request({
-    url: '/config/links',
+    url: '/config/manage/links',
     method: 'get',
     params
   }),
   getDetail: (id) => request({
-    url: `/config/links/${id}`,
+    url: `/config/manage/links/${id}`,
     method: 'get'
   }),
   create: (data) => request({
@@ -196,6 +201,7 @@ export const friendlyLinks = {
 }
 
 export default {
+  siteSettings,
   companyProfile,
   businessScope,
   qualifications,

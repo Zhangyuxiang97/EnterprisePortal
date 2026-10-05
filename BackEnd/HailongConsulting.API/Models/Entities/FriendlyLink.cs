@@ -7,8 +7,13 @@ namespace HailongConsulting.API.Models.Entities;
 /// 友情链接实体
 /// </summary>
 [Table("friendly_links")]
-public class FriendlyLink
+public class FriendlyLink : IVersionedContent
 {
+    [ConcurrencyCheck]
+    [Column("version")]
+    [MaxLength(32)]
+    public string Version { get; set; } = Guid.NewGuid().ToString("N");
+
     /// <summary>
     /// 链接ID
     /// </summary>

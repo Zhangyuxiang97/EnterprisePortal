@@ -1,3 +1,4 @@
+using HailongConsulting.API.Common;
 using AutoMapper;
 using HailongConsulting.API.Models.DTOs;
 using HailongConsulting.API.Models.Entities;
@@ -52,6 +53,7 @@ public class ConfigService : IConfigService
     {
         var banner = await _repository.GetBannerByIdAsync(id);
         if (banner == null) return false;
+        ContentRevision.Check(banner, dto.Version);
 
         // 只更新非null的字段
         if (dto.Title != null) banner.Title = dto.Title;
@@ -93,7 +95,9 @@ public class ConfigService : IConfigService
 
     public async Task<bool> UpdateCompanyProfileAsync(UpdateCompanyProfileDto dto)
     {
-        var profile = _mapper.Map<CompanyProfile>(dto);
+        var profile = await _repository.GetCompanyProfileAsync() ?? new CompanyProfile();
+        if (profile.Id != 0) ContentRevision.Check(profile, dto.Version);
+        _mapper.Map(dto, profile);
         profile.Content = _htmlContentSanitizer.Sanitize(profile.Content);
         return await _repository.UpdateCompanyProfileAsync(profile);
     }
@@ -148,6 +152,7 @@ public class ConfigService : IConfigService
     {
         var achievement = await _repository.GetAchievementByIdAsync(id);
         if (achievement == null) return false;
+        ContentRevision.Check(achievement, dto.Version);
 
         // 只更新非null的字段
         if (dto.ProjectName != null) achievement.ProjectName = dto.ProjectName;
@@ -223,15 +228,16 @@ public class ConfigService : IConfigService
     {
         var honor = await _repository.GetHonorByIdAsync(id);
         if (honor == null) return false;
+        ContentRevision.Check(honor, dto.Version);
 
         // 只更新非null的字段
         if (dto.Name != null) honor.Name = dto.Name;
-        if (dto.Description != null) honor.Description = dto.Description;
-        if (dto.ImageId.HasValue) honor.ImageId = dto.ImageId;
-        if (dto.AwardOrganization != null) honor.AwardOrganization = dto.AwardOrganization;
-        if (dto.AwardDate.HasValue) honor.AwardDate = dto.AwardDate;
-        if (dto.CertificateNo != null) honor.CertificateNo = dto.CertificateNo;
-        if (dto.HonorLevel != null) honor.HonorLevel = dto.HonorLevel;
+        if (dto.DescriptionSpecified) honor.Description = dto.Description;
+        if (dto.ImageIdSpecified) honor.ImageId = dto.ImageId;
+        if (dto.AwardOrganizationSpecified) honor.AwardOrganization = dto.AwardOrganization;
+        if (dto.AwardDateSpecified) honor.AwardDate = dto.AwardDate;
+        if (dto.CertificateNoSpecified) honor.CertificateNo = dto.CertificateNo;
+        if (dto.HonorLevelSpecified) honor.HonorLevel = dto.HonorLevel;
         if (dto.SortOrder.HasValue) honor.SortOrder = dto.SortOrder.Value;
         if (dto.Status.HasValue) honor.Status = (sbyte)(dto.Status.Value ? 1 : 0);
 
@@ -270,6 +276,7 @@ public class ConfigService : IConfigService
     {
         var link = await _repository.GetLinkByIdAsync(id);
         if (link == null) return false;
+        ContentRevision.Check(link, dto.Version);
 
         // 只更新非null的字段
         if (dto.Name != null) link.Name = dto.Name;
@@ -383,6 +390,7 @@ public class ConfigService : IConfigService
     {
         var scope = await _repository.GetBusinessScopeByIdAsync(id);
         if (scope == null) return false;
+        ContentRevision.Check(scope, dto.Version);
 
         // 只更新非null的字段
         if (dto.Name != null) scope.Name = dto.Name;
@@ -463,15 +471,16 @@ public class ConfigService : IConfigService
     {
         var qualification = await _repository.GetQualificationByIdAsync(id);
         if (qualification == null) return false;
+        ContentRevision.Check(qualification, dto.Version);
 
         // 只更新非null的字段
         if (dto.Name != null) qualification.Name = dto.Name;
-        if (dto.Description != null) qualification.Description = dto.Description;
-        if (dto.CertificateImageId.HasValue) qualification.ImageId = dto.CertificateImageId;
-        if (dto.CertificateNumber != null) qualification.CertificateNo = dto.CertificateNumber;
-        if (dto.IssuingAuthority != null) qualification.IssuingAuthority = dto.IssuingAuthority;
-        if (dto.IssueDate.HasValue) qualification.IssueDate = dto.IssueDate;
-        if (dto.ExpiryDate.HasValue) qualification.ExpiryDate = dto.ExpiryDate;
+        if (dto.DescriptionSpecified) qualification.Description = dto.Description;
+        if (dto.CertificateImageIdSpecified) qualification.ImageId = dto.CertificateImageId;
+        if (dto.CertificateNumberSpecified) qualification.CertificateNo = dto.CertificateNumber;
+        if (dto.IssuingAuthoritySpecified) qualification.IssuingAuthority = dto.IssuingAuthority;
+        if (dto.IssueDateSpecified) qualification.IssueDate = dto.IssueDate;
+        if (dto.ExpiryDateSpecified) qualification.ExpiryDate = dto.ExpiryDate;
         if (dto.SortOrder.HasValue) qualification.SortOrder = dto.SortOrder.Value;
         if (dto.Status.HasValue) qualification.Status = (sbyte)(dto.Status.Value ? 1 : 0);
 

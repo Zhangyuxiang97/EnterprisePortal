@@ -34,7 +34,9 @@ public class HomeService : IHomeService
             .Where(x => x.IsDeleted == 0 && x.BusinessType == "GOV_PROCUREMENT" && x.ProcurementType == "project")
             .CountAsync();
 
-        var govCount = govGoodsCount + govServiceCount + govProjectCount;
+        var govCount = await _context.Announcements
+            .Where(x => x.IsDeleted == 0 && x.BusinessType == "GOV_PROCUREMENT")
+            .CountAsync();
 
         // 统计建设工程公告数量
         var constructionCount = await _context.Announcements
@@ -44,10 +46,10 @@ public class HomeService : IHomeService
         // 总项目数
         var totalProjects = govCount + constructionCount;
 
-        // 计算代理总额：统计 notice_type 为 result 的 budget_amount 金额总和
+        // 代理总额仅汇总已明确的中标/成交金额。
         var totalAmount = await _context.Announcements
-            .Where(x => x.IsDeleted == 0 && x.NoticeType == "result" && x.BudgetAmount.HasValue)
-            .SumAsync(x => x.BudgetAmount ?? 0);
+            .Where(x => x.IsDeleted == 0 && x.NoticeType == "result" && x.AwardAmount.HasValue)
+            .SumAsync(x => x.AwardAmount ?? 0);
 
         // 计算交易类型占比
         var projectTypes = new List<ProjectTypeStatDto>();
@@ -110,7 +112,7 @@ public class HomeService : IHomeService
             }
         }
 
-        // 统计地区排行（政府采购）- 包含项目数量和所有金额
+        // 地区公告数量及已明确的结果金额。
         var govRegionStats = await _context.Announcements
             .Where(x => x.IsDeleted == 0 && x.BusinessType == "GOV_PROCUREMENT")
             .GroupBy(x => x.ProjectRegion)
@@ -118,12 +120,12 @@ public class HomeService : IHomeService
             {
                 Region = g.Key,
                 Count = g.Count(),
-                Amount = g.Where(x => x.BudgetAmount.HasValue)
-                         .Sum(x => x.BudgetAmount ?? 0)
+                Amount = g.Where(x => x.NoticeType == "result" && x.AwardAmount.HasValue)
+                         .Sum(x => x.AwardAmount ?? 0)
             })
             .ToListAsync();
 
-        // 统计地区排行（建设工程）- 包含项目数量和所有金额
+        // 建设工程采用相同的中标金额口径。
         var constructionRegionStats = await _context.Announcements
             .Where(x => x.IsDeleted == 0 && x.BusinessType == "CONSTRUCTION")
             .GroupBy(x => x.ProjectRegion)
@@ -131,8 +133,8 @@ public class HomeService : IHomeService
             {
                 Region = g.Key,
                 Count = g.Count(),
-                Amount = g.Where(x => x.BudgetAmount.HasValue)
-                         .Sum(x => x.BudgetAmount ?? 0)
+                Amount = g.Where(x => x.NoticeType == "result" && x.AwardAmount.HasValue)
+                         .Sum(x => x.AwardAmount ?? 0)
             })
             .ToListAsync();
 
@@ -154,6 +156,7 @@ public class HomeService : IHomeService
         {
             TotalProjects = totalProjects,
             TotalAmount = totalAmount,
+            KnownAwardAmountCount = await _context.Announcements.CountAsync(x => x.IsDeleted == 0 && x.NoticeType == "result" && x.AwardAmount.HasValue),
             ProjectTypes = projectTypes,
             RegionRanking = regionRanking
         };
@@ -166,16 +169,22 @@ public class HomeService : IHomeService
     {
         // 获取最新5条政府采购公告
         var govAnnouncements = await _context.Announcements
-            .Where(x => x.IsDeleted == 0 && x.BusinessType == "GOV_PROCUREMENT")
+            .AsNoTracking()
+            .Where(x => x.IsDeleted == 0 && x.Status == 1 && x.BusinessType == "GOV_PROCUREMENT")
             .OrderByDescending(x => x.PublishTime)
+            .ThenByDescending(x => x.Id)
             .Take(5)
+            .Select(x => new { x.Id, x.Title, x.NoticeType, x.BusinessType, x.ProjectRegion, x.PublishTime, x.CreatedAt })
             .ToListAsync();
 
         // 获取最新5条建设工程公告
         var constructionAnnouncements = await _context.Announcements
-            .Where(x => x.IsDeleted == 0 && x.BusinessType == "CONSTRUCTION")
+            .AsNoTracking()
+            .Where(x => x.IsDeleted == 0 && x.Status == 1 && x.BusinessType == "CONSTRUCTION")
             .OrderByDescending(x => x.PublishTime)
+            .ThenByDescending(x => x.Id)
             .Take(5)
+            .Select(x => new { x.Id, x.Title, x.NoticeType, x.BusinessType, x.ProjectRegion, x.PublishTime, x.CreatedAt })
             .ToListAsync();
 
         // 合并并转换为DTO
@@ -213,7 +222,8 @@ public class HomeService : IHomeService
     public async Task<List<AchievementDto>> GetAchievementsAsync()
     {
         var achievements = await _context.MajorAchievements
-            .Where(x => x.IsDeleted == 0)
+            .AsNoTracking()
+            .Where(x => x.IsDeleted == 0 && x.Status == 1)
             .OrderBy(x => x.SortOrder)
             .ThenByDescending(x => x.CompletionDate)
             .Select(x => new AchievementDto

@@ -51,7 +51,7 @@ export const tokenUtils = {
    */
   getUserInfo() {
     const userInfo = localStorage.getItem(API_CONFIG.USER_INFO_KEY)
-    return userInfo ? JSON.parse(userInfo) : null
+    try { return userInfo ? JSON.parse(userInfo) : null } catch { return null }
   },
 
   /**

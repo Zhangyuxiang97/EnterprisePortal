@@ -10,6 +10,7 @@ BackEnd/.vs/
 
 # Generated runtime credentials
 .runtime/
+config/deployment.env
 logs/bootstrap/
 
 # 数据文件（太大不提交）

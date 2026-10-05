@@ -23,7 +23,7 @@ import request from './request'
  */
 export const getAnnouncementList = (params) => {
   return request({
-    url: '/announcements',
+    url: '/announcements/manage',
     method: 'get',
     params
   })
@@ -35,7 +35,7 @@ export const getAnnouncementList = (params) => {
  */
 export const getAnnouncementDetail = (id) => {
   return request({
-    url: `/announcements/${id}`,
+    url: `/announcements/manage/${id}`,
     method: 'get'
   })
 }
@@ -49,7 +49,8 @@ export const getAnnouncementDetail = (id) => {
  * @param {string} data.procurementType - 采购类型（政府采购必填）
  * @param {string} data.bidder - 招标人
  * @param {string} data.winner - 中标人
- * @param {number} data.budgetAmount - 预算金额
+ * @param {number|null} data.budgetAmount - 预算金额（万元）
+ * @param {number|null} data.awardAmount - 中标/成交金额（万元，结果公告）
  * @param {string} data.deadline - 截止时间
  * @param {string} data.province - 省份
  * @param {string} data.city - 城市

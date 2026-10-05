@@ -27,6 +27,19 @@ public class InfoPublicationController : ControllerBase
         _logger = logger;
     }
 
+    [HttpGet("manage")]
+    [Authorize(Roles = "admin,user")]
+    public async Task<ActionResult<ApiResponse<PagedResult<InfoPublicationListDto>>>> GetManagementList([FromQuery] InfoPublicationQueryDto query)
+        => Ok(ApiResponse<PagedResult<InfoPublicationListDto>>.SuccessResult(await _infoPublicationService.GetPagedAsync(query)));
+
+    [HttpGet("manage/{id:int}")]
+    [Authorize(Roles = "admin,user")]
+    public async Task<ActionResult<ApiResponse<InfoPublicationDto>>> GetManagementDetail(int id)
+    {
+        var data = await _infoPublicationService.GetByIdAsync(id, includeDisabled: true);
+        return data == null ? NotFound(ApiResponse<InfoPublicationDto>.FailResult("内容不存在")) : Ok(ApiResponse<InfoPublicationDto>.SuccessResult(data));
+    }
+
     /// <summary>
     /// 创建信息发布
     /// </summary>
@@ -40,10 +53,10 @@ public class InfoPublicationController : ControllerBase
             var publication = await _infoPublicationService.CreateAsync(dto);
             return Ok(ApiResponse<InfoPublicationDto>.SuccessResult(publication, "创建信息发布成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "创建信息发布失败");
-            return StatusCode(500, ApiResponse<InfoPublicationDto>.FailResult("创建信息发布失败"));
+            throw;
         }
     }
 
@@ -65,10 +78,10 @@ public class InfoPublicationController : ControllerBase
             }
             return Ok(ApiResponse<InfoPublicationDto>.SuccessResult(publication, "更新信息发布成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "更新信息发布失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<InfoPublicationDto>.FailResult("更新信息发布失败"));
+            throw;
         }
     }
 
@@ -92,10 +105,10 @@ public class InfoPublicationController : ControllerBase
 
             return Ok(ApiResponse<InfoPublicationDto>.SuccessResult(publication, "获取信息发布成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取信息发布失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<InfoPublicationDto>.FailResult("获取信息发布失败"));
+            throw;
         }
     }
 
@@ -104,17 +117,17 @@ public class InfoPublicationController : ControllerBase
     /// </summary>
     /// <param name="query">查询参数</param>
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<PagedResult<InfoPublicationDto>>>> GetInfoPublications([FromQuery] InfoPublicationQueryDto query)
+    public async Task<ActionResult<ApiResponse<PagedResult<InfoPublicationListDto>>>> GetInfoPublications([FromQuery] InfoPublicationQueryDto query)
     {
         try
         {
-            var result = await _infoPublicationService.GetPagedAsync(query);
-            return Ok(ApiResponse<PagedResult<InfoPublicationDto>>.SuccessResult(result, "获取信息发布列表成功"));
+            var result = await _infoPublicationService.GetPagedForPortalAsync(query);
+            return Ok(ApiResponse<PagedResult<InfoPublicationListDto>>.SuccessResult(result, "获取信息发布列表成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取信息发布列表失败");
-            return StatusCode(500, ApiResponse<PagedResult<InfoPublicationDto>>.FailResult("获取信息发布列表失败"));
+            throw;
         }
     }
 
@@ -135,10 +148,10 @@ public class InfoPublicationController : ControllerBase
             }
             return Ok(ApiResponse<bool>.SuccessResult(true, "删除信息发布成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "删除信息发布失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("删除信息发布失败"));
+            throw;
         }
     }
 
@@ -148,18 +161,18 @@ public class InfoPublicationController : ControllerBase
     /// 获取公司公告列表（门户专用，只返回启用状态）
     /// </summary>
     [HttpGet("company-news")]
-    public async Task<ActionResult<ApiResponse<PagedResult<InfoPublicationDto>>>> GetCompanyNews([FromQuery] InfoPublicationQueryDto query)
+    public async Task<ActionResult<ApiResponse<PagedResult<InfoPublicationListDto>>>> GetCompanyNews([FromQuery] InfoPublicationQueryDto query)
     {
         try
         {
             query.Type = "COMPANY_NEWS";
             var result = await _infoPublicationService.GetPagedForPortalAsync(query);
-            return Ok(ApiResponse<PagedResult<InfoPublicationDto>>.SuccessResult(result, "获取公司公告列表成功"));
+            return Ok(ApiResponse<PagedResult<InfoPublicationListDto>>.SuccessResult(result, "获取公司公告列表成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取公司公告列表失败");
-            return StatusCode(500, ApiResponse<PagedResult<InfoPublicationDto>>.FailResult("获取公司公告列表失败"));
+            throw;
         }
     }
 
@@ -171,18 +184,18 @@ public class InfoPublicationController : ControllerBase
     /// 获取政策法规列表（门户专用，只返回启用状态）
     /// </summary>
     [HttpGet("policy-regulations")]
-    public async Task<ActionResult<ApiResponse<PagedResult<InfoPublicationDto>>>> GetPolicyRegulations([FromQuery] InfoPublicationQueryDto query)
+    public async Task<ActionResult<ApiResponse<PagedResult<InfoPublicationListDto>>>> GetPolicyRegulations([FromQuery] InfoPublicationQueryDto query)
     {
         try
         {
             query.Type = "POLICY_REGULATION";
             var result = await _infoPublicationService.GetPagedForPortalAsync(query);
-            return Ok(ApiResponse<PagedResult<InfoPublicationDto>>.SuccessResult(result, "获取政策法规列表成功"));
+            return Ok(ApiResponse<PagedResult<InfoPublicationListDto>>.SuccessResult(result, "获取政策法规列表成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取政策法规列表失败");
-            return StatusCode(500, ApiResponse<PagedResult<InfoPublicationDto>>.FailResult("获取政策法规列表失败"));
+            throw;
         }
     }
 
@@ -194,18 +207,18 @@ public class InfoPublicationController : ControllerBase
     /// 获取政策信息列表（门户专用，只返回启用状态）
     /// </summary>
     [HttpGet("policy-info")]
-    public async Task<ActionResult<ApiResponse<PagedResult<InfoPublicationDto>>>> GetPolicyInfo([FromQuery] InfoPublicationQueryDto query)
+    public async Task<ActionResult<ApiResponse<PagedResult<InfoPublicationListDto>>>> GetPolicyInfo([FromQuery] InfoPublicationQueryDto query)
     {
         try
         {
             query.Type = "POLICY_INFO";
             var result = await _infoPublicationService.GetPagedForPortalAsync(query);
-            return Ok(ApiResponse<PagedResult<InfoPublicationDto>>.SuccessResult(result, "获取政策信息列表成功"));
+            return Ok(ApiResponse<PagedResult<InfoPublicationListDto>>.SuccessResult(result, "获取政策信息列表成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取政策信息列表失败");
-            return StatusCode(500, ApiResponse<PagedResult<InfoPublicationDto>>.FailResult("获取政策信息列表失败"));
+            throw;
         }
     }
 
@@ -217,18 +230,18 @@ public class InfoPublicationController : ControllerBase
     /// 获取通知公告列表（门户专用，只返回启用状态）
     /// </summary>
     [HttpGet("notices")]
-    public async Task<ActionResult<ApiResponse<PagedResult<InfoPublicationDto>>>> GetNotices([FromQuery] InfoPublicationQueryDto query)
+    public async Task<ActionResult<ApiResponse<PagedResult<InfoPublicationListDto>>>> GetNotices([FromQuery] InfoPublicationQueryDto query)
     {
         try
         {
             query.Type = "NOTICE";
             var result = await _infoPublicationService.GetPagedForPortalAsync(query);
-            return Ok(ApiResponse<PagedResult<InfoPublicationDto>>.SuccessResult(result, "获取通知公告列表成功"));
+            return Ok(ApiResponse<PagedResult<InfoPublicationListDto>>.SuccessResult(result, "获取通知公告列表成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取通知公告列表失败");
-            return StatusCode(500, ApiResponse<PagedResult<InfoPublicationDto>>.FailResult("获取通知公告列表失败"));
+            throw;
         }
     }
 

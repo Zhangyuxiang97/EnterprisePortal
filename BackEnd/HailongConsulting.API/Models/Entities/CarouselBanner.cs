@@ -7,8 +7,13 @@ namespace HailongConsulting.API.Models.Entities;
 /// 轮播图实体
 /// </summary>
 [Table("carousel_banners")]
-public class CarouselBanner
+public class CarouselBanner : IVersionedContent
 {
+    [ConcurrencyCheck]
+    [Column("version")]
+    [MaxLength(32)]
+    public string Version { get; set; } = Guid.NewGuid().ToString("N");
+
     /// <summary>
     /// 轮播图ID
     /// </summary>

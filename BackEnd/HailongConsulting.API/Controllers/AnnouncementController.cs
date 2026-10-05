@@ -30,6 +30,19 @@ public class AnnouncementController : ControllerBase
         _logger = logger;
     }
 
+    [HttpGet("manage")]
+    [Authorize(Roles = "admin,user")]
+    public async Task<ActionResult<ApiResponse<PagedResult<AnnouncementListDto>>>> GetManagementList([FromQuery] AnnouncementQueryDto query)
+        => Ok(ApiResponse<PagedResult<AnnouncementListDto>>.SuccessResult(await _announcementService.GetPagedAsync(query, includeDisabled: true)));
+
+    [HttpGet("manage/{id:int}")]
+    [Authorize(Roles = "admin,user")]
+    public async Task<ActionResult<ApiResponse<AnnouncementDto>>> GetManagementDetail(int id)
+    {
+        var data = await _announcementService.GetByIdAsync(id, includeDisabled: true);
+        return data == null ? NotFound(ApiResponse<AnnouncementDto>.FailResult("内容不存在")) : Ok(ApiResponse<AnnouncementDto>.SuccessResult(data));
+    }
+
     /// <summary>
     /// 创建公告
     /// </summary>
@@ -47,10 +60,10 @@ public class AnnouncementController : ControllerBase
         {
             return BadRequest(ApiResponse<AnnouncementDto>.FailResult(ex.Message));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "创建公告失败");
-            return StatusCode(500, ApiResponse<AnnouncementDto>.FailResult("创建公告失败"));
+            throw;
         }
     }
 
@@ -76,10 +89,10 @@ public class AnnouncementController : ControllerBase
         {
             return BadRequest(ApiResponse<AnnouncementDto>.FailResult(ex.Message));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "更新公告失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<AnnouncementDto>.FailResult("更新公告失败"));
+            throw;
         }
     }
 
@@ -109,10 +122,10 @@ public class AnnouncementController : ControllerBase
 
             return Ok(ApiResponse<AnnouncementDto>.SuccessResult(announcement, "获取公告成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "根据HashId获取公告失败，HashId: {HashId}", hashId);
-            return StatusCode(500, ApiResponse<AnnouncementDto>.FailResult("获取公告失败"));
+            throw;
         }
     }
 
@@ -136,10 +149,10 @@ public class AnnouncementController : ControllerBase
 
             return Ok(ApiResponse<AnnouncementDto>.SuccessResult(announcement, "获取公告成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取公告失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<AnnouncementDto>.FailResult("获取公告失败"));
+            throw;
         }
     }
 
@@ -148,17 +161,17 @@ public class AnnouncementController : ControllerBase
     /// </summary>
     /// <param name="query">查询参数</param>
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<PagedResult<AnnouncementDto>>>> GetAnnouncements([FromQuery] AnnouncementQueryDto query)
+    public async Task<ActionResult<ApiResponse<PagedResult<AnnouncementListDto>>>> GetAnnouncements([FromQuery] AnnouncementQueryDto query)
     {
         try
         {
             var result = await _announcementService.GetPagedAsync(query);
-            return Ok(ApiResponse<PagedResult<AnnouncementDto>>.SuccessResult(result, "获取公告列表成功"));
+            return Ok(ApiResponse<PagedResult<AnnouncementListDto>>.SuccessResult(result, "获取公告列表成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取公告列表失败");
-            return StatusCode(500, ApiResponse<PagedResult<AnnouncementDto>>.FailResult("获取公告列表失败"));
+            throw;
         }
     }
 
@@ -173,10 +186,10 @@ public class AnnouncementController : ControllerBase
             var result = await _announcementService.GetRegionOptionsAsync(query);
             return Ok(ApiResponse<AnnouncementRegionOptionsDto>.SuccessResult(result, "获取公告区域筛选项成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取公告区域筛选项失败");
-            return StatusCode(500, ApiResponse<AnnouncementRegionOptionsDto>.FailResult("获取公告区域筛选项失败"));
+            throw;
         }
     }
 
@@ -197,10 +210,10 @@ public class AnnouncementController : ControllerBase
             }
             return Ok(ApiResponse<bool>.SuccessResult(true, "删除公告成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "删除公告失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("删除公告失败"));
+            throw;
         }
     }
 
@@ -210,18 +223,18 @@ public class AnnouncementController : ControllerBase
     /// 获取政府采购公告列表
     /// </summary>
     [HttpGet("gov-procurement")]
-    public async Task<ActionResult<ApiResponse<PagedResult<AnnouncementDto>>>> GetGovProcurementAnnouncements([FromQuery] AnnouncementQueryDto query)
+    public async Task<ActionResult<ApiResponse<PagedResult<AnnouncementListDto>>>> GetGovProcurementAnnouncements([FromQuery] AnnouncementQueryDto query)
     {
         try
         {
             query.BusinessType = "GOV_PROCUREMENT";
             var result = await _announcementService.GetPagedAsync(query);
-            return Ok(ApiResponse<PagedResult<AnnouncementDto>>.SuccessResult(result, "获取政府采购公告列表成功"));
+            return Ok(ApiResponse<PagedResult<AnnouncementListDto>>.SuccessResult(result, "获取政府采购公告列表成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取政府采购公告列表失败");
-            return StatusCode(500, ApiResponse<PagedResult<AnnouncementDto>>.FailResult("获取政府采购公告列表失败"));
+            throw;
         }
     }
 
@@ -233,18 +246,18 @@ public class AnnouncementController : ControllerBase
     /// 获取建设工程公告列表
     /// </summary>
     [HttpGet("construction")]
-    public async Task<ActionResult<ApiResponse<PagedResult<AnnouncementDto>>>> GetConstructionAnnouncements([FromQuery] AnnouncementQueryDto query)
+    public async Task<ActionResult<ApiResponse<PagedResult<AnnouncementListDto>>>> GetConstructionAnnouncements([FromQuery] AnnouncementQueryDto query)
     {
         try
         {
             query.BusinessType = "CONSTRUCTION";
             var result = await _announcementService.GetPagedAsync(query);
-            return Ok(ApiResponse<PagedResult<AnnouncementDto>>.SuccessResult(result, "获取建设工程公告列表成功"));
+            return Ok(ApiResponse<PagedResult<AnnouncementListDto>>.SuccessResult(result, "获取建设工程公告列表成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取建设工程公告列表失败");
-            return StatusCode(500, ApiResponse<PagedResult<AnnouncementDto>>.FailResult("获取建设工程公告列表失败"));
+            throw;
         }
     }
 

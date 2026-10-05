@@ -8,8 +8,9 @@ import request from './request'
  * 获取企业简介
  * @returns {Promise}
  */
-export function getCompanyProfile() {
+export function getCompanyProfile(options = {}) {
   return request({
+    ...options,
     url: '/config/company-intro',
     method: 'get'
   })
@@ -23,8 +24,9 @@ export function getCompanyProfile() {
  * 获取所有业务范围
  * @returns {Promise}
  */
-export function getBusinessScope() {
+export function getBusinessScope(options = {}) {
   return request({
+    ...options,
     url: '/config/business-scope',
     method: 'get'
   })
@@ -35,8 +37,9 @@ export function getBusinessScope() {
  * @param {number} id - 业务范围ID
  * @returns {Promise}
  */
-export function getBusinessScopeById(id) {
+export function getBusinessScopeById(id, options = {}) {
   return request({
+    ...options,
     url: `/config/business-scope/${id}`,
     method: 'get'
   })
@@ -50,8 +53,9 @@ export function getBusinessScopeById(id) {
  * 获取所有企业资质
  * @returns {Promise}
  */
-export function getCompanyQualifications() {
+export function getCompanyQualifications(options = {}) {
   return request({
+    ...options,
     url: '/config/qualifications',
     method: 'get'
   })
@@ -62,8 +66,9 @@ export function getCompanyQualifications() {
  * @param {number} id - 资质ID
  * @returns {Promise}
  */
-export function getQualificationById(id) {
+export function getQualificationById(id, options = {}) {
   return request({
+    ...options,
     url: `/config/qualifications/${id}`,
     method: 'get'
   })
@@ -77,8 +82,9 @@ export function getQualificationById(id) {
  * 获取所有企业荣誉
  * @returns {Promise}
  */
-export function getCompanyHonors() {
+export function getCompanyHonors(options = {}) {
   return request({
+    ...options,
     url: '/config/honors',
     method: 'get'
   })
@@ -89,8 +95,9 @@ export function getCompanyHonors() {
  * @param {number} id - 荣誉ID
  * @returns {Promise}
  */
-export function getHonorById(id) {
+export function getHonorById(id, options = {}) {
   return request({
+    ...options,
     url: `/config/honors/${id}`,
     method: 'get'
   })
@@ -104,8 +111,9 @@ export function getHonorById(id) {
  * 获取所有重要业绩
  * @returns {Promise}
  */
-export function getMajorAchievements() {
+export function getMajorAchievements(options = {}) {
   return request({
+    ...options,
     url: '/config/achievements',
     method: 'get'
   })
@@ -116,8 +124,9 @@ export function getMajorAchievements() {
  * @param {number} id - 业绩ID
  * @returns {Promise}
  */
-export function getAchievementById(id) {
+export function getAchievementById(id, options = {}) {
   return request({
+    ...options,
     url: `/config/achievements/${id}`,
     method: 'get'
   })
@@ -131,8 +140,9 @@ export function getAchievementById(id) {
  * 获取网站访问统计
  * @returns {Promise}
  */
-export function getVisitStatistics() {
+export function getVisitStatistics(options = {}) {
   return request({
+    ...options,
     url: '/config/statistics',
     method: 'get'
   })
@@ -146,8 +156,9 @@ export function getVisitStatistics() {
  * @param {string} data.referer - 来源页面
  * @returns {Promise}
  */
-export function recordVisit(data) {
+export function recordVisit(data, options = {}) {
   return request({
+    ...options,
     url: '/config/statistics/record',
     method: 'post',
     data

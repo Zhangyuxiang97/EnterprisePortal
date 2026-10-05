@@ -25,14 +25,18 @@ public interface IInfoPublicationRepository : IRepository<InfoPublication>
         string? category,
         string? keyword,
         int pageIndex,
-        int pageSize);
+        int pageSize,
+        DateTime? startDate = null, DateTime? endDate = null,
+        string? sortBy = null, string? sortOrder = null);
     
     Task<(IEnumerable<InfoPublication> Items, int TotalCount)> GetPagedPublicationsForPortalAsync(
         string? type,
         string? category,
         string? keyword,
         int pageIndex,
-        int pageSize);
+        int pageSize,
+        DateTime? startDate = null, DateTime? endDate = null,
+        string? sortBy = null, string? sortOrder = null);
     
     /// <summary>
     /// 软删除信息发布

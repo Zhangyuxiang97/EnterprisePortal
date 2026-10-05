@@ -34,10 +34,10 @@ public class SystemLogController : ControllerBase
             var result = await _systemLogService.GetPagedListAsync(query);
             return Ok(ApiResponse<PagedResult<SystemLogDto>>.SuccessResult(result));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "Failed to get system log list");
-            return StatusCode(500, ApiResponse<PagedResult<SystemLogDto>>.FailResult("获取系统日志列表失败"));
+            throw;
         }
     }
 
@@ -57,10 +57,10 @@ public class SystemLogController : ControllerBase
 
             return Ok(ApiResponse<SystemLogDto>.SuccessResult(log));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "Failed to get system log by id: {Id}", id);
-            return StatusCode(500, ApiResponse<SystemLogDto>.FailResult("获取系统日志失败"));
+            throw;
         }
     }
 
@@ -79,13 +79,13 @@ public class SystemLogController : ControllerBase
             }
             else
             {
-                return StatusCode(500, ApiResponse<bool>.FailResult("清空系统日志失败"));
+                throw new InvalidOperationException("清空系统日志失败");
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "Failed to clear system logs");
-            return StatusCode(500, ApiResponse<bool>.FailResult("清空系统日志失败"));
+            throw;
         }
     }
 
@@ -100,10 +100,10 @@ public class SystemLogController : ControllerBase
             var count = await _systemLogService.DeleteLogsBeforeDateAsync(date);
             return Ok(ApiResponse<int>.SuccessResult(count, $"成功删除 {count} 条日志"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "Failed to delete system logs before date: {Date}", date);
-            return StatusCode(500, ApiResponse<int>.FailResult("删除系统日志失败"));
+            throw;
         }
     }
 }

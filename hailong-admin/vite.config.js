@@ -10,14 +10,16 @@ export default defineConfig({
     }
   },
   server: {
-    port: 3000,
+    port: 3001,
     proxy: {
       // 开发环境API代理
       '/api': {
-        target: 'https://localhost:49522',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        target: process.env.API_PROXY_TARGET || 'http://127.0.0.1:5000',
+        changeOrigin: true
+      },
+      '/uploads': {
+        target: process.env.API_PROXY_TARGET || 'http://127.0.0.1:5000',
+        changeOrigin: true
       }
     }
   }

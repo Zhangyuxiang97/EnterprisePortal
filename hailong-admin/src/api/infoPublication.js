@@ -20,7 +20,7 @@ import request from './request'
  */
 export const getInfoPublicationList = (params) => {
   return request({
-    url: '/info-publications',
+    url: '/info-publications/manage',
     method: 'get',
     params
   })
@@ -32,7 +32,7 @@ export const getInfoPublicationList = (params) => {
  */
 export const getInfoPublicationDetail = (id) => {
   return request({
-    url: `/info-publications/${id}`,
+    url: `/info-publications/manage/${id}`,
     method: 'get'
   })
 }

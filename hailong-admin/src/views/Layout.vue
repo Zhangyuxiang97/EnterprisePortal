@@ -4,16 +4,19 @@
     <el-aside :width="isCollapse ? '64px' : '200px'" class="layout-aside">
       <Sidebar :isCollapse="isCollapse" />
     </el-aside>
-    
+
     <!-- 主内容区 -->
     <el-container>
       <!-- 顶部导航栏 -->
       <el-header class="layout-header">
         <Header @toggle-collapse="toggleCollapse" :isCollapse="isCollapse" />
       </el-header>
-      
+
       <!-- 内容区域 -->
       <el-main class="layout-main">
+        <el-alert v-if="!session.token" type="warning" :closable="false" show-icon style="margin-bottom: 16px">
+          登录已过期，当前编辑内容已保留。<a href="/login" target="_blank" rel="noopener">在新窗口重新登录</a>后返回此页继续保存。
+        </el-alert>
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component :is="Component" />
@@ -26,6 +29,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { session } from '@/utils/session'
 import Sidebar from '@/components/Sidebar.vue'
 import Header from '@/components/Header.vue'
 

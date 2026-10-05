@@ -1,141 +1,65 @@
 <template>
-  <nav class="fixed top-0 left-0 right-0 z-50 bg-hailong-dark/90 backdrop-blur-md text-white shadow-2xl border-b border-white/10">
-    <div class="container-wide">
-      <div class="flex items-center justify-between h-20">
-        <div class="flex items-center space-x-3">
-          <img :src="logoUrl" :alt="companyInfo.fullName" class="h-12 w-auto" />
-          <div class="text-3xl font-bold font-tech bg-gradient-to-r from-hailong-primary to-hailong-secondary bg-clip-text text-transparent">
-            {{ companyInfo.fullName }}
-          </div>
-        </div>
-        <div class="hidden md:flex items-center space-x-8">
-          <template v-for="link in navLinks" :key="link.name">
-            <!-- 带下拉菜单的导航项 -->
-            <div v-if="link.children" class="relative group">
-              <button
-                class="hover:text-hailong-cyan transition-colors text-sm font-medium flex items-center gap-1"
-                :class="{ 'text-hailong-cyan': isActiveParent(link) }"
-              >
-                {{ link.name }}
-                <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
+  <header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-hailong-dark/95 text-white backdrop-blur-md shadow-lg">
+    <nav ref="navigationElement" aria-label="主导航" class="container-wide" @keydown.esc="closeMenus">
+      <div class="flex h-20 items-center justify-between gap-4">
+        <router-link to="/" class="flex min-w-0 items-center gap-2 sm:gap-3" aria-label="返回首页">
+          <img :src="logoUrl" alt="" class="h-10 sm:h-12 w-auto shrink-0" />
+          <span class="text-base sm:text-xl xl:text-2xl font-bold tracking-tight">{{ companyInfo.fullName }}</span>
+        </router-link>
+        <div class="hidden lg:flex items-center gap-6 xl:gap-8 shrink-0">
+          <template v-for="(link, index) in navLinks" :key="link.name">
+            <div v-if="link.children" class="relative" @mouseleave="desktopMenu = null" @focusout="closeOnFocusOut">
+              <button type="button" @mouseenter="desktopMenu = link.name" @click="desktopMenu = link.name" :aria-expanded="desktopMenu === link.name" :aria-controls="`desktop-submenu-${index}`" class="nav-link flex items-center gap-1 py-5" :class="{ active: isActiveParent(link) }">
+                {{ link.name }} <span aria-hidden="true" class="text-xs">⌄</span>
               </button>
-              <!-- 下拉菜单 -->
-              <div class="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden">
-                <router-link
-                  v-for="child in link.children"
-                  :key="child.name"
-                  :to="child.path"
-                  class="block px-4 py-3 text-gray-700 hover:bg-hailong-primary hover:text-white transition-colors text-sm"
-                  :class="{ 'bg-hailong-primary/10 text-hailong-primary': isActive(child.path) }"
-                >
-                  {{ child.name }}
-                </router-link>
+              <div v-show="desktopMenu === link.name" :id="`desktop-submenu-${index}`" class="absolute left-0 top-full w-44 overflow-hidden rounded-xl border border-slate-100 bg-white py-2 text-slate-700 shadow-xl">
+                <router-link v-for="child in link.children" :key="child.path" :to="child.path" class="block px-5 py-3 text-sm hover:bg-slate-50 focus:bg-slate-50" :class="{ 'text-hailong-primary font-bold': isActive(child.path) }" :aria-current="isActive(child.path) ? 'page' : undefined">{{ child.name }}</router-link>
               </div>
             </div>
-            <!-- 普通导航项 -->
-            <router-link v-else :to="link.path"
-              class="hover:text-hailong-cyan transition-colors text-sm font-medium"
-              :class="{ 'text-hailong-cyan': isActive(link.path) }">
-              {{ link.name }}
-            </router-link>
+            <router-link v-else :to="link.path" class="nav-link" :class="{ active: isActive(link.path) }" :aria-current="isActive(link.path) ? 'page' : undefined">{{ link.name }}</router-link>
           </template>
         </div>
-        <!-- 移动端菜单按钮 -->
-        <button @click="toggleMobileMenu" class="md:hidden text-white">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path v-if="!showMobileMenu" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
+        <button type="button" @click="showMobileMenu = !showMobileMenu" class="lg:hidden shrink-0 rounded-lg p-2 hover:bg-white/10" :aria-expanded="showMobileMenu" aria-controls="mobile-navigation" :aria-label="showMobileMenu ? '关闭导航菜单' : '打开导航菜单'">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-width="2" :d="showMobileMenu ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'" /></svg>
         </button>
       </div>
-    </div>
-    <!-- 移动端菜单 -->
-    <div v-if="showMobileMenu" class="md:hidden bg-hailong-dark/95 border-t border-white/10">
-      <div class="container-wide py-4">
-        <template v-for="link in navLinks" :key="link.name">
-          <!-- 带子菜单的导航项 -->
+      <div v-if="showMobileMenu" id="mobile-navigation" class="lg:hidden max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-white/10 py-3">
+        <template v-for="(link, index) in navLinks" :key="link.name">
           <div v-if="link.children">
-            <button
-              @click="toggleMobileSubmenu(link.name)"
-              class="w-full flex items-center justify-between py-3 px-4 hover:bg-hailong-primary/20 rounded-lg transition-colors"
-              :class="{ 'bg-hailong-primary/30 text-hailong-cyan': isActiveParent(link) }"
-            >
-              <span>{{ link.name }}</span>
-              <svg
-                class="w-4 h-4 transition-transform"
-                :class="{ 'rotate-180': openMobileSubmenu === link.name }"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <!-- 子菜单 -->
-            <div v-if="openMobileSubmenu === link.name" class="ml-4 mt-1 space-y-1">
-              <router-link
-                v-for="child in link.children"
-                :key="child.name"
-                :to="child.path"
-                @click="showMobileMenu = false"
-                class="block py-2 px-4 hover:bg-hailong-primary/20 rounded-lg transition-colors text-sm"
-                :class="{ 'bg-hailong-primary/30 text-hailong-cyan': isActive(child.path) }"
-              >
-                {{ child.name }}
-              </router-link>
+            <button type="button" @click="mobileMenu = mobileMenu === link.name ? null : link.name" :aria-expanded="mobileMenu === link.name" :aria-controls="`mobile-submenu-${index}`" class="flex w-full items-center justify-between rounded-lg px-4 py-3" :class="{ active: isActiveParent(link) }">{{ link.name }} <span aria-hidden="true">⌄</span></button>
+            <div v-show="mobileMenu === link.name" :id="`mobile-submenu-${index}`" class="ml-4 border-l border-white/20">
+              <router-link v-for="child in link.children" :key="child.path" :to="child.path" class="block rounded-lg px-4 py-3 text-sm" :class="{ active: isActive(child.path) }">{{ child.name }}</router-link>
             </div>
           </div>
-          <!-- 普通导航项 -->
-          <router-link v-else :to="link.path"
-            @click="showMobileMenu = false"
-            class="block py-3 px-4 hover:bg-hailong-primary/20 rounded-lg transition-colors"
-            :class="{ 'bg-hailong-primary/30 text-hailong-cyan': isActive(link.path) }">
-            {{ link.name }}
-          </router-link>
+          <router-link v-else :to="link.path" class="block rounded-lg px-4 py-3" :class="{ active: isActive(link.path) }">{{ link.name }}</router-link>
         </template>
       </div>
-    </div>
-  </nav>
+    </nav>
+  </header>
 </template>
-
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import logoUrl from '@/assets/logo.png'
 import { getCompanyInfo, getNavigation } from '@/utils/config'
-
 const route = useRoute()
+const navigationElement = ref(null)
 const showMobileMenu = ref(false)
-const openMobileSubmenu = ref(null)
-
-// 获取公司信息和导航配置
-const companyInfo = computed(() => getCompanyInfo())
-const navigation = computed(() => getNavigation())
-const navLinks = computed(() => navigation.value.header)
-
-const isActive = (path) => {
-  return route.path === path || route.path.startsWith(path + '/')
-}
-
-const isActiveParent = (link) => {
-  if (link.children) {
-    return link.children.some(child => isActive(child.path))
-  }
-  return isActive(link.path)
-}
-
-const toggleMobileMenu = () => {
-  showMobileMenu.value = !showMobileMenu.value
-  openMobileSubmenu.value = null
-}
-
-const toggleMobileSubmenu = (name) => {
-  openMobileSubmenu.value = openMobileSubmenu.value === name ? null : name
-}
+const desktopMenu = ref(null)
+const mobileMenu = ref(null)
+const companyInfo = computed(getCompanyInfo)
+const navLinks = computed(() => getNavigation().header)
+const isActive = path => route.meta.navPath === path || route.path === path || (path !== '/' && route.path.startsWith(`${path}/`))
+const isActiveParent = link => link.children.some(child => isActive(child.path))
+const closeMenus = () => { desktopMenu.value = null; mobileMenu.value = null; showMobileMenu.value = false }
+const closeOnFocusOut = event => { if (!event.currentTarget.contains(event.relatedTarget)) desktopMenu.value = null }
+const closeOutside = event => { if (!navigationElement.value?.contains(event.target)) closeMenus() }
+watch(() => route.fullPath, closeMenus)
+onMounted(() => document.addEventListener('click', closeOutside))
+onUnmounted(() => document.removeEventListener('click', closeOutside))
 </script>
-
 <style scoped>
-/* 组件特定样式 */
+.nav-link { @apply text-sm font-medium transition-colors hover:text-hailong-cyan; }
+.active { @apply text-hailong-cyan; }
+@media print { header { display: none !important; } }
 </style>

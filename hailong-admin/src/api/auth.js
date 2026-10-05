@@ -4,6 +4,7 @@ import request from './request'
  * 认证相关 API
  */
 export const authApi = {
+  logout: () => request({ url: '/auth/logout', method: 'POST' }),
   /**
    * 登录
    * @param {Object} data - { username, password }

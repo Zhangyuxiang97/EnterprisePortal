@@ -4,7 +4,7 @@
       <el-icon class="collapse-icon" :size="20" @click="handleToggleCollapse">
         <component :is="isCollapse ? 'Expand' : 'Fold'" />
       </el-icon>
-      
+
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/home' }">
           <img src="@/assets/hailong.ico" alt="首页" class="breadcrumb-icon" />
@@ -15,7 +15,7 @@
         </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
-    
+
     <div class="header-right">
       <el-dropdown @command="handleCommand">
         <span class="user-info">
@@ -44,17 +44,19 @@
 </template>
 
 <script setup>
+import { confirmEditorsLeave, resetEditorLeaveApprovals } from '@/utils/editorLeave'
+import { notifyError } from '@/utils/errors'
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
-import { 
-  Fold, 
-  Expand, 
-  User, 
-  ArrowDown, 
-  Lock, 
-  SwitchButton 
+import {
+  Fold,
+  Expand,
+  User,
+  ArrowDown,
+  Lock,
+  SwitchButton
 } from '@element-plus/icons-vue'
 
 const props = defineProps({
@@ -75,13 +77,13 @@ const userStore = useUserStore()
 const breadcrumbs = computed(() => {
   const matched = route.matched
   const crumbs = []
-  
+
   matched.forEach(item => {
     if (item.meta?.title && item.path !== '/') {
       crumbs.push(item.meta.title)
     }
   })
-  
+
   return crumbs
 })
 
@@ -100,7 +102,7 @@ const handleCommand = async (command) => {
     case 'changePassword':
       router.push('/system/change-password')
       break
-      
+
     case 'logout':
       try {
         await ElMessageBox.confirm('确定要退出登录吗？', '提示', {
@@ -108,12 +110,15 @@ const handleCommand = async (command) => {
           cancelButtonText: '取消',
           type: 'warning'
         })
-        
-        userStore.logout()
+
+        if (!await confirmEditorsLeave()) break
+        await userStore.logout()
         ElMessage.success('已退出登录')
-        router.push('/login')
-      } catch {
-        // 用户取消
+        await router.push('/login')
+      } catch (error) {
+        notifyError(error, '退出失败，请重试')
+      } finally {
+        resetEditorLeaveApprovals()
       }
       break
   }

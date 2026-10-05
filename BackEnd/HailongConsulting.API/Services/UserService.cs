@@ -1,3 +1,6 @@
+using System.Data;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore.Storage;
 using AutoMapper;
 using HailongConsulting.API.Common;
 using HailongConsulting.API.Common.Helpers;
@@ -48,6 +51,8 @@ public class UserService : IUserService
             query.PageSize);
 
         var dtos = _mapper.Map<List<UserDto>>(items);
+        var activeAdmins = await _dbContext.Users.AsNoTracking().CountAsync(u => u.IsDeleted == 0 && u.Status == 1 && u.Role == "admin");
+        foreach (var dto in dtos) dto.IsLastActiveAdmin = activeAdmins == 1 && dto.Role == "admin" && dto.Status == 1;
 
         return new PagedResult<UserDto>
         {
@@ -113,7 +118,7 @@ public class UserService : IUserService
     /// <summary>
     /// 更新用户
     /// </summary>
-    public async Task<UserDto> UpdateAsync(int id, UpdateUserDto dto)
+    private async Task<UserDto> UpdateCoreAsync(int id, UpdateUserDto dto)
     {
         var user = await _userRepository.GetByIdAsync(id);
         if (user == null || user.IsDeleted == 1)
@@ -127,6 +132,7 @@ public class UserService : IUserService
             throw new InvalidOperationException("邮箱已被其他用户使用");
         }
 
+        await EnsureAdministratorRemainsAsync(user, dto.Role != "admin" || dto.Status != 1);
         user.Email = dto.Email;
         user.Phone = dto.Phone;
         user.RealName = dto.RealName;
@@ -151,7 +157,7 @@ public class UserService : IUserService
     /// <summary>
     /// 删除用户（软删除）
     /// </summary>
-    public async Task<bool> DeleteAsync(int id)
+    private async Task<bool> DeleteCoreAsync(int id)
     {
         var user = await _userRepository.GetByIdAsync(id);
         if (user == null || user.IsDeleted == 1)
@@ -159,6 +165,7 @@ public class UserService : IUserService
             return false;
         }
 
+        await EnsureAdministratorRemainsAsync(user, true);
         user.IsDeleted = 1;
         user.TokenVersion++;
         user.UpdatedAt = DateTime.Now;
@@ -199,7 +206,7 @@ public class UserService : IUserService
     /// <summary>
     /// 启用/禁用用户
     /// </summary>
-    public async Task<bool> ToggleStatusAsync(int id)
+    private async Task<bool> ToggleStatusCoreAsync(int id)
     {
         var user = await _userRepository.GetByIdAsync(id);
         if (user == null || user.IsDeleted == 1)
@@ -207,6 +214,7 @@ public class UserService : IUserService
             return false;
         }
 
+        await EnsureAdministratorRemainsAsync(user, user.Status == 1);
         user.Status = (sbyte)(user.Status == 1 ? 0 : 1);
         user.TokenVersion++;
         user.UpdatedAt = DateTime.Now;
@@ -222,6 +230,44 @@ public class UserService : IUserService
         _logger.LogInformation("User status toggled: {Username}, Status: {Status}", user.Username, user.Status);
 
         return true;
+    }
+
+    public Task<UserDto> UpdateAsync(int id, UpdateUserDto dto) => WithAdministratorLockAsync(() => UpdateCoreAsync(id, dto));
+    public Task<bool> DeleteAsync(int id) => WithAdministratorLockAsync(() => DeleteCoreAsync(id));
+    public Task<bool> ToggleStatusAsync(int id) => WithAdministratorLockAsync(() => ToggleStatusCoreAsync(id));
+
+    private static readonly SemaphoreSlim AdministratorGate = new(1, 1);
+
+    private async Task<T> WithAdministratorLockAsync<T>(Func<Task<T>> operation)
+    {
+        await AdministratorGate.WaitAsync();
+        try
+        {
+            var attempt = 0;
+            return await _dbContext.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
+            {
+                if (attempt++ > 0) _dbContext.ChangeTracker.Clear();
+                await using var transaction = _dbContext.Database.IsRelational()
+                    ? await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable) : null;
+                if (_dbContext.Database.ProviderName?.Contains("MySql") == true)
+                {
+                    // 锁定全部可用管理员；多个实例也不能同时移除最后的管理入口。
+                    await _dbContext.Users.FromSqlRaw("SELECT * FROM users WHERE role='admin' AND status=1 AND is_deleted=0 ORDER BY id FOR UPDATE")
+                        .AsNoTracking().ToListAsync();
+                }
+                var result = await operation();
+                if (transaction != null) await transaction.CommitAsync();
+                return result;
+            });
+        }
+        finally { AdministratorGate.Release(); }
+    }
+
+    private async Task EnsureAdministratorRemainsAsync(User user, bool removingAccess)
+    {
+        if (removingAccess && user.IsDeleted == 0 && user.Status == 1 && user.Role == "admin" &&
+            !await _dbContext.Users.AsNoTracking().AnyAsync(u => u.Id != user.Id && u.IsDeleted == 0 && u.Status == 1 && u.Role == "admin"))
+            throw new ValidationException("至少保留一名可用管理员，请先创建并启用另一名管理员。");
     }
 
     private async Task RevokeActiveSessionsAsync(int userId)

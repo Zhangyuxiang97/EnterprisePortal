@@ -1,16 +1,17 @@
 <template>
-  <div class="py-24 bg-gradient-to-b from-gray-50 to-white">
+  <div class="home-section">
     <div class="container-wide">
-      <div class="text-center mb-16">
+      <div class="text-center mb-8">
         <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 font-tech tracking-tight">企业简介</h2>
         <div class="w-12 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto rounded-full mt-3"></div>
       </div>
       <div v-if="profileLoading" class="text-center py-8 text-gray-500">加载中...</div>
+      <AsyncState v-else-if="fetchError" :error="fetchError" @retry="loadCompanyProfile" />
       <div v-else-if="!profileContent" class="text-center py-8 text-gray-500">暂无企业简介</div>
-      <div v-else class="bg-white rounded-2xl p-8 md:p-12 shadow-lg border border-gray-200">
+      <div v-else class="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-200">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-          <div class="lg:col-span-2">
-            <div class="text-gray-700 text-base leading-relaxed prose prose-lg max-w-none" v-html="profileContent"></div>
+          <div :class="profileHighlights.length ? 'lg:col-span-2' : 'lg:col-span-3'">
+            <p class="text-gray-700 text-base leading-loose">{{ profileContent }}</p>
             <div class="mt-6">
               <router-link to="/about"
                 class="inline-flex items-center text-hailong-primary hover:text-hailong-secondary font-medium transition-colors group">
@@ -42,44 +43,34 @@
 </template>
 
 <script setup>
+import AsyncState from "@/components/common/AsyncState.vue"
 import { ref, onMounted } from 'vue'
 import { getCompanyProfile } from '@/api/config'
 
 const profileLoading = ref(false)
+const fetchError = ref('')
 const profileContent = ref('')
 const profileHighlights = ref([])
 
-const extractFirstParagraphs = (htmlContent, count = 2) => {
-  if (!htmlContent) return ''
-  
-  const tempDiv = document.createElement('div')
-  tempDiv.innerHTML = htmlContent
-  
-  const paragraphs = tempDiv.querySelectorAll('p')
-  
-  if (paragraphs.length === 0) {
-    const text = tempDiv.textContent || tempDiv.innerText || ''
-    return text.length <= 300 ? text : text.substring(0, 300).trim() + '...'
-  }
-  
-  let result = ''
-  for (let i = 0; i < Math.min(count, paragraphs.length); i++) {
-    result += paragraphs[i].outerHTML
-  }
-  
-  return result
+const extractSummary = html => {
+  const document = new DOMParser().parseFromString(html || '', 'text/html')
+  const text = (document.body.textContent || '').replace(/\s+/g, ' ').trim()
+  return text.length > 220 ? text.slice(0, 220) + '…' : text
 }
 
 const loadCompanyProfile = async () => {
   profileLoading.value = true
+  fetchError.value = ''
   try {
     const response = await getCompanyProfile()
+    if (!response.success || !response.data) throw new Error('加载失败')
     if (response.success && response.data) {
       const fullContent = response.data.content || ''
-      profileContent.value = extractFirstParagraphs(fullContent, 2)
+      profileContent.value = extractSummary(fullContent)
       profileHighlights.value = response.data.highlights || []
     }
   } catch (error) {
+    fetchError.value = '内容加载失败，请稍后重试'
     console.error('加载企业简介失败:', error)
   } finally {
     profileLoading.value = false

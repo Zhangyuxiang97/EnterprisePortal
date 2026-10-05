@@ -28,7 +28,7 @@ public class GlobalSearchRepository : IGlobalSearchRepository
         if (request.Category == "all" || request.Category == "gov_procurement")
         {
             var govQuery = _context.Announcements
-                .Where(x => x.IsDeleted == 0 && x.BusinessType == "GOV_PROCUREMENT");
+                .Where(x => x.IsDeleted == 0 && x.Status == 1 && x.BusinessType == "GOV_PROCUREMENT");
 
             // 关键词搜索
             if (!string.IsNullOrWhiteSpace(request.Keyword))
@@ -92,7 +92,7 @@ public class GlobalSearchRepository : IGlobalSearchRepository
         if (request.Category == "all" || request.Category == "construction")
         {
             var constructionQuery = _context.Announcements
-                .Where(x => x.IsDeleted == 0 && x.BusinessType == "CONSTRUCTION");
+                .Where(x => x.IsDeleted == 0 && x.Status == 1 && x.BusinessType == "CONSTRUCTION");
 
             // 关键词搜索
             if (!string.IsNullOrWhiteSpace(request.Keyword))

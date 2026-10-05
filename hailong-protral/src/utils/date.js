@@ -98,3 +98,12 @@ export function getCurrentDateTime() {
 export function getCurrentDate() {
   return formatDate(new Date())
 }
+
+// 以本地日历日期计算，范围包含今天；避免 UTC 转换与夏令时导致偏移。
+export function getDateRange(range, today = new Date()) {
+  const days = { today: 1, '3days': 3, week: 7, month: 30 }[range]
+  if (!days) return { startDate: '', endDate: '' }
+  const start = new Date(today)
+  start.setDate(start.getDate() - days + 1)
+  return { startDate: formatDate(start), endDate: formatDate(today) }
+}

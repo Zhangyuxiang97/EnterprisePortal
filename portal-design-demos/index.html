@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="海隆工程咨询门户的四种设计方向：专业企业蓝、建筑编辑风、克制极简、公告优先。">
+  <title>海隆门户 · 设计方向预览</title>
+  <link rel="icon" href="assets/favicon.ico">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="data.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body data-style="corporate">
+  <a class="skip-link" href="#announcements">跳到公告信息</a>
+  <aside class="preview-bar" aria-label="设计风格切换">
+    <div class="preview-brand"><span class="preview-symbol">H</span><span>海隆门户<span class="preview-subtitle">设计方向预览</span></span></div>
+    <div class="style-options" role="group" aria-label="选择设计风格">
+      <button type="button" data-style-choice="corporate" aria-pressed="true"><i class="swatch swatch-blue"></i><span><b>01</b> 专业企业蓝</span></button>
+      <button type="button" data-style-choice="editorial" aria-pressed="false"><i class="swatch swatch-olive"></i><span><b>02</b> 建筑编辑风</span></button>
+      <button type="button" data-style-choice="minimal" aria-pressed="false"><i class="swatch swatch-black"></i><span><b>03</b> 克制极简</span></button>
+      <button type="button" data-style-choice="portal" aria-pressed="false"><i class="swatch swatch-navy"></i><span><b>04</b> 公告优先</span></button>
+    </div>
+    <button type="button" class="compare-button" id="design-notes">设计说明 <span aria-hidden="true">↗</span></button>
+  </aside>
+  <div id="site-root"></div>
+  <dialog id="detail-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-top"><span id="dialog-context">海隆咨询</span><button type="button" id="close-dialog" aria-label="关闭详情">关闭 <span aria-hidden="true">×</span></button></div>
+    <div class="dialog-content" id="dialog-content"></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <noscript><p class="noscript">此演示需要启用 JavaScript 才能切换风格和展示公告。</p></noscript>
+</body>
+</html>

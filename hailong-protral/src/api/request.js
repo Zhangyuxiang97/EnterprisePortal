@@ -28,6 +28,7 @@ request.interceptors.response.use(
     return response.data
   },
   error => {
+    if (axios.isCancel(error)) return Promise.reject(error)
     console.error('响应错误:', error)
     
     // 处理错误响应

@@ -28,7 +28,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (sbyte)(src.Status ? 1 : 0)));
         
         CreateMap<UpdateCarouselBannerDto, CarouselBanner>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
+            .ForMember(dest => dest.Status, opt => { opt.PreCondition(src => src.Status.HasValue); opt.MapFrom(src => (sbyte)(src.Status.GetValueOrDefault() ? 1 : 0)); })
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
         // 企业简介
@@ -38,7 +38,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => DeserializeintList(src.ImageIds)));
         
         CreateMap<UpdateCompanyProfileDto, CompanyProfile>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
+            .ForMember(dest => dest.Status, opt => { opt.PreCondition(src => src.Status.HasValue); opt.MapFrom(src => (sbyte)(src.Status.GetValueOrDefault() ? 1 : 0)); })
             .ForMember(dest => dest.Highlights, opt => opt.MapFrom(src => SerializeStringList(src.Highlights)))
             .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => SerializeintList(src.ImageIds)))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
@@ -53,7 +53,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => SerializeintList(src.ImageIds)));
         
         CreateMap<UpdateMajorAchievementDto, MajorAchievement>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
+            .ForMember(dest => dest.Status, opt => { opt.PreCondition(src => src.Status.HasValue); opt.MapFrom(src => (sbyte)(src.Status.GetValueOrDefault() ? 1 : 0)); })
             .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => SerializeintList(src.ImageIds)))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
@@ -65,7 +65,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (sbyte)(src.Status ? 1 : 0)));
         
         CreateMap<UpdateCompanyHonorDto, CompanyHonor>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
+            .ForMember(dest => dest.Status, opt => { opt.PreCondition(src => src.Status.HasValue); opt.MapFrom(src => (sbyte)(src.Status.GetValueOrDefault() ? 1 : 0)); })
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
         // 友情链接
@@ -76,7 +76,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (sbyte)(src.Status ? 1 : 0)));
         
         CreateMap<UpdateFriendlyLinkDto, FriendlyLink>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
+            .ForMember(dest => dest.Status, opt => { opt.PreCondition(src => src.Status.HasValue); opt.MapFrom(src => (sbyte)(src.Status.GetValueOrDefault() ? 1 : 0)); })
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
         // 业务范围
@@ -89,7 +89,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Features, opt => opt.MapFrom(src => SerializeStringList(src.Features)));
         
         CreateMap<UpdateBusinessScopeDto, BusinessScope>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
+            .ForMember(dest => dest.Status, opt => { opt.PreCondition(src => src.Status.HasValue); opt.MapFrom(src => (sbyte)(src.Status.GetValueOrDefault() ? 1 : 0)); })
             .ForMember(dest => dest.Features, opt => opt.MapFrom(src => SerializeStringList(src.Features)))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
@@ -107,7 +107,7 @@ public class MappingProfile : Profile
         CreateMap<UpdateCompanyQualificationDto, CompanyQualification>()
             .ForMember(dest => dest.CertificateNo, opt => opt.MapFrom(src => src.CertificateNumber))
             .ForMember(dest => dest.ImageId, opt => opt.MapFrom(src => src.CertificateImageId))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
+            .ForMember(dest => dest.Status, opt => { opt.PreCondition(src => src.Status.HasValue); opt.MapFrom(src => (sbyte)(src.Status.GetValueOrDefault() ? 1 : 0)); })
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
         // 附件映射
@@ -122,6 +122,13 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => DeserializeintList(src.AttachmentIds)))
             .ForMember(dest => dest.NoticeTypeName, opt => opt.MapFrom(src => GetNoticeTypeName(src.NoticeType, src.BusinessType)))
             .ForMember(dest => dest.ProcurementTypeName, opt => opt.MapFrom(src => GetProcurementTypeName(src.ProcurementType)));
+        CreateMap<Announcement, AnnouncementListDto>()
+            .ForMember(dest => dest.HashId, opt => opt.MapFrom(src => EncodeHashId(src.Id)))
+            .ForMember(dest => dest.IsTop, opt => opt.MapFrom(src => src.IsTop == 1))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (int)src.Status))
+            .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => DeserializeintList(src.AttachmentIds)))
+            .ForMember(dest => dest.NoticeTypeName, opt => opt.MapFrom(src => GetNoticeTypeName(src.NoticeType, src.BusinessType)))
+            .ForMember(dest => dest.ProcurementTypeName, opt => opt.MapFrom(src => GetProcurementTypeName(src.ProcurementType)));
         
         CreateMap<CreateAnnouncementDto, Announcement>()
             .ForMember(dest => dest.IsTop, opt => opt.MapFrom(src => (sbyte)(src.IsTop ? 1 : 0)))
@@ -129,13 +136,17 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => SerializeintList(src.AttachmentIds)));
         
         CreateMap<UpdateAnnouncementDto, Announcement>()
-            .ForMember(dest => dest.IsTop, opt => opt.MapFrom(src => src.IsTop.HasValue ? (sbyte)(src.IsTop.Value ? 1 : 0) : (sbyte?)null))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)src.Status.Value : (sbyte?)null))
+            .ForMember(dest => dest.IsTop, opt => { opt.PreCondition(src => src.IsTop.HasValue); opt.MapFrom(src => (sbyte)(src.IsTop.GetValueOrDefault() ? 1 : 0)); })
+            .ForMember(dest => dest.Status, opt => { opt.PreCondition(src => src.Status.HasValue); opt.MapFrom(src => (sbyte)src.Status.GetValueOrDefault()); })
             .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => SerializeintList(src.AttachmentIds)))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
         // 信息发布映射
         CreateMap<InfoPublication, InfoPublicationDto>()
+            .ForMember(dest => dest.IsTop, opt => opt.MapFrom(src => src.IsTop == 1))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (int)src.Status))
+            .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => DeserializeintList(src.AttachmentIds)));
+        CreateMap<InfoPublication, InfoPublicationListDto>()
             .ForMember(dest => dest.IsTop, opt => opt.MapFrom(src => src.IsTop == 1))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (int)src.Status))
             .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => DeserializeintList(src.AttachmentIds)));
@@ -146,8 +157,8 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => SerializeintList(src.AttachmentIds)));
         
         CreateMap<UpdateInfoPublicationDto, InfoPublication>()
-            .ForMember(dest => dest.IsTop, opt => opt.MapFrom(src => src.IsTop.HasValue ? (sbyte)(src.IsTop.Value ? 1 : 0) : (sbyte?)null))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)src.Status.Value : (sbyte?)null))
+            .ForMember(dest => dest.IsTop, opt => { opt.PreCondition(src => src.IsTop.HasValue); opt.MapFrom(src => (sbyte)(src.IsTop.GetValueOrDefault() ? 1 : 0)); })
+            .ForMember(dest => dest.Status, opt => { opt.PreCondition(src => src.Status.HasValue); opt.MapFrom(src => (sbyte)src.Status.GetValueOrDefault()); })
             .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => SerializeintList(src.AttachmentIds)))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 

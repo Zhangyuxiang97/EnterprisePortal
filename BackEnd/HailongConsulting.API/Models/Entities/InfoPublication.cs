@@ -7,8 +7,13 @@ namespace HailongConsulting.API.Models.Entities;
 /// 统一信息发布实体（新闻中心 + 政策法规）
 /// </summary>
 [Table("info_publications")]
-public class InfoPublication
+public class InfoPublication : IVersionedContent
 {
+    [ConcurrencyCheck]
+    [Column("version")]
+    [MaxLength(32)]
+    public string Version { get; set; } = Guid.NewGuid().ToString("N");
+
     /// <summary>
     /// 信息ID
     /// </summary>
@@ -42,6 +47,10 @@ public class InfoPublication
     /// <summary>
     /// 摘要
     /// </summary>
+    [Column("document_number")]
+    [MaxLength(100)]
+    public string? DocumentNumber { get; set; }
+
     [Column("summary")]
     [MaxLength(500)]
     public string? Summary { get; set; }

@@ -7,8 +7,13 @@ namespace HailongConsulting.API.Models.Entities;
 /// 企业简介实体
 /// </summary>
 [Table("company_profile")]
-public class CompanyProfile
+public class CompanyProfile : IVersionedContent
 {
+    [ConcurrencyCheck]
+    [Column("version")]
+    [MaxLength(32)]
+    public string Version { get; set; } = Guid.NewGuid().ToString("N");
+
     /// <summary>
     /// 简介ID
     /// </summary>

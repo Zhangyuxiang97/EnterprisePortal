@@ -23,7 +23,7 @@
             </div>
             <div class="stat-content">
               <div class="stat-value">{{ overview.todayAdded || 0 }}</div>
-              <div class="stat-label">今日新增</div>
+              <div class="stat-label">今日入库</div>
             </div>
           </div>
         </el-card>
@@ -62,7 +62,7 @@
         <el-card class="chart-card">
           <template #header>
             <div class="card-header">
-              <span>发布趋势（最近30天）</span>
+              <span>发布趋势（最近30天 · 按启用记录的发布时间）</span>
               <el-select v-model="trendBusinessType" size="small" style="width: 120px;" @change="loadTrendData">
                 <el-option label="全部" value="" />
                 <el-option label="政府采购" value="GOV_PROCUREMENT" />
@@ -148,11 +148,21 @@
 </template>
 
 <script setup>
+import { useLatestRequest } from '@/composables/useLatestRequest'
+const loadOverviewRequest = useLatestRequest()
+const loadTrendDataRequest = useLatestRequest()
+const loadTypeDistributionRequest = useLatestRequest()
+const loadStatusDistributionRequest = useLatestRequest()
+const loadRegionDistributionRequest = useLatestRequest()
+const loadHotAnnouncementsRequest = useLatestRequest()
+
+import { notifyError } from '@/utils/errors'
+import { localDate } from '@/utils/form'
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Document, Calendar, View, TrendCharts } from '@element-plus/icons-vue'
 import { statisticsApi } from '@/api'
-import * as echarts from 'echarts'
+import * as echarts from '@/utils/echarts'
 import { getDoughnutChartOption, getHorizontalBarChartOption } from '@/utils/chartOptions'
 
 // 概览数据
@@ -231,14 +241,17 @@ const formatDateTime = (dateStr) => {
  * 加载概览数据
  */
 const loadOverview = async () => {
+  const requestId = loadOverviewRequest.begin()
   try {
     const res = await statisticsApi.announcement.getOverview()
+    if (!loadOverviewRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       Object.assign(overview, res.data)
     }
   } catch (error) {
-    console.error('加载概览数据失败:', error)
-    ElMessage.error('加载概览数据失败')
+    if (!loadOverviewRequest.isCurrent(requestId)) return
+
+    notifyError(error, '加载概览数据失败')
   }
 }
 
@@ -246,24 +259,27 @@ const loadOverview = async () => {
  * 加载发布趋势
  */
 const loadTrendData = async () => {
+  const requestId = loadTrendDataRequest.begin()
   try {
     const endDate = new Date()
     const startDate = new Date()
     startDate.setDate(startDate.getDate() - 30)
-    
+
     const params = {
-      startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0],
+      startDate: localDate(startDate),
+      endDate: localDate(endDate),
       businessType: trendBusinessType.value || undefined,
       groupBy: 'day'
     }
     const res = await statisticsApi.announcement.getTrend(params)
+    if (!loadTrendDataRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       renderTrendChart(res.data)
     }
   } catch (error) {
-    console.error('加载趋势数据失败:', error)
-    ElMessage.error('加载趋势数据失败')
+    if (!loadTrendDataRequest.isCurrent(requestId)) return
+
+    notifyError(error, '加载趋势数据失败')
   }
 }
 
@@ -274,11 +290,11 @@ const renderTrendChart = (data) => {
   if (!trendChart) {
     trendChart = echarts.init(trendChartRef.value)
   }
-  
+
   const dates = data.map(item => item.date)
   const govData = data.map(item => item.govProcurementCount)
   const constructionData = data.map(item => item.constructionCount)
-  
+
   const option = {
     tooltip: {
       trigger: 'axis',
@@ -333,7 +349,7 @@ const renderTrendChart = (data) => {
       }
     ]
   }
-  
+
   trendChart.setOption(option)
 }
 
@@ -341,8 +357,10 @@ const renderTrendChart = (data) => {
  * 加载公告类型分布
  */
 const loadTypeDistribution = async () => {
+  const requestId = loadTypeDistributionRequest.begin()
   try {
     const res = await statisticsApi.announcement.getTypeDistribution()
+    if (!loadTypeDistributionRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       const typeData = res.data.map(item => ({
         name: item.typeName || item.type,
@@ -351,8 +369,9 @@ const loadTypeDistribution = async () => {
       renderTypeChart(typeData)
     }
   } catch (error) {
-    console.error('加载类型分布失败:', error)
-    ElMessage.error('加载类型分布失败')
+    if (!loadTypeDistributionRequest.isCurrent(requestId)) return
+
+    notifyError(error, '加载类型分布失败')
   }
 }
 
@@ -363,12 +382,12 @@ const renderTypeChart = (data) => {
   if (!typeChart) {
     typeChart = echarts.init(typeChartRef.value)
   }
-  
+
   const option = getDoughnutChartOption(data, {
     radius: ['40%', '70%'],
     center: ['50%', '50%']
   })
-  
+
   typeChart.setOption(option)
 }
 
@@ -376,8 +395,10 @@ const renderTypeChart = (data) => {
  * 加载状态分布
  */
 const loadStatusDistribution = async () => {
+  const requestId = loadStatusDistributionRequest.begin()
   try {
     const res = await statisticsApi.announcement.getStatusDistribution()
+    if (!loadStatusDistributionRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       const statusData = res.data.map(item => ({
         name: item.statusName || item.status,
@@ -386,8 +407,9 @@ const loadStatusDistribution = async () => {
       renderStatusChart(statusData)
     }
   } catch (error) {
-    console.error('加载状态分布失败:', error)
-    ElMessage.error('加载状态分布失败')
+    if (!loadStatusDistributionRequest.isCurrent(requestId)) return
+
+    notifyError(error, '加载状态分布失败')
   }
 }
 
@@ -398,12 +420,12 @@ const renderStatusChart = (data) => {
   if (!statusChart) {
     statusChart = echarts.init(statusChartRef.value)
   }
-  
+
   const option = getDoughnutChartOption(data, {
     radius: ['40%', '70%'],
     center: ['50%', '50%']
   })
-  
+
   statusChart.setOption(option)
 }
 
@@ -411,18 +433,21 @@ const renderStatusChart = (data) => {
  * 加载区域分布
  */
 const loadRegionDistribution = async () => {
+  const requestId = loadRegionDistributionRequest.begin()
   try {
     const params = {
       businessType: regionBusinessType.value || undefined,
       limit: 10
     }
     const res = await statisticsApi.announcement.getRegionDistribution(params)
+    if (!loadRegionDistributionRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       renderRegionChart(res.data)
     }
   } catch (error) {
-    console.error('加载区域分布失败:', error)
-    ElMessage.error('加载区域分布失败')
+    if (!loadRegionDistributionRequest.isCurrent(requestId)) return
+
+    notifyError(error, '加载区域分布失败')
   }
 }
 
@@ -433,12 +458,12 @@ const renderRegionChart = (data) => {
   if (!regionChart) {
     regionChart = echarts.init(regionChartRef.value)
   }
-  
+
   const chartData = data.map(item => ({
     name: item.region,
     value: item.count
   }))
-  
+
   const option = getHorizontalBarChartOption(chartData, {
     color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
       { offset: 0, color: '#83bff6' },
@@ -447,7 +472,7 @@ const renderRegionChart = (data) => {
     ]),
     showLabel: true
   })
-  
+
   regionChart.setOption(option)
 }
 
@@ -455,6 +480,7 @@ const renderRegionChart = (data) => {
  * 加载热门公告
  */
 const loadHotAnnouncements = async () => {
+  const requestId = loadHotAnnouncementsRequest.begin()
   loading.value = true
   try {
     const params = {
@@ -462,14 +488,18 @@ const loadHotAnnouncements = async () => {
       limit: 10
     }
     const res = await statisticsApi.announcement.getHotAnnouncements(params)
+    if (!loadHotAnnouncementsRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       hotAnnouncements.value = res.data
     }
   } catch (error) {
-    console.error('加载热门公告失败:', error)
-    ElMessage.error('加载热门公告失败')
+    if (!loadHotAnnouncementsRequest.isCurrent(requestId)) return
+
+    notifyError(error, '加载热门公告失败')
   } finally {
-    loading.value = false
+    if (loadHotAnnouncementsRequest.isCurrent(requestId)) {
+      loading.value = false
+    }
   }
 }
 

@@ -62,15 +62,15 @@
           <template #default="{ row }">
             <el-button type="primary" size="small" link @click="handleEdit(row)">编辑</el-button>
             <el-button type="warning" size="small" link @click="handleResetPassword(row)">重置密码</el-button>
-            <el-button 
-              :type="row.status === 1 ? 'warning' : 'success'" 
-              size="small" 
-              link 
-              @click="handleToggleStatus(row)"
+            <el-button
+              :type="row.status === 1 ? 'warning' : 'success'"
+              size="small"
+              link
+              :disabled="row.isLastActiveAdmin" :title="row.isLastActiveAdmin ? '至少保留一名启用的管理员' : ''" @click="handleToggleStatus(row)"
             >
               {{ row.status === 1 ? '禁用' : '启用' }}
             </el-button>
-            <el-button type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
+            <el-button type="danger" size="small" link :disabled="row.isLastActiveAdmin" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -89,30 +89,30 @@
     </el-card>
 
     <!-- 新增/编辑对话框 -->
-    <el-dialog 
-      v-model="dialogVisible" 
-      :title="dialogTitle" 
+    <el-dialog
+      v-model="dialogVisible"
+      :title="dialogTitle"
       width="600px"
       @close="handleDialogClose"
     >
-      <el-form 
-        ref="formRef" 
-        :model="formData" 
-        :rules="formRules" 
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
         label-width="100px"
       >
         <el-form-item label="用户名" prop="username">
-          <el-input 
-            v-model="formData.username" 
-            placeholder="请输入用户名" 
+          <el-input
+            v-model="formData.username"
+            placeholder="请输入用户名"
             :disabled="isEdit"
           />
         </el-form-item>
         <el-form-item label="密码" prop="password" v-if="!isEdit">
-          <el-input 
-            v-model="formData.password" 
-            type="password" 
-            placeholder="请输入密码" 
+          <el-input
+            v-model="formData.password"
+            type="password"
+            placeholder="请输入密码"
             show-password
           />
         </el-form-item>
@@ -126,7 +126,7 @@
           <el-input v-model="formData.phone" placeholder="请输入手机号" />
         </el-form-item>
         <el-form-item label="角色" prop="role">
-          <el-select v-model="formData.role" placeholder="请选择角色">
+          <el-select v-model="formData.role" :disabled="isEdit && currentRow?.isLastActiveAdmin" placeholder="请选择角色">
             <el-option label="管理员" value="admin" />
             <el-option label="普通用户" value="user" />
           </el-select>
@@ -134,7 +134,7 @@
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="formData.status">
             <el-radio :label="1">启用</el-radio>
-            <el-radio :label="0">禁用</el-radio>
+            <el-radio :label="0" :disabled="isEdit && currentRow?.isLastActiveAdmin">禁用</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -148,10 +148,10 @@
     <el-dialog v-model="resetPasswordVisible" title="重置密码" width="400px">
       <el-form :model="resetPasswordForm" :rules="resetPasswordRules" ref="resetPasswordFormRef">
         <el-form-item label="新密码" prop="newPassword" label-width="80px">
-          <el-input 
-            v-model="resetPasswordForm.newPassword" 
-            type="password" 
-            placeholder="请输入新密码" 
+          <el-input
+            v-model="resetPasswordForm.newPassword"
+            type="password"
+            placeholder="请输入新密码"
             show-password
           />
         </el-form-item>
@@ -165,6 +165,10 @@
 </template>
 
 <script setup>
+import { useLatestRequest } from '@/composables/useLatestRequest'
+const loadDataRequest = useLatestRequest()
+
+import { notifyError } from '@/utils/errors'
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { systemApi } from '@/api'
@@ -237,6 +241,7 @@ const resetPasswordRules = {
 }
 
 const loadData = async () => {
+  const requestId = loadDataRequest.begin()
   loading.value = true
   try {
     const params = {
@@ -244,8 +249,9 @@ const loadData = async () => {
       page: pagination.page,
       pageSize: pagination.pageSize
     }
-    
+
     const res = await systemApi.getUserList(params)
+    if (!loadDataRequest.isCurrent(requestId)) return
     if (res.success) {
       tableData.value = res.data?.items || []
       pagination.total = res.data?.totalCount || 0
@@ -253,10 +259,14 @@ const loadData = async () => {
       ElMessage.error(res.message || '加载数据失败')
     }
   } catch (error) {
-    console.error('加载数据失败:', error)
-    ElMessage.error('加载数据失败，请稍后重试')
+    if (!loadDataRequest.isCurrent(requestId)) return
+
+    notifyError(error, '加载数据失败，请稍后重试')
   } finally {
+    if (loadDataRequest.isCurrent(requestId)) {
     loading.value = false
+
+    }
   }
 }
 
@@ -310,10 +320,10 @@ const handleDialogClose = () => {
 
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   await formRef.value.validate(async (valid) => {
     if (!valid) return
-    
+
     submitting.value = true
     try {
       let res
@@ -323,7 +333,7 @@ const handleSubmit = async () => {
       } else {
         res = await systemApi.createUser(formData)
       }
-      
+
       if (res.success) {
         ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
         dialogVisible.value = false
@@ -332,8 +342,8 @@ const handleSubmit = async () => {
         ElMessage.error(res.message || '操作失败')
       }
     } catch (error) {
-      console.error('操作失败:', error)
-      ElMessage.error('操作失败，请稍后重试')
+
+      notifyError(error, '操作失败，请稍后重试')
     } finally {
       submitting.value = false
     }
@@ -343,15 +353,15 @@ const handleSubmit = async () => {
 const handleDelete = async (row) => {
   try {
     await ElMessageBox.confirm(
-      `确定要删除用户"${row.username}"吗？`, 
-      '警告', 
+      `确定要删除用户"${row.username}"吗？`,
+      '警告',
       {
         type: 'warning',
         confirmButtonText: '确定',
         cancelButtonText: '取消'
       }
     )
-    
+
     const res = await systemApi.deleteUser(row.id)
     if (res.success) {
       ElMessage.success('删除成功')
@@ -361,8 +371,8 @@ const handleDelete = async (row) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('删除失败:', error)
-      ElMessage.error('删除失败，请稍后重试')
+
+      notifyError(error, '删除失败，请稍后重试')
     }
   }
 }
@@ -375,17 +385,17 @@ const handleResetPassword = (row) => {
 
 const handleResetPasswordSubmit = async () => {
   if (!resetPasswordFormRef.value) return
-  
+
   await resetPasswordFormRef.value.validate(async (valid) => {
     if (!valid) return
-    
+
     submitting.value = true
     try {
       const res = await systemApi.resetUserPassword(
-        currentRow.value.id, 
+        currentRow.value.id,
         resetPasswordForm.newPassword
       )
-      
+
       if (res.success) {
         ElMessage.success('密码重置成功')
         resetPasswordVisible.value = false
@@ -393,8 +403,8 @@ const handleResetPasswordSubmit = async () => {
         ElMessage.error(res.message || '密码重置失败')
       }
     } catch (error) {
-      console.error('密码重置失败:', error)
-      ElMessage.error('密码重置失败，请稍后重试')
+
+      notifyError(error, '密码重置失败，请稍后重试')
     } finally {
       submitting.value = false
     }
@@ -405,15 +415,15 @@ const handleToggleStatus = async (row) => {
   try {
     const action = row.status === 1 ? '禁用' : '启用'
     await ElMessageBox.confirm(
-      `确定要${action}用户"${row.username}"吗？`, 
-      '提示', 
+      `确定要${action}用户"${row.username}"吗？`,
+      '提示',
       {
         type: 'warning',
         confirmButtonText: '确定',
         cancelButtonText: '取消'
       }
     )
-    
+
     const res = await systemApi.toggleUserStatus(row.id)
     if (res.success) {
       ElMessage.success(`${action}成功`)
@@ -423,8 +433,8 @@ const handleToggleStatus = async (row) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('操作失败:', error)
-      ElMessage.error('操作失败，请稍后重试')
+
+      notifyError(error, '操作失败，请稍后重试')
     }
   }
 }

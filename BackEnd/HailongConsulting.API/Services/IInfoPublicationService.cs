@@ -21,13 +21,13 @@ public interface IInfoPublicationService : IInfoPublicationStatisticsExtension
     /// <summary>
     /// 根据ID获取信息发布
     /// </summary>
-    Task<InfoPublicationDto?> GetByIdAsync(int id);
+    Task<InfoPublicationDto?> GetByIdAsync(int id, bool includeDisabled = false);
     
     /// <summary>
     /// 分页查询信息发布
     /// </summary>
-    Task<PagedResult<InfoPublicationDto>> GetPagedAsync(InfoPublicationQueryDto queryDto);
-    Task<PagedResult<InfoPublicationDto>> GetPagedForPortalAsync(InfoPublicationQueryDto queryDto);
+    Task<PagedResult<InfoPublicationListDto>> GetPagedAsync(InfoPublicationQueryDto queryDto);
+    Task<PagedResult<InfoPublicationListDto>> GetPagedForPortalAsync(InfoPublicationQueryDto queryDto);
     
     /// <summary>
     /// 删除信息发布

@@ -7,8 +7,13 @@ namespace HailongConsulting.API.Models.Entities;
 /// 企业荣誉实体
 /// </summary>
 [Table("company_honors")]
-public class CompanyHonor
+public class CompanyHonor : IVersionedContent
 {
+    [ConcurrencyCheck]
+    [Column("version")]
+    [MaxLength(32)]
+    public string Version { get; set; } = Guid.NewGuid().ToString("N");
+
     /// <summary>
     /// 荣誉ID
     /// </summary>

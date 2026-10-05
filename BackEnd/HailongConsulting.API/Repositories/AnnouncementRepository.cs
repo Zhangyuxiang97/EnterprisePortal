@@ -58,7 +58,7 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
         int pageSize,
         string? procurementType = null,
         DateTime? startDate = null,
-        DateTime? endDate = null)
+        DateTime? endDate = null, bool includeDisabled = false, string? sortBy = null, string? sortOrder = null)
     {
         var query = BuildFilteredQuery(
             businessType,
@@ -71,10 +71,24 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
             city,
             district);
 
+        if (!includeDisabled) query = query.Where(a => a.Status == 1);
         var totalCount = await query.CountAsync();
 
-        var items = await query
-            .OrderByDescending(a => a.PublishTime)
+        var ascending = string.Equals(sortOrder, "asc", StringComparison.OrdinalIgnoreCase);
+        var ordered = query.OrderByDescending(a => a.IsTop);
+        ordered = sortBy?.ToLowerInvariant() switch {
+            "createdat" => ascending ? ordered.ThenBy(a => a.CreatedAt) : ordered.ThenByDescending(a => a.CreatedAt),
+            "viewcount" => ascending ? ordered.ThenBy(a => a.ViewCount) : ordered.ThenByDescending(a => a.ViewCount),
+            _ => ascending ? ordered.ThenBy(a => a.PublishTime) : ordered.ThenByDescending(a => a.PublishTime)
+        };
+        var items = await ordered.ThenByDescending(a => a.Id).AsNoTracking()
+            .Select(a => new Announcement {
+                Id=a.Id, Title=a.Title, BusinessType=a.BusinessType, NoticeType=a.NoticeType, ProcurementType=a.ProcurementType,
+                Bidder=a.Bidder, Winner=a.Winner, BudgetAmount=a.BudgetAmount, AwardAmount=a.AwardAmount, Deadline=a.Deadline,
+                Province=a.Province, City=a.City, District=a.District, ProjectRegion=a.ProjectRegion, Publisher=a.Publisher,
+                PublishTime=a.PublishTime, ViewCount=a.ViewCount, IsTop=a.IsTop, Status=a.Status, CreatedAt=a.CreatedAt,
+                UpdatedAt=a.UpdatedAt, Version=a.Version
+            })
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -104,6 +118,7 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
             city,
             district: null);
 
+        query = query.Where(a => a.Status == 1);
         var groupedCounts = regionLevel switch
         {
             1 => await query
@@ -192,11 +207,13 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
 
     public async Task IncrementViewCountAsync(int id)
     {
-        var announcement = await _dbSet.FindAsync(id);
-        if (announcement != null)
+        if (_context.Database.IsRelational())
         {
-            announcement.ViewCount++;
-            announcement.UpdatedAt = DateTime.UtcNow;
+            await _dbSet.Where(a => a.Id == id && a.IsDeleted == 0 && a.Status == 1)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(a => a.ViewCount, a => a.ViewCount + 1));
+            return;
         }
+        var entity = await _dbSet.FirstOrDefaultAsync(a => a.Id == id && a.IsDeleted == 0 && a.Status == 1);
+        if (entity != null) { entity.ViewCount++; await _context.SaveChangesAsync(); }
     }
 }

@@ -7,14 +7,14 @@
           <el-button type="primary" icon="Plus" @click="handleAdd">新增轮播图</el-button>
         </div>
       </template>
-      
+
       <!-- 表格 -->
       <el-table :data="tableData" v-loading="loading" border stripe>
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column label="图片" width="150">
           <template #default="{ row }">
-            <el-image 
-              :src="row.imageUrl" 
+            <el-image
+              :src="row.imageUrl"
               :preview-src-list="[row.imageUrl]"
               fit="cover"
               style="width: 100px; height: 60px;"
@@ -41,7 +41,7 @@
         </el-table-column>
       </el-table>
     </el-card>
-    
+
     <!-- 编辑对话框 -->
     <el-dialog
       v-model="dialogVisible"
@@ -62,7 +62,7 @@
             show-word-limit
           />
         </el-form-item>
-        
+
         <el-form-item label="轮播图" prop="imageId">
           <FileUpload
             v-model="formData.imageId"
@@ -75,7 +75,7 @@
           />
           <div class="form-tip">建议尺寸：1920x600px，支持jpg、png格式</div>
         </el-form-item>
-        
+
         <el-form-item label="链接地址">
           <el-input
             v-model="formData.linkUrl"
@@ -83,7 +83,7 @@
             maxlength="500"
           />
         </el-form-item>
-        
+
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="排序" prop="sortOrder">
@@ -115,6 +115,7 @@
 </template>
 
 <script setup>
+import { notifyError } from '@/utils/errors'
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { systemConfigApi } from '@/api'
@@ -159,8 +160,8 @@ const loadData = async () => {
       ElMessage.error(res.message || '加载数据失败')
     }
   } catch (error) {
-    console.error('加载数据失败:', error)
-    ElMessage.error('加载数据失败，请稍后重试')
+
+    notifyError(error, '加载数据失败，请稍后重试')
   } finally {
     loading.value = false
   }
@@ -186,6 +187,7 @@ const handleEdit = async (row) => {
     if (res.success && res.data) {
       Object.assign(formData, {
         id: res.data.id,
+        version: res.data.version,
         title: res.data.title,
         imageId: res.data.imageId,
         linkUrl: res.data.linkUrl || '',
@@ -197,8 +199,8 @@ const handleEdit = async (row) => {
       ElMessage.error(res.message || '获取详情失败')
     }
   } catch (error) {
-    console.error('获取详情失败:', error)
-    ElMessage.error('获取详情失败，请稍后重试')
+
+    notifyError(error, '获取详情失败，请稍后重试')
   }
 }
 
@@ -213,7 +215,7 @@ const handleDelete = async (row) => {
         type: 'warning'
       }
     )
-    
+
     const res = await systemConfigApi.banners.delete(row.id)
     if (res.success) {
       ElMessage.success(res.message || '删除成功')
@@ -223,8 +225,8 @@ const handleDelete = async (row) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('删除失败:', error)
-      ElMessage.error('删除失败，请稍后重试')
+
+      notifyError(error, '删除失败，请稍后重试')
     }
   }
 }
@@ -239,38 +241,39 @@ const handleSort = async (row, direction) => {
       ElMessage.error(res.message || '排序失败')
     }
   } catch (error) {
-    console.error('排序失败:', error)
-    ElMessage.error('排序失败，请稍后重试')
+
+    notifyError(error, '排序失败，请稍后重试')
   }
 }
 
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   try {
     await formRef.value.validate()
   } catch (error) {
     ElMessage.warning('请正确填写表单')
     return
   }
-  
+
   submitting.value = true
   try {
     const submitData = {
+      version: formData.version,
       title: formData.title,
       imageId: formData.imageId,
       linkUrl: formData.linkUrl || null,
       sortOrder: formData.sortOrder,
       status: formData.status
     }
-    
+
     let res
     if (isEdit.value) {
       res = await systemConfigApi.banners.update(formData.id, submitData)
     } else {
       res = await systemConfigApi.banners.create(submitData)
     }
-    
+
     if (res.success) {
       ElMessage.success(res.message || (isEdit.value ? '更新成功' : '创建成功'))
       dialogVisible.value = false
@@ -279,8 +282,8 @@ const handleSubmit = async () => {
       ElMessage.error(res.message || (isEdit.value ? '更新失败' : '创建失败'))
     }
   } catch (error) {
-    console.error('提交失败:', error)
-    ElMessage.error(isEdit.value ? '更新失败，请稍后重试' : '创建失败，请稍后重试')
+
+    notifyError(error, isEdit.value ? '更新失败，请稍后重试' : '创建失败，请稍后重试')
   } finally {
     submitting.value = false
   }

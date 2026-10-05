@@ -28,6 +28,7 @@ public class ApplicationDbContext : DbContext
 
     // 系统配置模块
     public DbSet<CompanyProfile> CompanyProfiles { get; set; }
+    public DbSet<PortalSiteSettings> PortalSiteSettings { get; set; }
     public DbSet<BusinessScope> BusinessScopes { get; set; }
     public DbSet<CompanyQualification> CompanyQualifications { get; set; }
     public DbSet<MajorAchievement> MajorAchievements { get; set; }
@@ -43,6 +44,17 @@ public class ApplicationDbContext : DbContext
 
     // 系统日志
     public DbSet<SystemLog> SystemLogs { get; set; }
+
+    private void UpdateContentVersions()
+    {
+        ChangeTracker.DetectChanges();
+        foreach (var entry in ChangeTracker.Entries<IVersionedContent>().Where(e => e.State == EntityState.Modified))
+        {
+            // 浏览量更新只修改计数，不改变内容版本。
+            if (entry.Properties.Any(p => p.IsModified && p.Metadata.Name is not ("ViewCount" or "UpdatedAt" or "Version")))
+                entry.Entity.Version = Guid.NewGuid().ToString("N");
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -238,12 +250,14 @@ public class ApplicationDbContext : DbContext
 
     public override int SaveChanges()
     {
+        UpdateContentVersions();
         UpdateTimestamps();
         return base.SaveChanges();
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
+        UpdateContentVersions();
         UpdateTimestamps();
         return base.SaveChangesAsync(cancellationToken);
     }

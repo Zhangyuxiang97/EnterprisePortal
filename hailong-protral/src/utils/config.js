@@ -1,5 +1,20 @@
-// 配置文件加载工具
-import siteConfig from '../../config/site-config.json'
+import { reactive } from 'vue'
+import request from '@/api/request'
+import staticConfig from '../../config/site-config.json'
+import defaults from '../../../BackEnd/HailongConsulting.API/SiteSettingsDefaults.json'
+import { createSiteSettingsLoader } from './siteSettingsLoader'
+
+// 导航和首页组件布局保持静态；站点展示内容在启动时从 API 更新。
+const siteConfig = reactive(JSON.parse(JSON.stringify({ ...staticConfig, ...defaults })))
+let storage
+try { storage = window.localStorage } catch { /* 浏览器禁用存储时保留网络读取 */ }
+const settingsLoader = createSiteSettingsLoader({
+  fetchSettings: () => request({ url: '/config/site-settings', method: 'get', timeout: 3000 }),
+  applySettings: data => Object.assign(siteConfig, data),
+  storage
+})
+
+export const loadSiteConfig = settingsLoader.load
 
 /**
  * 获取站点配置

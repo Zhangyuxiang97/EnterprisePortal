@@ -1,0 +1,209 @@
+{
+  "retrievedAt": "2026-10-04",
+  "scope": "企业简介与荣誉、43 篇新闻和政策引用的 uploadfile 图片及附件；源文件按原样保存。旧 .doc 实为 OpenXML Word 文档，按 .docx 发布。",
+  "assets": [
+    {
+      "legacyPath": "/uploadfile/20190514143531807.jpg",
+      "publicPath": "/uploads/legacy/20190514143531807.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20190514143531807.jpg",
+      "size": 88966,
+      "sha256": "6040213eff2160bfb6bc9d8128ba5f7e3a6540f9f3533bac3756eef8eda1af7e"
+    },
+    {
+      "legacyPath": "/uploadfile/20190514143542760.jpg",
+      "publicPath": "/uploads/legacy/20190514143542760.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20190514143542760.jpg",
+      "size": 71096,
+      "sha256": "2888622a5bca77430ef9bb72fb956045272d3091cc02d25a6a860bc4fa9b3356"
+    },
+    {
+      "legacyPath": "/uploadfile/20190514143550674.jpg",
+      "publicPath": "/uploads/legacy/20190514143550674.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20190514143550674.jpg",
+      "size": 60470,
+      "sha256": "087c2e27470ac96b926fca2c56e9e352f8d5ebb001d229f1ac462b29499b62f6"
+    },
+    {
+      "legacyPath": "/uploadfile/20190514143559600.doc",
+      "publicPath": "/uploads/legacy/20190514143559600.docx",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20190514143559600.doc",
+      "size": 15866,
+      "sha256": "b4e9e07e8f5f39c3549c9fef6cae5fb6b41b1aa70eb0b7a68fff8dbceb7e819e"
+    },
+    {
+      "legacyPath": "/uploadfile/20190516155655558.jpg",
+      "publicPath": "/uploads/legacy/20190516155655558.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20190516155655558.jpg",
+      "size": 45459,
+      "sha256": "a857fcac8c74ffb62848be8d200264565439c45fd6c71ae50003806a56cd8188"
+    },
+    {
+      "legacyPath": "/uploadfile/20190516155704881.jpg",
+      "publicPath": "/uploads/legacy/20190516155704881.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20190516155704881.jpg",
+      "size": 12951,
+      "sha256": "3ea7eda19b70571296f8978021f94e46c6d7f4c9e5a774c977f5a45835cf0319"
+    },
+    {
+      "legacyPath": "/uploadfile/20190516155712340.jpg",
+      "publicPath": "/uploads/legacy/20190516155712340.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20190516155712340.jpg",
+      "size": 66166,
+      "sha256": "859b48cdd4c9bd30a5c2466ff9a3283363a112797abe802d175116b26dc9dc17"
+    },
+    {
+      "legacyPath": "/uploadfile/20190516155720371.jpg",
+      "publicPath": "/uploads/legacy/20190516155720371.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20190516155720371.jpg",
+      "size": 68055,
+      "sha256": "090e9166338cf86367d6a6d4c2eb032474dcbd391b0fe2d835bdbe1177a0c020"
+    },
+    {
+      "legacyPath": "/uploadfile/20190516155728564.jpg",
+      "publicPath": "/uploads/legacy/20190516155728564.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20190516155728564.jpg",
+      "size": 62665,
+      "sha256": "4c1713d8cd3a2934a71ef2df1045b2de9f95e2641a88bacf08b87abb7095867e"
+    },
+    {
+      "legacyPath": "/uploadfile/20190516155736600.jpg",
+      "publicPath": "/uploads/legacy/20190516155736600.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20190516155736600.jpg",
+      "size": 67476,
+      "sha256": "aef23356280a2bed3e1f74b10a5550b20efebeaf94747b1863bf80779cd711a1"
+    },
+    {
+      "legacyPath": "/uploadfile/20190516155800960.jpg",
+      "publicPath": "/uploads/legacy/20190516155800960.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20190516155800960.jpg",
+      "size": 66705,
+      "sha256": "20a9c363cab6a1876831060a7a35a80c04300fa05ef6a668b57177fa95e94f48"
+    },
+    {
+      "legacyPath": "/uploadfile/20190516155903615.jpg",
+      "publicPath": "/uploads/legacy/20190516155903615.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20190516155903615.jpg",
+      "size": 60020,
+      "sha256": "3357e79167beef24c82ac886a2a4f9b2c712cfeb87e44d9ad19b98bc40e9193e"
+    },
+    {
+      "legacyPath": "/uploadfile/20190516155911638.jpg",
+      "publicPath": "/uploads/legacy/20190516155911638.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20190516155911638.jpg",
+      "size": 66402,
+      "sha256": "d7cced120804420f4ac9ab02e7f604014467a669ca80b9a275307c1d8a637dbe"
+    },
+    {
+      "legacyPath": "/uploadfile/20190516155919102.jpg",
+      "publicPath": "/uploads/legacy/20190516155919102.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20190516155919102.jpg",
+      "size": 57610,
+      "sha256": "32a5d86e5cba9af229529d109c98f371f59b9ca7deca41ec574898118607a2f5"
+    },
+    {
+      "legacyPath": "/uploadfile/20190801163902403.jpg",
+      "publicPath": "/uploads/legacy/20190801163902403.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20190801163902403.jpg",
+      "size": 79635,
+      "sha256": "bf4b59bcb65602a1e3e213af2fd32cd83a95f424cdf8b615e2404e151ea636e1"
+    },
+    {
+      "legacyPath": "/uploadfile/20190801163918971.jpg",
+      "publicPath": "/uploads/legacy/20190801163918971.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20190801163918971.jpg",
+      "size": 24649,
+      "sha256": "f1ed73c85d89874bdd8e79d094d302adf0980e646ae80596e40b4a2ad41d0680"
+    },
+    {
+      "legacyPath": "/uploadfile/20230804104937173.jpg",
+      "publicPath": "/uploads/legacy/20230804104937173.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20230804104937173.jpg",
+      "size": 174484,
+      "sha256": "00d412649e1bb54d7a15818516a67518c5d7d92e4ddacafca2e9cf50ccae2ec3"
+    },
+    {
+      "legacyPath": "/uploadfile/20230804135140469.jpg",
+      "publicPath": "/uploads/legacy/20230804135140469.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20230804135140469.jpg",
+      "size": 135524,
+      "sha256": "5a96c80a9399d8177e175d0004e599dfd42397f4a284728700369e490694c724"
+    },
+    {
+      "legacyPath": "/uploadfile/20230804135156185.jpg",
+      "publicPath": "/uploads/legacy/20230804135156185.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20230804135156185.jpg",
+      "size": 138311,
+      "sha256": "ad9cb18de2f75fc9fe6b684a7abed8dc6b8d90a428cfb47ee0dd125f4899fd43"
+    },
+    {
+      "legacyPath": "/uploadfile/20230804135209174.jpg",
+      "publicPath": "/uploads/legacy/20230804135209174.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20230804135209174.jpg",
+      "size": 138129,
+      "sha256": "de87ca6806d788dd40db140d482d92f5ec2160bc2653d98ba0b3cbe5f33d7065"
+    },
+    {
+      "legacyPath": "/uploadfile/20240808173501766.jpg",
+      "publicPath": "/uploads/legacy/20240808173501766.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20240808173501766.jpg",
+      "size": 182930,
+      "sha256": "93fa3be89870e496d4dbd15156bd1d0e9535d9182e2bdf58a0be08e7abfe5069"
+    },
+    {
+      "legacyPath": "/uploadfile/20240808173623235.jpg",
+      "publicPath": "/uploads/legacy/20240808173623235.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20240808173623235.jpg",
+      "size": 194332,
+      "sha256": "dec2d41a7a31821005b319730aa611626896634e687a62156bd10f6d43c71caa"
+    },
+    {
+      "legacyPath": "/uploadfile/20250327100101368.jpg",
+      "publicPath": "/uploads/legacy/20250327100101368.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20250327100101368.jpg",
+      "size": 197911,
+      "sha256": "95b8dcd758ec3b950ffa39135768ebaa33b13137af73b120252c33ffd7e2abec"
+    },
+    {
+      "legacyPath": "/uploadfile/20250327100127543.jpg",
+      "publicPath": "/uploads/legacy/20250327100127543.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20250327100127543.jpg",
+      "size": 190187,
+      "sha256": "4c80d894027c8ab0e585ba74fee3826e19629823a0ed2b67ccbe5fe620ea5042"
+    },
+    {
+      "legacyPath": "/uploadfile/20250327100856480.jpg",
+      "publicPath": "/uploads/legacy/20250327100856480.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20250327100856480.jpg",
+      "size": 168205,
+      "sha256": "7088ac9eedc59859e765a64afa31021e4a48c73896ae2645ef209cacf7fa9e4f"
+    },
+    {
+      "legacyPath": "/uploadfile/20250327101200712.jpg",
+      "publicPath": "/uploads/legacy/20250327101200712.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20250327101200712.jpg",
+      "size": 185685,
+      "sha256": "d23a0bb631d75c6aeec0a80ffc1ce9182c8012c83b3cd072f3c5d7018a5ab492"
+    },
+    {
+      "legacyPath": "/uploadfile/20250327101407320.jpg",
+      "publicPath": "/uploads/legacy/20250327101407320.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20250327101407320.jpg",
+      "size": 137902,
+      "sha256": "8de0beb654dbd971ecc126c3d5fb3c15a1b636eece0718b8d7f1dc768d7907e1"
+    },
+    {
+      "legacyPath": "/uploadfile/20250327101540383.jpg",
+      "publicPath": "/uploads/legacy/20250327101540383.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20250327101540383.jpg",
+      "size": 197862,
+      "sha256": "3e0cbedf25ccd31d7b43d33e84b4502811ea1327966061944637e99a1b790a78"
+    },
+    {
+      "legacyPath": "/uploadfile/20250711095148141.jpg",
+      "publicPath": "/uploads/legacy/20250711095148141.jpg",
+      "sourceUrl": "http://www.henanhailong.com/uploadfile/20250711095148141.jpg",
+      "size": 194796,
+      "sha256": "cd414b8ec2d7bebbca754dc1374f523cac8b86df87ba78db9bd46cb49f94d232"
+    }
+  ]
+}

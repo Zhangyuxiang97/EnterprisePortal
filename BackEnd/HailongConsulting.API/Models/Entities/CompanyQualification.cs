@@ -7,8 +7,13 @@ namespace HailongConsulting.API.Models.Entities;
 /// 企业资质实体（企业荣誉、企业资质）
 /// </summary>
 [Table("company_qualifications")]
-public class CompanyQualification
+public class CompanyQualification : IVersionedContent
 {
+    [ConcurrencyCheck]
+    [Column("version")]
+    [MaxLength(32)]
+    public string Version { get; set; } = Guid.NewGuid().ToString("N");
+
     /// <summary>
     /// 资质ID
     /// </summary>

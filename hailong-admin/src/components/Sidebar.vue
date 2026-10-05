@@ -6,7 +6,7 @@
       <img v-else src="@/assets/hailong.ico" alt="HL" class="logo-img-mini" />
       <h2 v-if="!isCollapse" class="logo-title">海隆咨询</h2>
     </div>
-    
+
     <!-- 菜单 -->
     <el-menu
       :default-active="activeMenu"
@@ -21,7 +21,7 @@
         <el-icon><Odometer /></el-icon>
         <template #title>数据看板</template>
       </el-menu-item>
-      
+
       <el-sub-menu index="announcements">
         <template #title>
           <el-icon><Document /></el-icon>
@@ -30,7 +30,7 @@
         <el-menu-item index="/gov-procurement">政府采购公告</el-menu-item>
         <el-menu-item index="/construction">建设工程公告</el-menu-item>
       </el-sub-menu>
-      
+
       <el-sub-menu index="info-publish">
         <template #title>
           <el-icon><DocumentCopy /></el-icon>
@@ -39,18 +39,21 @@
         <el-menu-item index="/info-publish/news-center">新闻中心</el-menu-item>
         <el-menu-item index="/info-publish/policy-regulation">政策法规</el-menu-item>
       </el-sub-menu>
-      
+
       <!-- 仅管理员可见 -->
       <el-menu-item v-if="isAdmin" index="/attachments">
         <el-icon><Paperclip /></el-icon>
         <template #title>附件管理</template>
       </el-menu-item>
-      
+
       <!-- 仅管理员可见 -->
+      <el-menu-item v-if="isAdmin" index="/config/site-settings">
+        <el-icon><Setting /></el-icon><template #title>门户设置</template>
+      </el-menu-item>
       <el-sub-menu v-if="isAdmin" index="config">
         <template #title>
           <el-icon><Setting /></el-icon>
-          <span>系统配置</span>
+          <span>企业资料</span>
         </template>
         <el-menu-item index="/config/company-profile">企业简介</el-menu-item>
         <el-menu-item index="/config/business-scope">业务范围</el-menu-item>
@@ -60,7 +63,7 @@
         <!-- <el-menu-item index="/config/banners">轮播图管理</el-menu-item> -->
         <!-- <el-menu-item index="/config/friendly-links">友情链接</el-menu-item> -->
       </el-sub-menu>
-      
+
       <!-- 仅管理员可见 -->
       <el-sub-menu v-if="isAdmin" index="statistics">
         <template #title>
@@ -71,7 +74,7 @@
         <el-menu-item index="/statistics/announcement">公告统计</el-menu-item>
         <el-menu-item index="/statistics/info-publication">信息发布统计</el-menu-item>
       </el-sub-menu>
-      
+
       <el-sub-menu index="system">
         <template #title>
           <el-icon><Tools /></el-icon>

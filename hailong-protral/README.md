@@ -8,7 +8,7 @@
 
 **技术架构**: Vue 3 + Vite + Tailwind CSS
 
-**开发状态**: ✅ 已完成并投入使用
+**开发状态**: 本地开发与验证，部署状态以实际环境为准
 
 ## 🛠 技术栈
 
@@ -22,80 +22,41 @@
 
 ## 📁 项目结构
 
-```
+```text
 hailong-protral/
-├── public/                          # 静态资源
-│   ├── favicon.ico                  # 网站图标
-│   └── images/                      # 公共图片
-├── src/
-│   ├── api/                        # API接口封装
-│   │   ├── request.js              # Axios封装
-│   │   ├── announcement.js         # 公告API
-│   │   ├── infoPublication.js      # 信息发布API
-│   │   ├── config.js               # 配置API
-│   │   ├── region.js               # 区域API
-│   │   └── search.js               # 搜索API
-│   ├── assets/                     # 资源文件
-│   │   ├── images/                 # 图片资源
-│   │   └── styles/                 # 样式文件
-│   ├── components/                 # 公共组件
-│   │   ├── Header.vue              # 顶部导航栏
-│   │   ├── Footer.vue              # 底部信息栏
-│   │   ├── Breadcrumb.vue          # 面包屑导航
-│   │   ├── Pagination.vue          # 分页组件
-│   │   └── home/                   # 首页组件
-│   │       ├── HeroSection.vue     # 轮播Banner
-│   │       ├── AboutSection.vue    # 企业简介
-│   │       ├── BusinessSection.vue # 业务范围
-│   │       ├── DataSection.vue     # 数据统计
-│   │       ├── AchievementSection.vue # 业绩展示
-│   │       └── NewsSection.vue     # 新闻公告
-│   ├── router/                     # 路由配置
-│   │   └── index.js                # 路由定义
-│   ├── utils/                      # 工具函数
-│   │   ├── config.js               # 配置工具
-│   │   ├── date.js                 # 日期格式化
-│   │   └── request.js              # 请求工具
-│   ├── views/                      # 页面组件
-│   │   ├── Home.vue                # 首页
-│   │   ├── pages/                  # 静态页面
-│   │   │   ├── About.vue           # 关于我们
-│   │   │   ├── Business.vue        # 业务范围
-│   │   │   ├── Qualifications.vue  # 企业资质
-│   │   │   ├── Honors.vue          # 企业荣誉
-│   │   │   ├── Achievements.vue    # 重要业绩
-│   │   │   ├── Contact.vue         # 联系我们
-│   │   │   ├── ExpertDatabase.vue  # 专家库
-│   │   │   └── Tools.vue           # 实用工具
-│   │   ├── announcements/          # 公告页面
-│   │   │   ├── GovProcurement.vue  # 政府采购公告列表
-│   │   │   └── Construction.vue    # 建设工程公告列表
-│   │   ├── news/                   # 新闻页面
-│   │   │   ├── CompanyNews.vue     # 公司新闻列表
-│   │   │   └── PolicyRegulation.vue # 政策法规列表
-│   │   ├── details/                # 详情页面
-│   │   │   ├── AnnouncementDetail.vue      # 公告详情
-│   │   │   ├── CompanyAnnouncementDetail.vue # 公司公告详情
-│   │   │   └── PolicyDetail.vue    # 政策法规详情
-│   │   ├── search/                 # 搜索页面
-│   │   │   └── SearchResult.vue    # 搜索结果
-│   │   └── tools/                  # 工具页面
-│   │       ├── BiddingFeeCalculator.vue    # 招标代理费计算器
-│   │       ├── CostingFeeCalculator.vue    # 造价咨询费计算器
-│   │       └── JudicialFeeCalculator.vue   # 司法鉴定费计算器
-│   ├── App.vue                     # 根组件
-│   ├── main.js                     # 入口文件
-│   └── style.css                   # 全局样式
-├── .env.development                # 开发环境配置
-├── .env.production                 # 生产环境配置
-├── .gitignore                      # Git忽略文件
-├── index.html                      # HTML模板
-├── package.json                    # 项目依赖
-├── postcss.config.js               # PostCSS配置
-├── tailwind.config.js              # Tailwind配置
-├── vite.config.js                  # Vite配置
-└── README.md                       # 项目说明
+├─ config/site-config.json      导航、首页模块启用与排序
+├─ src/
+│  ├─ layouts/PortalLayout.vue  公共页头页脚与页面元信息
+│  ├─ views/
+│  │  ├─ home/                 首页
+│  │  ├─ announcements/        公告列表与详情
+│  │  ├─ news/                 新闻列表与详情
+│  │  ├─ policies/             政策列表与详情
+│  │  ├─ company/              关于、联系、业务/资质/业绩详情
+│  │  ├─ services/             工具与专家库
+│  │  └─ NotFound.vue          未知地址页面
+│  ├─ components/
+│  │  ├─ common/               加载状态、分页、富文本与图片预览
+│  │  ├─ announcements/        公告筛选与卡片
+│  │  ├─ company/              企业简介与业务集合
+│  │  └─ home/                 首页模块、标语与联系弹层
+│  ├─ composables/             可取消查询、详情加载、URL 筛选、元信息
+│  ├─ api/                     HTTP 接口
+│  ├─ utils/                   日期、分类、配置、查询辅助
+│  ├─ router/                  公开 URL、栏目归属、默认页面标题
+│  └─ assets/                  Logo、二维码等资源
+└─ tests/                      请求竞态、日期、详情、元信息及配置回归
 ```
+
+页面通过 `PortalLayout` 统一显示页头、页脚，不在单个页面重复引入。公开 URL 与原系统保持一致。
+首页按品牌、公告、业务、简介、资质、业绩、数据、联系展示；资质和业绩成功加载后为空时隐藏整块，失败显示重试入口。屏外模块采用异步组件和可视区域触发。
+首页背景由 `views/home/Home.vue` 统一管理，普通模块使用 `home-section` 与共享浅灰蓝底色，首屏和联系区分别标记为 `hero`、`closing`。调整模块顺序时，无需再拼接各模块独立的背景渐变；加载占位沿用相同底色。
+列表筛选保存在 URL 中，重复搜索支持重新读取，旧请求不覆盖当前结果；新闻和政策分类与后台选项一致。关于页栏目通过 `?tab=` 链接定位，按访问的栏目加载内容。
+正文使用 `RichTextContent`，后端继续负责 HTML 清洗；前端仅统一排版，不更改上传文件路径。
+页面标题、描述、canonical 和分享信息由路由及详情数据生成，域名来自实际访问地址。当前为客户端 SPA 元信息，不等同于服务端渲染；需要无 JavaScript 的完整搜索引擎/分享抓取时另行增加预渲染。
+
+回归命令：`node --test tests/*.test.mjs`；构建：`npm run build`。
+
 
 ## 🚀 快速开始
 
@@ -319,7 +280,7 @@ npm run preview
 
 - ✅ 联系方式展示
   - 固定电话：0371-55894666
-  - 公司地址：河南省郑州市郑东新区金水东路雅宝·东方国际广场2号楼13层
+  - 公司地址：河南省郑州市郑东新区金水东路雅宝·东方国际广场1号楼8层
   - 电子邮箱
   - 工作时间
 - ✅ 地图定位（百度/高德地图）
@@ -514,11 +475,10 @@ onMounted(() => {
 
 3. **添加导航链接**:
 
-```vue
-<!-- src/components/Header.vue -->
-<router-link to="/new-page" class="nav-link">
-  新页面
-</router-link>
+在 `config/site-config.json` 的 `navigation.header` 中添加链接；需要下拉分组时使用 `children`。
+
+```json
+{ "name": "新页面", "path": "/new-page", "order": 7 }
 ```
 
 ### 使用Tailwind CSS

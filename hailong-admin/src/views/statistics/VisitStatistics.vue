@@ -106,22 +106,22 @@
           </div>
         </div>
       </template>
-      
+
       <!-- 搜索区域 -->
       <el-form :model="searchForm" inline class="search-form">
         <el-form-item label="页面URL">
-          <el-input 
-            v-model="searchForm.pageUrl" 
-            placeholder="请输入页面URL" 
-            clearable 
+          <el-input
+            v-model="searchForm.pageUrl"
+            placeholder="请输入页面URL"
+            clearable
             style="width: 200px;"
           />
         </el-form-item>
         <el-form-item label="页面标题">
-          <el-input 
-            v-model="searchForm.pageTitle" 
-            placeholder="请输入页面标题" 
-            clearable 
+          <el-input
+            v-model="searchForm.pageTitle"
+            placeholder="请输入页面标题"
+            clearable
             style="width: 200px;"
           />
         </el-form-item>
@@ -141,7 +141,7 @@
           <el-button icon="Refresh" @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
-      
+
       <el-table :data="tableData" v-loading="tableLoading" border stripe>
         <el-table-column type="index" label="序号" width="60" align="center" />
         <el-table-column prop="visitDate" label="访问日期" width="120" align="center" />
@@ -152,7 +152,7 @@
         <el-table-column prop="visitCount" label="访问次数" width="100" align="center" sortable />
         <el-table-column prop="createdAt" label="记录时间" width="160" align="center" />
       </el-table>
-      
+
       <!-- 分页 -->
       <el-pagination
         v-model:current-page="pagination.pageIndex"
@@ -169,11 +169,21 @@
 </template>
 
 <script setup>
+import { useLatestRequest } from '@/composables/useLatestRequest'
+const loadOverviewRequest = useLatestRequest()
+const loadTrendDataRequest = useLatestRequest()
+const loadHotPagesRequest = useLatestRequest()
+const loadRefererStatisticsRequest = useLatestRequest()
+const loadTableDataRequest = useLatestRequest()
+const loadRealtimeDataRequest = useLatestRequest()
+
+import { notifyError } from '@/utils/errors'
+import { localDate } from '@/utils/form'
 import { ref, reactive, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
 import { ElMessage } from 'element-plus'
 import { View, User, Calendar, Document } from '@element-plus/icons-vue'
 import { statisticsApi } from '@/api'
-import * as echarts from 'echarts'
+import * as echarts from '@/utils/echarts'
 import { getHorizontalBarChartOption } from '@/utils/chartOptions'
 
 // 概览数据
@@ -219,13 +229,16 @@ const exportLoading = ref(false)
  * 加载概览数据
  */
 const loadOverview = async () => {
+  const requestId = loadOverviewRequest.begin()
   try {
     const res = await statisticsApi.visit.getOverview()
+    if (!loadOverviewRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       Object.assign(overview, res.data)
     }
   } catch (error) {
-    console.error('加载概览数据失败:', error)
+    if (!loadOverviewRequest.isCurrent(requestId)) return
+    notifyError(error, '加载概览数据失败:')
   }
 }
 
@@ -233,24 +246,24 @@ const loadOverview = async () => {
  * 加载趋势数据
  */
 const loadTrendData = async () => {
+  const requestId = loadTrendDataRequest.begin()
   try {
     const days = parseInt(trendPeriod.value)
     const endDate = new Date()
     const startDate = new Date()
     startDate.setDate(startDate.getDate() - days)
-    
+
     const params = {
-      startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0],
+      startDate: localDate(startDate),
+      endDate: localDate(endDate),
       groupBy: 'day'
     }
-    
-    console.log('访问趋势请求参数:', params)
+
     const res = await statisticsApi.visit.getTrend(params)
-    console.log('访问趋势响应:', res)
-    
+    if (!loadTrendDataRequest.isCurrent(requestId)) return
+
     if (res.success && res.data) {
-      console.log('访问趋势数据:', res.data)
+
       renderTrendChart(res.data)
     } else {
       console.warn('访问趋势数据为空或请求失败')
@@ -258,7 +271,8 @@ const loadTrendData = async () => {
       renderTrendChart([])
     }
   } catch (error) {
-    console.error('加载趋势数据失败:', error)
+    if (!loadTrendDataRequest.isCurrent(requestId)) return
+    notifyError(error, '加载趋势数据失败:')
     // 渲染空图表
     renderTrendChart([])
   }
@@ -271,18 +285,18 @@ const renderTrendChart = (data) => {
   if (!trendChart) {
     trendChart = echarts.init(trendChartRef.value)
   }
-  
+
   // 处理空数据情况
   if (!data || data.length === 0) {
     console.warn('访问趋势数据为空，显示空图表')
     data = []
   }
-  
+
   // 后端返回的是数组格式：[{date, visitCount, uniqueVisitors}]
   const dates = data.map(item => item.date || '')
   const visits = data.map(item => item.visitCount || 0)
   const uniqueVisitors = data.map(item => item.uniqueVisitors || 0)
-  
+
   const option = {
     tooltip: {
       trigger: 'axis',
@@ -337,7 +351,7 @@ const renderTrendChart = (data) => {
       }
     ]
   }
-  
+
   trendChart.setOption(option)
 }
 
@@ -345,13 +359,16 @@ const renderTrendChart = (data) => {
  * 加载热门页面
  */
 const loadHotPages = async () => {
+  const requestId = loadHotPagesRequest.begin()
   try {
     const res = await statisticsApi.visit.getHotPages({ limit: 10, days: 30 })
+    if (!loadHotPagesRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       renderHotPagesChart(res.data)
     }
   } catch (error) {
-    console.error('加载热门页面失败:', error)
+    if (!loadHotPagesRequest.isCurrent(requestId)) return
+    notifyError(error, '加载热门页面失败:')
   }
 }
 
@@ -362,13 +379,13 @@ const renderHotPagesChart = (data) => {
   if (!hotPagesChart) {
     hotPagesChart = echarts.init(hotPagesChartRef.value)
   }
-  
+
   // 反转数组，让数值大的显示在上面
   const chartData = data.map(item => ({
     name: item.pageTitle || item.pageUrl || '未知页面',
     value: item.visitCount || item.totalViews || 0
   })).reverse()
-  
+
   const option = getHorizontalBarChartOption(chartData, {
     color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
       { offset: 0, color: '#667eea' },
@@ -376,7 +393,7 @@ const renderHotPagesChart = (data) => {
     ]),
     showLabel: true
   })
-  
+
   hotPagesChart.setOption(option)
 }
 
@@ -384,13 +401,16 @@ const renderHotPagesChart = (data) => {
  * 加载访问来源统计
  */
 const loadRefererStatistics = async () => {
+  const requestId = loadRefererStatisticsRequest.begin()
   try {
     const res = await statisticsApi.visit.getSources({ limit: 10 })
+    if (!loadRefererStatisticsRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       renderRefererChart(res.data)
     }
   } catch (error) {
-    console.error('加载访问来源失败:', error)
+    if (!loadRefererStatisticsRequest.isCurrent(requestId)) return
+    notifyError(error, '加载访问来源失败:')
   }
 }
 
@@ -401,13 +421,13 @@ const renderRefererChart = (data) => {
   if (!refererChart) {
     refererChart = echarts.init(refererChartRef.value)
   }
-  
+
   // 反转数组，让数值大的显示在上面
   const chartData = data.map(item => ({
     name: item.referer || item.source || '直接访问',
     value: item.count || item.visitCount || 0
   })).reverse()
-  
+
   const option = getHorizontalBarChartOption(chartData, {
     color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
       { offset: 0, color: '#f093fb' },
@@ -415,7 +435,7 @@ const renderRefererChart = (data) => {
     ]),
     showLabel: true
   })
-  
+
   refererChart.setOption(option)
 }
 
@@ -423,6 +443,7 @@ const renderRefererChart = (data) => {
  * 加载访问记录
  */
 const loadTableData = async () => {
+  const requestId = loadTableDataRequest.begin()
   tableLoading.value = true
   try {
     if (dateRange.value && dateRange.value.length === 2) {
@@ -432,7 +453,7 @@ const loadTableData = async () => {
       searchForm.startDate = ''
       searchForm.endDate = ''
     }
-    
+
     const params = {
       pageUrl: searchForm.pageUrl || undefined,
       pageTitle: searchForm.pageTitle || undefined,
@@ -441,17 +462,21 @@ const loadTableData = async () => {
       page: pagination.pageIndex,
       pageSize: pagination.pageSize
     }
-    
+
     const res = await statisticsApi.visit.getList(params)
+    if (!loadTableDataRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       tableData.value = res.data.items || []
       pagination.total = res.data.totalCount || 0
     }
   } catch (error) {
-    console.error('加载访问记录失败:', error)
-    ElMessage.error('加载访问记录失败')
+    if (!loadTableDataRequest.isCurrent(requestId)) return
+
+    notifyError(error, '加载访问记录失败')
   } finally {
-    tableLoading.value = false
+    if (loadTableDataRequest.isCurrent(requestId)) {
+      tableLoading.value = false
+    }
   }
 }
 
@@ -483,16 +508,16 @@ const exportData = async () => {
       searchForm.startDate = dateRange.value[0]
       searchForm.endDate = dateRange.value[1]
     }
-    
+
     const params = {
       pageUrl: searchForm.pageUrl || undefined,
       pageTitle: searchForm.pageTitle || undefined,
       startDate: searchForm.startDate || undefined,
       endDate: searchForm.endDate || undefined
     }
-    
+
     const res = await statisticsApi.visit.export(params)
-    
+
     // 创建下载链接
     const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
     const url = window.URL.createObjectURL(blob)
@@ -503,11 +528,11 @@ const exportData = async () => {
     link.click()
     document.body.removeChild(link)
     window.URL.revokeObjectURL(url)
-    
+
     ElMessage.success('导出成功')
   } catch (error) {
-    console.error('导出失败:', error)
-    ElMessage.error('导出失败')
+
+    notifyError(error, '导出失败')
   } finally {
     exportLoading.value = false
   }
@@ -517,13 +542,16 @@ const exportData = async () => {
  * 加载实时数据
  */
 const loadRealtimeData = async () => {
+  const requestId = loadRealtimeDataRequest.begin()
   try {
     const res = await statisticsApi.system.getRealtime()
+    if (!loadRealtimeDataRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       overview.todayVisits = res.data.todayVisits || overview.todayVisits
     }
   } catch (error) {
-    console.error('加载实时数据失败:', error)
+    if (!loadRealtimeDataRequest.isCurrent(requestId)) return
+    notifyError(error, '加载实时数据失败:')
   }
 }
 

@@ -193,7 +193,7 @@ Protral/
 ### 环境要求
 
 - **Node.js** >= 18.0
-- **.NET SDK** >= 7.0
+- **.NET SDK** >= 8.0
 - **MySQL** >= 8.0
 - **Git**
 
@@ -370,101 +370,12 @@ npm run dev
 
 ## 🚀 部署指南
 
-### 生产环境要求
+项目采用 Ubuntu 22.04 + Docker Compose 部署，后端为 .NET 8。
 
-- **服务器**: CentOS 7+ / Ubuntu 20.04+
-- **Web服务器**: Nginx
-- **.NET Runtime**: 7.0
-- **MySQL**: 8.0+
-- **Node.js**: 18.0+ (仅构建时需要)
-
-### 部署步骤
-
-#### 1. 数据库部署
-
-```bash
-# 创建数据库
-mysql -u root -p < SQL/hailong_consulting_schema.sql
-mysql -u root -p < SQL/hailong_consulting_init_data.sql
-```
-
-#### 2. 后端API部署
-
-```bash
-# 发布应用
-cd BackEnd/HailongConsulting.API
-dotnet publish -c Release -o ./publish
-
-# 配置systemd服务
-sudo nano /etc/systemd/system/hailong-api.service
-
-# 启动服务
-sudo systemctl start hailong-api
-sudo systemctl enable hailong-api
-```
-
-#### 3. 前端部署
-
-```bash
-# 构建后台管理系统
-cd hailong-admin
-npm install
-npm run build
-
-# 构建前端门户
-cd ../hailong-protral
-npm install
-npm run build
-
-# 部署到Nginx
-sudo cp -r hailong-admin/dist /var/www/hailong-admin
-sudo cp -r hailong-protral/dist /var/www/hailong-protral
-```
-
-#### 4. Nginx配置
-
-```nginx
-# 后端API
-server {
-    listen 80;
-    server_name api.yourdomain.com;
-    
-    location / {
-        proxy_pass http://localhost:5000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-
-# 后台管理系统
-server {
-    listen 80;
-    server_name admin.yourdomain.com;
-    
-    root /var/www/hailong-admin;
-    index index.html;
-    
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-}
-
-# 前端门户
-server {
-    listen 80;
-    server_name www.yourdomain.com;
-    
-    root /var/www/hailong-protral;
-    index index.html;
-    
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-}
-```
+- 部署入口：根目录 `deploy-ubuntu22-docker.sh`。
+- [Ubuntu22 Docker 部署指南](docs/deployment/ubuntu22-docker.md)：安装、8082 默认端口、更新、验证与回退。
+- [配置存储位置](docs/configuration/storage.md)：部署参数、展示默认值与运行密钥。
+- [全部文档](docs/README.md)。
 
 ## 📝 开发规范
 
@@ -522,6 +433,7 @@ chore: 构建/工具链相关
 - [后端API文档](BackEnd/HailongConsulting.API/README.md)
 - [后台管理文档](hailong-admin/README.md)
 - [前端门户文档](hailong-protral/README.md)
+- [门户站点配置说明](docs/portal-settings.md)
 - [数据库文档](SQL/README.md)
 
 ## 👥 团队成员
@@ -539,7 +451,7 @@ chore: 构建/工具链相关
 
 **联系电话**: 0371-55894666
 
-**公司地址**: 河南省郑州市郑东新区金水东路雅宝·东方国际广场2号楼13层
+**公司地址**: 河南省郑州市郑东新区金水东路雅宝·东方国际广场1号楼8层
 
 **技术支持**: support@hailongzixun.com
 

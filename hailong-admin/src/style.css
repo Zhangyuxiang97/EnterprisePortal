@@ -1,4 +1,26 @@
 /* 全局样式重置 */
+:root {
+  --el-color-primary: #245b85;
+  --el-color-primary-light-3: #668da9;
+  --el-color-primary-light-5: #92adc2;
+  --el-color-primary-light-7: #bdceda;
+  --el-color-primary-light-8: #d3dee7;
+  --el-color-primary-light-9: #e9eff3;
+  --el-color-primary-dark-2: #1d496a;
+}
+
+/* 长表单只滚动正文，操作按钮保持可见。 */
+.el-dialog.editor-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  margin-top: 5vh;
+  max-width: calc(100vw - 32px);
+}
+.editor-dialog > .el-dialog__body { overflow-y: auto; min-height: 0; padding-right: 8px; }
+.editor-dialog > .el-dialog__footer { flex-shrink: 0; border-top: 1px solid #e9eef3; padding-top: 16px; }
+.editor-dialog > .el-dialog__header { flex-shrink: 0; }
+.attachment-references .el-message-box__message { white-space: pre-line; overflow-wrap: anywhere; }
 * {
   margin: 0;
   padding: 0;

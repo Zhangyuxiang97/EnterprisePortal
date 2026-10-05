@@ -94,6 +94,18 @@ done
 
 print_info "所有必需文件检查通过"
 
+# 非敏感部署参数；命令行环境变量优先，其次为 config/deployment.env。
+if [ -f "$PROJECT_PATH/config/deployment.env" ]; then
+    configured_port=$(sed -n 's/^PORTAL_HTTP_PORT=//p' "$PROJECT_PATH/config/deployment.env" | tail -n 1 | tr -d '\r')
+fi
+export PORTAL_HTTP_PORT="${PORTAL_HTTP_PORT:-${configured_port:-8082}}"
+if ! [[ "$PORTAL_HTTP_PORT" =~ ^[0-9]{1,5}$ ]] || [ "$PORTAL_HTTP_PORT" -lt 1 ] || [ "$PORTAL_HTTP_PORT" -gt 65535 ] || [ "$PORTAL_HTTP_PORT" -eq 5001 ] || [ "$PORTAL_HTTP_PORT" -eq 8080 ]; then
+    print_error "PORTAL_HTTP_PORT 必须为 1–65535 且不能与 5001、8080 冲突"
+    exit 1
+fi
+PORTAL_URL="http://$SERVER_IP:$PORTAL_HTTP_PORT"
+
+
 # 密钥仅在首次部署生成；以后重跑脚本会复用同一份文件，避免与已有 MySQL 数据卷失配。
 RUNTIME_SECRETS_DIR="$PROJECT_PATH/.runtime"
 RUNTIME_SECRETS_FILE="$RUNTIME_SECRETS_DIR/secrets.env"
@@ -122,10 +134,7 @@ Jwt__Key=$JWT_SECRET
 EOF
     chmod 600 "$RUNTIME_SECRETS_FILE"
     SECRETS_CREATED=true
-    print_warn "已首次生成运行时密钥，请立即安全保存以下内容；此信息不会在后续部署时再次打印。"
-    echo "  MySQL Root密码: $MYSQL_ROOT_PASSWORD"
-    echo "  MySQL应用密码: $MYSQL_APP_PASSWORD"
-    echo "  JWT密钥: $JWT_SECRET"
+    print_warn "已首次生成运行时密钥，请安全备份受限文件。"
     echo "  密钥文件: $RUNTIME_SECRETS_FILE"
 fi
 
@@ -298,13 +307,12 @@ print_step "第七步：启动Docker容器"
 
 cd "$PROJECT_PATH"
 
-print_info "停止并删除旧容器（如果存在）..."
-$COMPOSE_CMD down 2>/dev/null || true
-
-print_info "启动所有服务..."
+print_info "先构建新镜像，构建失败时保留正在运行的容器..."
 print_warn "首次启动需要构建镜像，可能需要5-10分钟，请耐心等待..."
 
-$COMPOSE_CMD up -d --build
+$COMPOSE_CMD --env-file .runtime/secrets.env build
+print_info "构建成功，更新服务容器..."
+$COMPOSE_CMD --env-file .runtime/secrets.env up -d --no-build
 
 print_info "等待服务启动..."
 sleep 10
@@ -315,12 +323,14 @@ sleep 10
 print_step "第八步：验证部署"
 
 print_info "检查容器状态..."
-$COMPOSE_CMD ps
+$COMPOSE_CMD --env-file .runtime/secrets.env ps
 
 # 等待MySQL初始化完成
 print_info "等待MySQL初始化完成..."
+mysql_ready=false
 for i in {1..30}; do
     if docker exec hailong-mysql mysqladmin ping -h localhost -p"$MYSQL_ROOT_PASSWORD" &> /dev/null; then
+        mysql_ready=true
         print_info "MySQL已就绪"
         break
     fi
@@ -329,10 +339,17 @@ for i in {1..30}; do
 done
 echo ""
 
+if [ "$mysql_ready" != true ]; then
+    print_error "MySQL 等待超时，部署验证失败。请使用 compose logs mysql 检查。"
+    exit 1
+fi
+
 # 等待API启动
 print_info "等待API服务启动..."
+api_ready=false
 for i in {1..30}; do
-    if curl -s http://localhost:5001/api/home/statistics > /dev/null 2>&1; then
+    if curl -fsS --connect-timeout 2 --max-time 5 http://localhost:5001/health/ready > /dev/null 2>&1; then
+        api_ready=true
         print_info "API服务已就绪"
         break
     fi
@@ -341,6 +358,15 @@ for i in {1..30}; do
 done
 echo ""
 
+if [ "$api_ready" != true ]; then
+    print_error "API/数据库就绪检查超时，部署验证失败。请使用 compose logs api 检查。"
+    exit 1
+fi
+if ! curl -fsS --connect-timeout 2 --max-time 5 "http://localhost:$PORTAL_HTTP_PORT/" > /dev/null; then
+    print_error "门户访问检查失败，部署验证未通过。"
+    exit 1
+fi
+
 # 检查数据库表
 print_info "验证数据库初始化..."
 TABLE_COUNT=$(docker exec hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "USE hailong_consulting; SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='hailong_consulting';" -s -N 2>/dev/null || echo "0")
@@ -348,9 +374,8 @@ TABLE_COUNT=$(docker exec hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD" -
 if [ "$TABLE_COUNT" -gt "0" ]; then
     print_info "数据库初始化成功，共 $TABLE_COUNT 张表"
 else
-    print_warn "数据库表数量为0，可能初始化失败"
-    print_info "查看MySQL日志："
-    $COMPOSE_CMD logs mysql | tail -20
+    print_error "数据库初始化验证失败，请检查 MySQL 日志。"
+    exit 1
 fi
 
 ###############################################################################
@@ -360,7 +385,7 @@ print_step "第九步：配置防火墙"
 
 if command -v ufw &> /dev/null; then
     print_info "配置UFW防火墙..."
-    ufw allow 80/tcp
+    ufw allow "$PORTAL_HTTP_PORT/tcp"
     ufw allow 8080/tcp
     ufw allow 5001/tcp
     ufw allow 22/tcp
@@ -384,7 +409,7 @@ echo ""
 echo "服务器IP: $SERVER_IP"
 echo ""
 echo "访问地址："
-echo "  - 前端门户:     http://$SERVER_IP"
+echo "  - 前端门户:     $PORTAL_URL"
 echo "  - 后台管理:     http://$SERVER_IP:8080"
 echo "  - API接口:      http://$SERVER_IP:5001"
 echo ""
@@ -397,11 +422,11 @@ echo "  - hailong-api    (.NET 8.0 API)"
 echo "  - hailong-nginx  (Nginx)"
 echo ""
 echo "常用Docker命令："
-echo "  - 查看容器状态:  $COMPOSE_CMD ps"
-echo "  - 查看日志:      $COMPOSE_CMD logs -f"
-echo "  - 重启服务:      $COMPOSE_CMD restart"
-echo "  - 停止服务:      $COMPOSE_CMD down"
-echo "  - 启动服务:      $COMPOSE_CMD up -d"
+echo "  - 查看容器状态:  $COMPOSE_CMD --env-file .runtime/secrets.env ps"
+echo "  - 查看日志:      $COMPOSE_CMD --env-file .runtime/secrets.env logs -f"
+echo "  - 重启服务:      $COMPOSE_CMD --env-file .runtime/secrets.env restart"
+echo "  - 停止服务:      $COMPOSE_CMD --env-file .runtime/secrets.env down"
+echo "  - 启动服务:      $COMPOSE_CMD --env-file .runtime/secrets.env up -d"
 echo ""
 echo "数据库信息："
 echo "  - 数据库名: hailong_consulting"
@@ -421,10 +446,10 @@ cat > /root/hailong-docker-deploy-info.txt <<EOF
 海隆咨询官网Docker部署信息 (Ubuntu 22.04)
 部署时间: $(date)
 服务器IP: $SERVER_IP
-使用命令: $COMPOSE_CMD
+使用命令: $COMPOSE_CMD --env-file .runtime/secrets.env
 
 访问地址:
-- 前端门户: http://$SERVER_IP
+- 前端门户: $PORTAL_URL
 - 后台管理: http://$SERVER_IP:8080
 - API接口: http://$SERVER_IP:5001
 
@@ -445,15 +470,16 @@ Docker容器:
 
 常用命令:
 cd $PROJECT_PATH
-$COMPOSE_CMD ps              # 查看容器状态
-$COMPOSE_CMD logs -f         # 查看日志
-$COMPOSE_CMD restart api     # 重启API
-$COMPOSE_CMD restart nginx   # 重启Nginx
-$COMPOSE_CMD down            # 停止所有服务
-$COMPOSE_CMD up -d           # 启动所有服务
+export PORTAL_HTTP_PORT=$PORTAL_HTTP_PORT
+$COMPOSE_CMD --env-file .runtime/secrets.env ps              # 查看容器状态
+$COMPOSE_CMD --env-file .runtime/secrets.env logs -f         # 查看日志
+$COMPOSE_CMD --env-file .runtime/secrets.env restart api     # 重启API
+$COMPOSE_CMD --env-file .runtime/secrets.env restart nginx   # 重启Nginx
+$COMPOSE_CMD --env-file .runtime/secrets.env down            # 停止所有服务
+$COMPOSE_CMD --env-file .runtime/secrets.env up -d           # 启动所有服务
 
 备份命令:
-source $RUNTIME_SECRETS_FILE && docker exec hailong-mysql mysqldump -u root -p\$MYSQL_ROOT_PASSWORD hailong_consulting > backup.sql
+MYSQL_ROOT_PASSWORD=\$(sed -n 's/^MYSQL_ROOT_PASSWORD=//p' "$RUNTIME_SECRETS_FILE") && docker exec -e MYSQL_PWD="\$MYSQL_ROOT_PASSWORD" hailong-mysql mysqldump --single-transaction -u root hailong_consulting > backup.sql
 EOF
 
 print_info "部署信息已保存到: /root/hailong-docker-deploy-info.txt"
@@ -461,8 +487,8 @@ print_info "部署信息已保存到: /root/hailong-docker-deploy-info.txt"
 # 显示容器状态
 echo ""
 print_info "当前容器状态："
-$COMPOSE_CMD ps
+$COMPOSE_CMD --env-file .runtime/secrets.env ps
 
 echo ""
 print_info "如需查看详细日志，请执行："
-echo "  cd $PROJECT_PATH && $COMPOSE_CMD logs -f"
+echo "  cd $PROJECT_PATH && $COMPOSE_CMD --env-file .runtime/secrets.env logs -f"

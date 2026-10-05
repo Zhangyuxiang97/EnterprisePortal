@@ -38,6 +38,15 @@ public class StatisticsController : ControllerBase
         _logger = logger;
     }
 
+    private static bool TryDateRange(string? startText, string? endText, out DateOnly start, out DateOnly end)
+    {
+        start = DateOnly.FromDateTime(DateTime.Now.AddDays(-30));
+        end = DateOnly.FromDateTime(DateTime.Now);
+        return (string.IsNullOrEmpty(startText) || DateOnly.TryParseExact(startText, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start))
+            && (string.IsNullOrEmpty(endText) || DateOnly.TryParseExact(endText, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end))
+            && start <= end;
+    }
+
     #region 访问统计
 
     /// <summary>
@@ -53,27 +62,15 @@ public class StatisticsController : ControllerBase
     {
         try
         {
-            var start = string.IsNullOrEmpty(startDate) 
-                ? DateOnly.FromDateTime(DateTime.Now.AddDays(-30)) 
-                : DateOnly.Parse(startDate);
-            var end = string.IsNullOrEmpty(endDate) 
-                ? DateOnly.FromDateTime(DateTime.Now) 
-                : DateOnly.Parse(endDate);
+            if (!TryDateRange(startDate, endDate, out var start, out var end))
+                return BadRequest(new { success = false, message = "日期须为 yyyy-MM-dd，开始日期不能晚于结束日期" });
 
-            var statistics = await _visitStatisticService.GetVisitStatisticsAsync(start, end);
-            
-            // 如果指定了页面路径，进行过滤
-            if (!string.IsNullOrEmpty(pagePath))
-            {
-                statistics = statistics.Where(s => s.PageUrl != null && s.PageUrl.Contains(pagePath));
-            }
+            if (page < 1 || pageSize < 1 || pageSize > 100 || (long)(page - 1) * pageSize > int.MaxValue)
+                return BadRequest(new { success = false, message = "页码须大于 0，每页条数须为 1–100，分页偏移不能超出范围" });
 
-            var totalCount = statistics.Count();
-            var items = statistics
-                .OrderByDescending(s => s.CreatedAt)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
+            var statistics = await _visitStatisticService.GetVisitStatisticsPageAsync(start, end, pagePath, page, pageSize);
+            var items = statistics.Items;
+            var totalCount = statistics.TotalCount;
 
             var dtos = _mapper.Map<List<VisitStatisticDetailDto>>(items);
             
@@ -87,10 +84,10 @@ public class StatisticsController : ControllerBase
             
             return Ok(ApiResponse<PagedResult<VisitStatisticDetailDto>>.SuccessResult(result));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取访问统计列表失败");
-            return StatusCode(500, ApiResponse<PagedResult<VisitStatisticDetailDto>>.FailResult("获取访问统计列表失败"));
+            throw;
         }
     }
 
@@ -122,10 +119,10 @@ public class StatisticsController : ControllerBase
 
             return Ok(ApiResponse<VisitStatisticsOverviewDto>.SuccessResult(overview));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取访问统计概览失败");
-            return StatusCode(500, ApiResponse<VisitStatisticsOverviewDto>.FailResult("获取访问统计概览失败"));
+            throw;
         }
     }
 
@@ -140,21 +137,17 @@ public class StatisticsController : ControllerBase
     {
         try
         {
-            var start = string.IsNullOrEmpty(startDate) 
-                ? DateOnly.FromDateTime(DateTime.Now.AddDays(-30)) 
-                : DateOnly.Parse(startDate);
-            var end = string.IsNullOrEmpty(endDate) 
-                ? DateOnly.FromDateTime(DateTime.Now) 
-                : DateOnly.Parse(endDate);
+            if (!TryDateRange(startDate, endDate, out var start, out var end))
+                return BadRequest(new { success = false, message = "日期须为 yyyy-MM-dd，开始日期不能晚于结束日期" });
 
             var trendData = await _visitStatisticService.GetVisitTrendAsync(start, end, groupBy);
             
             return Ok(ApiResponse<List<VisitTrendDataDto>>.SuccessResult(trendData));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取访问趋势失败");
-            return StatusCode(500, ApiResponse<List<VisitTrendDataDto>>.FailResult("获取访问趋势失败"));
+            throw;
         }
     }
 
@@ -173,10 +166,10 @@ public class StatisticsController : ControllerBase
             
             return Ok(ApiResponse<List<PopularPageDto>>.SuccessResult(popularPages));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取热门页面失败");
-            return StatusCode(500, ApiResponse<List<PopularPageDto>>.FailResult("获取热门页面失败"));
+            throw;
         }
     }
 
@@ -196,10 +189,10 @@ public class StatisticsController : ControllerBase
             await _visitStatisticService.RecordVisitAsync(dto.PageUrl ?? "", dto.PageTitle, ip, userAgent, referer);
             return Ok(ApiResponse<bool>.SuccessResult(true, "记录访问成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "记录访问失败");
-            return StatusCode(500, ApiResponse<bool>.FailResult("记录访问失败"));
+            throw;
         }
     }
 
@@ -216,10 +209,10 @@ public class StatisticsController : ControllerBase
             var sources = await _visitStatisticService.GetVisitSourcesAsync();
             return Ok(ApiResponse<List<VisitSourceDto>>.SuccessResult(sources));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取访问来源统计失败");
-            return StatusCode(500, ApiResponse<List<VisitSourceDto>>.FailResult("获取访问来源统计失败"));
+            throw;
         }
     }
 
@@ -238,10 +231,10 @@ public class StatisticsController : ControllerBase
             var overview = await _announcementService.GetStatisticsOverviewAsync();
             return Ok(ApiResponse<AnnouncementStatisticsOverviewDto>.SuccessResult(overview));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取公告统计概览失败");
-            return StatusCode(500, ApiResponse<AnnouncementStatisticsOverviewDto>.FailResult("获取公告统计概览失败"));
+            throw;
         }
     }
 
@@ -257,20 +250,16 @@ public class StatisticsController : ControllerBase
     {
         try
         {
-            var start = string.IsNullOrEmpty(startDate) 
-                ? DateOnly.FromDateTime(DateTime.Now.AddDays(-30)) 
-                : DateOnly.Parse(startDate);
-            var end = string.IsNullOrEmpty(endDate) 
-                ? DateOnly.FromDateTime(DateTime.Now) 
-                : DateOnly.Parse(endDate);
+            if (!TryDateRange(startDate, endDate, out var start, out var end))
+                return BadRequest(new { success = false, message = "日期须为 yyyy-MM-dd，开始日期不能晚于结束日期" });
 
             var trend = await _announcementService.GetPublishTrendAsync(start, end, businessType, groupBy);
             return Ok(ApiResponse<List<AnnouncementPublishTrendDto>>.SuccessResult(trend));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取公告发布趋势失败");
-            return StatusCode(500, ApiResponse<List<AnnouncementPublishTrendDto>>.FailResult("获取公告发布趋势失败"));
+            throw;
         }
     }
 
@@ -285,10 +274,10 @@ public class StatisticsController : ControllerBase
             var distribution = await _announcementService.GetTypeDistributionAsync();
             return Ok(ApiResponse<List<AnnouncementTypeDistributionDto>>.SuccessResult(distribution));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取公告类型分布失败");
-            return StatusCode(500, ApiResponse<List<AnnouncementTypeDistributionDto>>.FailResult("获取公告类型分布失败"));
+            throw;
         }
     }
 
@@ -305,10 +294,10 @@ public class StatisticsController : ControllerBase
             var distribution = await _announcementService.GetRegionDistributionAsync(businessType, limit);
             return Ok(ApiResponse<List<AnnouncementRegionDistributionDto>>.SuccessResult(distribution));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取公告区域分布失败");
-            return StatusCode(500, ApiResponse<List<AnnouncementRegionDistributionDto>>.FailResult("获取公告区域分布失败"));
+            throw;
         }
     }
 
@@ -325,10 +314,10 @@ public class StatisticsController : ControllerBase
             var popular = await _announcementService.GetPopularAnnouncementsAsync(businessType, limit);
             return Ok(ApiResponse<List<PopularAnnouncementDto>>.SuccessResult(popular));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取热门公告失败");
-            return StatusCode(500, ApiResponse<List<PopularAnnouncementDto>>.FailResult("获取热门公告失败"));
+            throw;
         }
     }
 
@@ -343,10 +332,10 @@ public class StatisticsController : ControllerBase
             var distribution = await _announcementService.GetStatusDistributionAsync();
             return Ok(ApiResponse<List<AnnouncementStatusDistributionDto>>.SuccessResult(distribution));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取公告状态分布失败");
-            return StatusCode(500, ApiResponse<List<AnnouncementStatusDistributionDto>>.FailResult("获取公告状态分布失败"));
+            throw;
         }
     }
 
@@ -365,10 +354,10 @@ public class StatisticsController : ControllerBase
             var overview = await _infoPublicationService.GetStatisticsOverviewAsync();
             return Ok(ApiResponse<InfoPublicationStatisticsOverviewDto>.SuccessResult(overview));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取信息发布统计概览失败");
-            return StatusCode(500, ApiResponse<InfoPublicationStatisticsOverviewDto>.FailResult("获取信息发布统计概览失败"));
+            throw;
         }
     }
 
@@ -383,20 +372,16 @@ public class StatisticsController : ControllerBase
     {
         try
         {
-            var start = string.IsNullOrEmpty(startDate) 
-                ? DateOnly.FromDateTime(DateTime.Now.AddDays(-30)) 
-                : DateOnly.Parse(startDate);
-            var end = string.IsNullOrEmpty(endDate) 
-                ? DateOnly.FromDateTime(DateTime.Now) 
-                : DateOnly.Parse(endDate);
+            if (!TryDateRange(startDate, endDate, out var start, out var end))
+                return BadRequest(new { success = false, message = "日期须为 yyyy-MM-dd，开始日期不能晚于结束日期" });
 
             var trend = await _infoPublicationService.GetPublishTrendAsync(start, end, groupBy);
             return Ok(ApiResponse<List<InfoPublicationPublishTrendDto>>.SuccessResult(trend));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取信息发布趋势失败");
-            return StatusCode(500, ApiResponse<List<InfoPublicationPublishTrendDto>>.FailResult("获取信息发布趋势失败"));
+            throw;
         }
     }
 
@@ -411,10 +396,10 @@ public class StatisticsController : ControllerBase
             var distribution = await _infoPublicationService.GetTypeDistributionAsync();
             return Ok(ApiResponse<List<InfoPublicationTypeDistributionDto>>.SuccessResult(distribution));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取信息类型分布失败");
-            return StatusCode(500, ApiResponse<List<InfoPublicationTypeDistributionDto>>.FailResult("获取信息类型分布失败"));
+            throw;
         }
     }
 
@@ -430,10 +415,10 @@ public class StatisticsController : ControllerBase
             var popular = await _infoPublicationService.GetPopularInfoPublicationsAsync(limit);
             return Ok(ApiResponse<List<PopularInfoPublicationDto>>.SuccessResult(popular));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取热门信息失败");
-            return StatusCode(500, ApiResponse<List<PopularInfoPublicationDto>>.FailResult("获取热门信息失败"));
+            throw;
         }
     }
 
@@ -448,10 +433,10 @@ public class StatisticsController : ControllerBase
             var statistics = await _infoPublicationService.GetAuthorStatisticsAsync();
             return Ok(ApiResponse<List<AuthorPublishStatisticDto>>.SuccessResult(statistics));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取作者统计失败");
-            return StatusCode(500, ApiResponse<List<AuthorPublishStatisticDto>>.FailResult("获取作者统计失败"));
+            throw;
         }
     }
 
@@ -479,10 +464,10 @@ public class StatisticsController : ControllerBase
 
             return Ok(ApiResponse<SystemOverviewDto>.SuccessResult(overview));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取系统概览失败");
-            return StatusCode(500, ApiResponse<SystemOverviewDto>.FailResult("获取系统概览失败"));
+            throw;
         }
     }
 
@@ -507,10 +492,10 @@ public class StatisticsController : ControllerBase
 
             return Ok(ApiResponse<RealtimeStatisticsDto>.SuccessResult(realtime));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取实时统计失败");
-            return StatusCode(500, ApiResponse<RealtimeStatisticsDto>.FailResult("获取实时统计失败"));
+            throw;
         }
     }
 

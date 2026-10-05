@@ -1,63 +1,4 @@
 {
-  "company": {
-    "fullName": "海隆工程咨询有限公司",
-    "shortName": "海隆咨询",
-    "englishName": "Hailong Engineering Consulting Co., Ltd.",
-    "slogan": "海纳百川，才望兼隆",
-    "description": "致力于成为工程建设的专业支撑者、行业发展的可信力量，以科学、规范、公正的咨询服务助力政府与企业项目高质量实施。"
-  },
-  "contact": {
-    "phone": "0371-55894666",
-    "email": "037155894666@henanhailong.com",
-    "address": {
-      "province": "河南省",
-      "city": "郑州市",
-      "district": "郑东新区",
-      "street": "金水东路85号",
-      "building": "雅宝·东方国际广场2号楼13层",
-      "fullAddress": "郑州市郑东新区金水东路85号雅宝·东方国际广场2号楼13层"
-    },
-    "workingHours": {
-      "weekdays": "工作日 9:00-17:20",
-      "weekend": "休息"
-    },
-    "map": {
-      "apiKey": "21c2669531206e2b32dd6a3b1020c581",
-      "longitude": 113.773301,
-      "latitude": 34.768953,
-      "zoom": 16
-    }
-  },
-  "transportation": {
-    "metro": {
-      "enabled": true,
-      "lines": [
-        {
-          "line": "地铁5号线",
-          "station": "金水东路站",
-          "exit": "A口",
-          "walkingDistance": "约100米"
-        }
-      ]
-    },
-    "bus": {
-      "enabled": true,
-      "routes": ["115路", "326路", "G29路", "S606路", "园博园市区6号线"],
-      "station": "金水东路中兴路站",
-      "description": "金水东路中兴路站下车即到"
-    },
-    "driving": {
-      "enabled": true,
-      "navigation": "海隆工程咨询有限公司",
-      "parking": "外来车辆可停负二层"
-    },
-    "landmarks": [
-      "郑州东站",
-      "郑东万象城",
-      "绿地360广场",
-      "弘坊"
-    ]
-  },
   "navigation": {
     "header": [
       {
@@ -66,39 +7,47 @@
         "order": 1
       },
       {
-        "name": "关于海隆",
-        "path": "/about",
+        "name": "公告信息",
+        "path": "/announcements",
         "order": 2
       },
       {
-        "name": "公告信息",
-        "path": "/announcements",
+        "name": "关于海隆",
+        "path": "/about",
         "order": 3
       },
       {
-        "name": "新闻中心",
-        "path": "/news",
-        "order": 4
+        "name": "资讯中心",
+        "order": 4,
+        "children": [
+          {
+            "name": "新闻中心",
+            "path": "/news"
+          },
+          {
+            "name": "政策法规",
+            "path": "/policies"
+          }
+        ]
       },
       {
-        "name": "政策法规",
-        "path": "/policies",
-        "order": 5
-      },
-      {
-        "name": "实用工具",
-        "path": "/tools",
-        "order": 6
-      },
-      {
-        "name": "专家库",
-        "path": "/expert-database",
-        "order": 7
+        "name": "服务入口",
+        "order": 5,
+        "children": [
+          {
+            "name": "实用工具",
+            "path": "/tools"
+          },
+          {
+            "name": "专家库",
+            "path": "/expert-database"
+          }
+        ]
       },
       {
         "name": "联系我们",
         "path": "/contact",
-        "order": 8
+        "order": 6
       }
     ],
     "footer": {
@@ -108,15 +57,15 @@
           "links": [
             {
               "name": "政府采购代理",
-              "path": "#"
+              "path": "/about?tab=business"
             },
             {
               "name": "工程招标代理",
-              "path": "#"
+              "path": "/about?tab=business"
             },
             {
               "name": "造价咨询",
-              "path": "#"
+              "path": "/about?tab=business"
             }
           ]
         },
@@ -143,21 +92,7 @@
         },
         {
           "title": "联系我们",
-          "type": "contact",
-          "items": [
-            {
-              "label": "电话",
-              "value": "0371-55894666"
-            },
-            {
-              "label": "邮箱",
-              "value": "037155894666@henanhailong.com"
-            },
-            {
-              "label": "地址",
-              "value": "郑州市郑东新区金水东路85号雅宝·东方国际广场2号楼13层"
-            }
-          ]
+          "type": "contact"
         }
       ],
       "icp": "",
@@ -168,28 +103,28 @@
     {
       "name": "hero",
       "component": "HeroBanner",
-      "title": "英雄区",
+      "title": "海隆工程咨询",
       "order": 1,
-      "enabled": true
-    },
-    {
-      "name": "intro",
-      "component": "CompanyIntro",
-      "title": "企业简介",
-      "order": 2,
       "enabled": true
     },
     {
       "name": "announcement",
       "component": "AnnouncementList",
       "title": "公告信息",
-      "order": 3,
+      "order": 2,
       "enabled": true
     },
     {
       "name": "business",
       "component": "BusinessScope",
       "title": "业务范围",
+      "order": 3,
+      "enabled": true
+    },
+    {
+      "name": "intro",
+      "component": "CompanyIntro",
+      "title": "企业简介",
       "order": 4,
       "enabled": true
     },
@@ -220,24 +155,6 @@
       "title": "联系我们",
       "order": 8,
       "enabled": true
-    }
-  ],
-  "faqs": [
-    {
-      "question": "如何联系海隆咨询？",
-      "answer": "您可以通过电话、邮箱或在线留言的方式联系我们,我们会在工作时间内尽快回复您。"
-    },
-    {
-      "question": "海隆咨询的主要业务范围是什么？",
-      "answer": "我们主要提供政府采购代理、工程招标代理、造价咨询、工程监理等专业服务。"
-    },
-    {
-      "question": "如何获取项目报价？",
-      "answer": "请通过电话或邮箱联系我们，提供项目基本信息，我们会根据具体情况为您提供专业报价。"
-    },
-    {
-      "question": "海隆咨询的服务区域有哪些？",
-      "answer": "我们主要服务于河南省及周边地区，具体服务范围可通过电话咨询了解详情。"
     }
   ]
 }

@@ -36,7 +36,7 @@ public interface IAnnouncementRepository : IRepository<Announcement>
         int pageSize,
         string? procurementType = null,
         DateTime? startDate = null,
-        DateTime? endDate = null);
+        DateTime? endDate = null, bool includeDisabled = false, string? sortBy = null, string? sortOrder = null);
 
     /// <summary>
     /// 按区域层级统计符合筛选条件的公告数量

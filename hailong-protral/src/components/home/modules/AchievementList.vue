@@ -1,19 +1,18 @@
 <template>
-  <div class="py-24 bg-hailong-dark text-white">
+  <div v-if="loading || error || achievementsList.length" class="home-section">
     <div class="container-wide">
       <div class="text-center mb-16">
-        <h2 class="text-3xl md:text-4xl font-extrabold mb-4 font-tech tracking-tight">重要业绩展示</h2>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 font-tech tracking-tight">重要业绩展示</h2>
         <div class="w-12 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto rounded-full mt-3"></div>
       </div>
-      <div v-if="loading" class="text-center py-8 text-white/70">加载中...</div>
-      <div v-else-if="achievementsList.length === 0" class="text-center py-8 text-white/70">暂无业绩数据</div>
+      <AsyncState v-if="loading || error" :loading="loading" :error="error" @retry="loadAchievements" />
       <div v-else class="relative overflow-hidden">
         <div class="flex gap-6 animate-scroll">
-          <div v-for="achievement in [...achievementsList, ...achievementsList]"
-            :key="achievement.id + Math.random()"
-            @click="$emit('achievement-click', achievement.id)"
-            class="flex-shrink-0 w-80 bg-white/10 backdrop-blur-lg rounded-2xl overflow-hidden hover:bg-white/20 transition-all cursor-pointer group">
-            <div class="h-48 overflow-hidden bg-gray-700">
+          <div v-for="(achievement, index) in [...achievementsList, ...achievementsList]"
+            :key="`${achievement.id}-${index}`"
+            @click="$emit('achievement-click', achievement.id)" @keydown.enter="$emit('achievement-click', achievement.id)" tabindex="0" role="link"
+            class="flex-shrink-0 w-80 max-w-full bg-white border border-slate-200/80 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
+            <div class="h-48 overflow-hidden bg-slate-100">
               <img v-if="achievement.imageUrls && achievement.imageUrls.length > 0" :src="achievement.imageUrls[0]" :alt="achievement.projectName"
                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               <div v-else class="w-full h-full flex items-center justify-center text-gray-500">
@@ -26,15 +25,15 @@
               <div v-if="achievement.projectType" class="flex items-center justify-between mb-3">
                 <span :class="[
                   'px-3 py-1 rounded-full text-xs font-semibold',
-                  achievement.projectType === '工程' ? 'bg-hailong-primary/20 text-hailong-primary' :
-                    achievement.projectType === '服务' ? 'bg-hailong-secondary/20 text-hailong-secondary' :
-                      'bg-hailong-cyan/20 text-hailong-cyan'
+                  achievement.projectType === '工程' ? 'bg-blue-50 text-blue-700' :
+                    achievement.projectType === '服务' ? 'bg-violet-50 text-violet-700' :
+                      'bg-cyan-50 text-cyan-700'
                 ]">
                   {{ achievement.projectType }}
                 </span>
               </div>
               <h3 class="text-lg font-bold mb-3 line-clamp-2">{{ achievement.projectName }}</h3>
-              <div v-if="achievement.projectAmount" class="text-2xl font-bold text-hailong-secondary">
+              <div v-if="achievement.projectAmount" class="text-2xl font-bold text-hailong-primary">
                 {{ formatAmount(achievement.projectAmount) }}
               </div>
             </div>
@@ -46,27 +45,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
+import { useResource } from '@/composables/useResource'
+import AsyncState from '@/components/common/AsyncState.vue'
 import { getMajorAchievements } from '@/api/config'
 
 defineEmits(['achievement-click'])
 
-const loading = ref(false)
-const achievementsList = ref([])
-
-const loadAchievements = async () => {
-  loading.value = true
-  try {
-    const response = await getMajorAchievements()
-    if (response.success && response.data) {
-      achievementsList.value = response.data
-    }
-  } catch (error) {
-    console.error('加载重要业绩失败:', error)
-  } finally {
-    loading.value = false
-  }
-}
+const { data: achievementsList, loading, error, execute } = useResource([])
+const loadAchievements = () => execute(async signal => {
+  const response = await getMajorAchievements({ signal })
+  if (!response.success || !response.data) throw new Error('内容加载失败，请重试')
+  return response.data.filter(item => item.status !== false)
+})
 
 const formatAmount = (amount) => {
   if (!amount) return '0'
@@ -103,7 +94,8 @@ onMounted(() => {
   animation: scroll 30s linear infinite;
 }
 
-.animate-scroll:hover {
+.animate-scroll:hover, .animate-scroll:focus-within {
   animation-play-state: paused;
 }
+@media (prefers-reduced-motion: reduce) { .animate-scroll { animation: none; flex-wrap: wrap; } }
 </style>

@@ -23,7 +23,7 @@
             </div>
             <div class="stat-content">
               <div class="stat-value">{{ overview.todayAdded || 0 }}</div>
-              <div class="stat-label">今日新增</div>
+              <div class="stat-label">今日入库</div>
             </div>
           </div>
         </el-card>
@@ -62,7 +62,7 @@
         <el-card class="chart-card">
           <template #header>
             <div class="card-header">
-              <span>发布趋势（最近30天）</span>
+              <span>发布趋势（最近30天 · 按启用记录的发布时间）</span>
             </div>
           </template>
           <div ref="trendChartRef" style="height: 350px;"></div>
@@ -121,11 +121,20 @@
 </template>
 
 <script setup>
+import { useLatestRequest } from '@/composables/useLatestRequest'
+const loadOverviewRequest = useLatestRequest()
+const loadTrendDataRequest = useLatestRequest()
+const loadTypeDistributionRequest = useLatestRequest()
+const loadAuthorStatisticsRequest = useLatestRequest()
+const loadHotInfoRequest = useLatestRequest()
+
+import { notifyError } from '@/utils/errors'
+import { localDate } from '@/utils/form'
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { DocumentCopy, Calendar, View, TrendCharts } from '@element-plus/icons-vue'
 import { statisticsApi } from '@/api'
-import * as echarts from 'echarts'
+import * as echarts from '@/utils/echarts'
 import { getHorizontalBarChartOption, getDoughnutChartOption } from '@/utils/chartOptions'
 
 // 概览数据
@@ -184,9 +193,9 @@ const getTypeColor = (type) => {
 const formatDateTime = (dateStr) => {
   if (!dateStr) return '-'
   const date = new Date(dateStr)
-  return date.toLocaleString('zh-CN', { 
-    year: 'numeric', 
-    month: '2-digit', 
+  return date.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit'
@@ -197,14 +206,17 @@ const formatDateTime = (dateStr) => {
  * 加载概览数据
  */
 const loadOverview = async () => {
+  const requestId = loadOverviewRequest.begin()
   try {
     const res = await statisticsApi.infoPublication.getOverview()
+    if (!loadOverviewRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       Object.assign(overview, res.data)
     }
   } catch (error) {
-    console.error('加载概览数据失败:', error)
-    ElMessage.error('加载概览数据失败')
+    if (!loadOverviewRequest.isCurrent(requestId)) return
+
+    notifyError(error, '加载概览数据失败')
   }
 }
 
@@ -212,23 +224,26 @@ const loadOverview = async () => {
  * 加载发布趋势
  */
 const loadTrendData = async () => {
+  const requestId = loadTrendDataRequest.begin()
   try {
     const endDate = new Date()
     const startDate = new Date()
     startDate.setDate(startDate.getDate() - 30)
-    
+
     const params = {
-      startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0],
+      startDate: localDate(startDate),
+      endDate: localDate(endDate),
       groupBy: 'day'
     }
     const res = await statisticsApi.infoPublication.getTrend(params)
+    if (!loadTrendDataRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       renderTrendChart(res.data)
     }
   } catch (error) {
-    console.error('加载趋势数据失败:', error)
-    ElMessage.error('加载趋势数据失败')
+    if (!loadTrendDataRequest.isCurrent(requestId)) return
+
+    notifyError(error, '加载趋势数据失败')
   }
 }
 
@@ -239,11 +254,11 @@ const renderTrendChart = (data) => {
   if (!trendChart) {
     trendChart = echarts.init(trendChartRef.value)
   }
-  
+
   const dates = data.map(item => item.date)
   const newsData = data.map(item => item.newsCenterCount)
   const policyData = data.map(item => item.policyRegulationCount)
-  
+
   const option = {
     tooltip: {
       trigger: 'axis',
@@ -298,7 +313,7 @@ const renderTrendChart = (data) => {
       }
     ]
   }
-  
+
   trendChart.setOption(option)
 }
 
@@ -306,8 +321,10 @@ const renderTrendChart = (data) => {
  * 加载类型分布
  */
 const loadTypeDistribution = async () => {
+  const requestId = loadTypeDistributionRequest.begin()
   try {
     const res = await statisticsApi.infoPublication.getTypeDistribution()
+    if (!loadTypeDistributionRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       const typeData = res.data.map(item => ({
         name: item.typeName || getTypeName(item.type),
@@ -316,8 +333,9 @@ const loadTypeDistribution = async () => {
       renderTypeChart(typeData)
     }
   } catch (error) {
-    console.error('加载类型分布失败:', error)
-    ElMessage.error('加载类型分布失败')
+    if (!loadTypeDistributionRequest.isCurrent(requestId)) return
+
+    notifyError(error, '加载类型分布失败')
   }
 }
 
@@ -328,12 +346,12 @@ const renderTypeChart = (data) => {
   if (!typeChart) {
     typeChart = echarts.init(typeChartRef.value)
   }
-  
+
   const option = getDoughnutChartOption(data, {
     radius: ['40%', '70%'],
     center: ['50%', '50%']
   })
-  
+
   typeChart.setOption(option)
 }
 
@@ -341,14 +359,17 @@ const renderTypeChart = (data) => {
  * 加载作者统计
  */
 const loadAuthorStatistics = async () => {
+  const requestId = loadAuthorStatisticsRequest.begin()
   try {
     const res = await statisticsApi.infoPublication.getAuthorStatistics()
+    if (!loadAuthorStatisticsRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       renderAuthorChart(res.data)
     }
   } catch (error) {
-    console.error('加载作者统计失败:', error)
-    ElMessage.error('加载作者统计失败')
+    if (!loadAuthorStatisticsRequest.isCurrent(requestId)) return
+
+    notifyError(error, '加载作者统计失败')
   }
 }
 
@@ -359,14 +380,14 @@ const renderAuthorChart = (data) => {
   if (!authorChart) {
     authorChart = echarts.init(authorChartRef.value)
   }
-  
+
   // 取前10名
   const top10 = data.slice(0, 10)
   const chartData = top10.map(item => ({
     name: item.author || '未知作者',
     value: item.publishCount
   }))
-  
+
   const option = getHorizontalBarChartOption(chartData, {
     color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
       { offset: 0, color: '#667eea' },
@@ -374,7 +395,7 @@ const renderAuthorChart = (data) => {
     ]),
     showLabel: true
   })
-  
+
   authorChart.setOption(option)
 }
 
@@ -382,20 +403,25 @@ const renderAuthorChart = (data) => {
  * 加载热门信息
  */
 const loadHotInfo = async () => {
+  const requestId = loadHotInfoRequest.begin()
   loading.value = true
   try {
     const params = {
       limit: 10
     }
     const res = await statisticsApi.infoPublication.getHotInfo(params)
+    if (!loadHotInfoRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       hotInfo.value = res.data
     }
   } catch (error) {
-    console.error('加载热门信息失败:', error)
-    ElMessage.error('加载热门信息失败')
+    if (!loadHotInfoRequest.isCurrent(requestId)) return
+
+    notifyError(error, '加载热门信息失败')
   } finally {
-    loading.value = false
+    if (loadHotInfoRequest.isCurrent(requestId)) {
+      loading.value = false
+    }
   }
 }
 

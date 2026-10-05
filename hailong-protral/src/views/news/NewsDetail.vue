@@ -1,27 +1,15 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <Header />
+  <div class="min-h-screen bg-gray-50 pt-20">
     
-    <!-- 面包屑导航 -->
-    <div class="bg-white border-b">
-      <div class="container-wide py-4">
-        <div class="flex items-center text-sm text-gray-600">
-          <router-link to="/" class="hover:text-hailong-primary transition-colors">首页</router-link>
-          <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-          <router-link to="/news" class="hover:text-hailong-primary transition-colors">新闻中心</router-link>
-          <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-          <span class="text-gray-900">新闻详情</span>
-        </div>
-      </div>
-    </div>
-
     <!-- 内容区域 -->
-    <div class="py-12 bg-white">
+    <div class="pt-8 pb-12 bg-white">
       <div class="container-wide">
+        <DetailBreadcrumb
+          class="max-w-5xl mx-auto mb-4"
+          section-label="新闻中心"
+          section-to="/news"
+          current-label="新闻详情"
+        />
         <div v-if="loading" class="text-center py-20">
           <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-hailong-primary border-t-transparent"></div>
           <p class="mt-4 text-gray-500">加载中...</p>
@@ -32,6 +20,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <p class="text-gray-500 mb-4">{{ error }}</p>
+          <button @click="loadItemDetail" class="mt-4 rounded-lg bg-hailong-primary px-5 py-2 text-white">重新加载</button>
           <router-link to="/news" class="text-hailong-primary hover:underline">返回列表</router-link>
         </div>
 
@@ -117,7 +106,7 @@
 
           <!-- 文章内容 -->
           <div class="bg-white rounded-xl shadow-sm p-8 mb-6">
-            <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed" v-html="item.content"></div>
+            <RichTextContent class="prose prose-lg max-w-none text-gray-700 leading-relaxed" :content="item.content" />
           </div>
 
           <!-- 标签 -->
@@ -135,59 +124,7 @@
           </div>
 
           <!-- 附件列表 -->
-          <div v-if="item.attachments && item.attachments.length > 0" class="bg-white rounded-xl shadow-sm p-8 mb-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200 flex items-center gap-2">
-              <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-              </svg>
-              附件列表
-            </h2>
-            <div class="space-y-3">
-              <div
-                v-for="attachment in item.attachments"
-                :key="attachment.id"
-                class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group"
-              >
-                <div class="flex items-center gap-3 flex-1">
-                  <div class="w-10 h-10 bg-hailong-primary/10 rounded-lg flex items-center justify-center">
-                    <svg class="w-5 h-5 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div class="flex-1">
-                    <div class="text-gray-900 font-medium group-hover:text-hailong-primary transition-colors">
-                      {{ attachment.fileName }}
-                    </div>
-                    <div class="text-sm text-gray-500">
-                      {{ formatFileSize(attachment.fileSize) }}
-                    </div>
-                  </div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button
-                    @click="handlePreview(attachment)"
-                    class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium flex items-center gap-2"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    预览
-                  </button>
-                  <a
-                    :href="attachment.fileUrl"
-                    download
-                    class="px-4 py-2 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white rounded-lg hover:shadow-lg transition-all font-medium flex items-center gap-2"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    下载
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
+          <AttachmentList :attachments="item.attachments" @preview="handlePreview" />
 
           <!-- 相关新闻 -->
           <div v-if="relatedItems.length > 0" class="bg-white rounded-xl shadow-sm p-8 mb-6">
@@ -216,10 +153,10 @@
           </div>
 
           <!-- 操作按钮 -->
-          <div class="flex items-center justify-between">
+          <div class="no-print flex flex-wrap items-center justify-between gap-3">
             <router-link
               to="/news"
-              class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium flex items-center gap-2"
+              class="whitespace-nowrap px-4 sm:px-6 py-3 portal-button portal-button--secondary gap-2"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -230,7 +167,7 @@
             <div class="flex items-center gap-3">
               <button
                 @click="handleShare"
-                class="px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium flex items-center gap-2"
+                class="whitespace-nowrap px-4 sm:px-6 py-3 portal-button portal-button--secondary gap-2"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -240,7 +177,7 @@
 
               <button
                 @click="handlePrint"
-                class="px-6 py-3 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white rounded-lg hover:shadow-lg transition-all font-medium flex items-center gap-2"
+                class="portal-button portal-button--primary no-print whitespace-nowrap px-4 sm:px-6 py-3 flex items-center gap-2"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -259,25 +196,24 @@
       :attachment="currentAttachment"
       @close="previewVisible = false"
     />
-
-    <Footer />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import DetailBreadcrumb from '@/components/common/DetailBreadcrumb.vue'
+import AttachmentList from "@/components/common/AttachmentList.vue"
+import { getCategoryStyle as getTypeStyle } from "@/utils/categories"
+import { useDetail } from "@/composables/useDetail"
+import { usePageMeta } from "@/composables/usePageMeta"
+import RichTextContent from "@/components/common/RichTextContent.vue"
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { getInfoPublicationDetail } from '@/api/infoPublication'
-import Header from '@/components/Header.vue'
-import Footer from '@/components/Footer.vue'
 import AttachmentPreview from '@/components/AttachmentPreview.vue'
 
 const route = useRoute()
 
 // 新闻数据
-const item = ref(null)
-const loading = ref(true)
-const error = ref(null)
 const relatedItems = ref([])
 
 // 附件预览
@@ -304,20 +240,7 @@ const coverImageUrl = computed(() => {
 })
 
 // 获取类型样式
-const getTypeStyle = (type) => {
-  switch (type) {
-    case '企业动态':
-      return 'bg-blue-100 text-blue-700 border border-blue-200'
-    case '通知公告':
-      return 'bg-green-100 text-green-700 border border-green-200'
-    case '人事任免':
-      return 'bg-purple-100 text-purple-700 border border-purple-200'
-    case '制度文件':
-      return 'bg-orange-100 text-orange-700 border border-orange-200'
-    default:
-      return 'bg-gray-100 text-gray-800 border border-gray-200'
-  }
-}
+
 
 // 分享
 const handleShare = () => {
@@ -335,14 +258,6 @@ const handleShare = () => {
   }
 }
 
-// 格式化文件大小
-const formatFileSize = (bytes) => {
-  if (!bytes || bytes === 0) return '0 B'
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
-}
 
 // 预览附件
 const handlePreview = (attachment) => {
@@ -356,57 +271,26 @@ const handlePrint = () => {
 }
 
 // 加载新闻详情
-const loadItemDetail = async () => {
-  loading.value = true
-  error.value = null
-  
-  try {
-    const id = route.params.id
-    
-    if (!id) {
-      error.value = '新闻ID不存在'
-      return
-    }
-    
-    // 调用API获取新闻详情
-    const response = await getInfoPublicationDetail(id)
-    
-    if (response.success && response.data) {
-      // 映射后端字段到前端显示
-      item.value = {
-        id: response.data.id,
-        title: response.data.title,
-        type: response.data.category || '企业动态', // 使用category作为type
-        summary: response.data.summary,
-        author: response.data.author,
-        publishDate: formatDate(response.data.publishTime),
-        views: response.data.viewCount || 0,
-        isTop: response.data.isTop || false,
-        coverImage: response.data.coverImage,
-        content: response.data.content || '',
-        attachments: response.data.attachments || [],
+const { data: item, loading, error, reload: loadItemDetail } = useDetail(
+  () => route.params.id, getInfoPublicationDetail, value => {
+  if (value.type && value.type !== 'COMPANY_NEWS') throw new Error('该内容不属于当前栏目')
+  return {
+        id: value.id,
+        title: value.title,
+        type: value.category || '公司新闻', // 使用category作为type
+        summary: value.summary,
+        author: value.author,
+        publishDate: formatDate(value.publishTime),
+        views: value.viewCount || 0,
+        isTop: value.isTop || false,
+        coverImage: value.coverImage,
+        content: value.content || '',
+        attachments: value.attachments || [],
         tags: [] // 后端暂无tags字段，可以后续扩展
       }
-      
-      // 相关新闻（可以后续实现）
-      relatedItems.value = []
-    } else {
-      error.value = response.message || '获取新闻详情失败'
-      item.value = null
-    }
-  } catch (err) {
-    console.error('加载新闻详情失败:', err)
-    error.value = err.message || '加载新闻详情失败，请稍后重试'
-    item.value = null
-  } finally {
-    loading.value = false
-  }
-}
-
-// 组件挂载时加载数据
-onMounted(() => {
-  loadItemDetail()
 })
+usePageMeta(() => ({ title: item.value?.title || item.value?.name, description: item.value?.summary || item.value?.description, unavailable: Boolean(error.value) }))
+watch(() => route.params.id, () => { previewVisible.value = false; currentAttachment.value = {} })
 </script>
 
 <style scoped>
@@ -415,19 +299,6 @@ onMounted(() => {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.prose h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-}
-
-.prose p {
-  margin-bottom: 1rem;
-  line-height: 1.75;
 }
 
 @media print {

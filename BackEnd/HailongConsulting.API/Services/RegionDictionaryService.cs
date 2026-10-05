@@ -206,11 +206,18 @@ public class RegionDictionaryService : IRegionDictionaryService
             }
         }
 
-        var region = _mapper.Map<RegionDictionary>(dto);
-        region.CreatedAt = DateTime.Now;
+        // 行政编码有唯一索引；重新添加已删除编码时恢复该记录，避免数据库重复键错误。
+        var region = await _regionRepository.FirstOrDefaultAsync(r => r.RegionCode == dto.RegionCode && r.IsDeleted == 1);
+        if (region == null) {
+            region = _mapper.Map<RegionDictionary>(dto);
+            region.CreatedAt = DateTime.Now;
+            await _regionRepository.AddAsync(region);
+        } else {
+            _mapper.Map(dto, region);
+            region.IsDeleted = 0;
+            _regionRepository.Update(region);
+        }
         region.UpdatedAt = DateTime.Now;
-
-        await _regionRepository.AddAsync(region);
         await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("创建区域成功: {RegionCode} - {RegionName}", region.RegionCode, region.RegionName);
@@ -267,6 +274,10 @@ public class RegionDictionaryService : IRegionDictionaryService
         {
             throw new InvalidOperationException("该区域下存在子区域，无法删除");
         }
+
+        if (await _unitOfWork.Announcements.AnyAsync(a => a.IsDeleted == 0 &&
+            (a.Province == region.RegionCode || a.City == region.RegionCode || a.District == region.RegionCode)))
+            throw new InvalidOperationException("该地区被公告使用，请先调整公告地区，不能直接删除");
 
         // 软删除
         region.IsDeleted = 1;

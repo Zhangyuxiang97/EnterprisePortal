@@ -1,10 +1,14 @@
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
 namespace HailongConsulting.API.Models.DTOs;
 
 /// <summary>
 /// 统一公告DTO（政府采购 + 建设工程）
 /// </summary>
-public class AnnouncementDto
+public class AnnouncementListDto
 {
+    public string Version { get; set; } = string.Empty;
     /// <summary>
     /// 公告ID
     /// </summary>
@@ -60,6 +64,9 @@ public class AnnouncementDto
     /// </summary>
     public decimal? BudgetAmount { get; set; }
 
+    /// <summary>中标/成交金额（万元）</summary>
+    public decimal? AwardAmount { get; set; }
+
     /// <summary>
     /// 截止时间
     /// </summary>
@@ -86,11 +93,6 @@ public class AnnouncementDto
     public string? ProjectRegion { get; set; }
 
     /// <summary>
-    /// 公告内容（富文本）
-    /// </summary>
-    public string Content { get; set; } = string.Empty;
-
-    /// <summary>
     /// 发布人
     /// </summary>
     public string? Publisher { get; set; }
@@ -109,11 +111,6 @@ public class AnnouncementDto
     /// 附件ID列表
     /// </summary>
     public List<int>? AttachmentIds { get; set; }
-
-    /// <summary>
-    /// 附件列表
-    /// </summary>
-    public List<AttachmentDto>? Attachments { get; set; }
 
     /// <summary>
     /// 是否置顶
@@ -136,28 +133,47 @@ public class AnnouncementDto
     public DateTime UpdatedAt { get; set; }
 }
 
+public class AnnouncementDto : AnnouncementListDto
+{
+    public string Content { get; set; } = string.Empty;
+    public List<AttachmentDto>? Attachments { get; set; }
+}
+
+
 /// <summary>
 /// 公告创建DTO
 /// </summary>
 public class CreateAnnouncementDto
 {
+    [Required, MaxLength(255)]
     public string Title { get; set; } = string.Empty;
+    [Required, RegularExpression("^(GOV_PROCUREMENT|CONSTRUCTION)$")]
     public string BusinessType { get; set; } = string.Empty;
+    [Required, RegularExpression("^(bidding|correction|result)$")]
     public string NoticeType { get; set; } = string.Empty;
     public string? ProcurementType { get; set; }
+    [MaxLength(255)]
     public string? Bidder { get; set; }
+    [MaxLength(255)]
     public string? Winner { get; set; }
+    [Range(typeof(decimal), "0", "9999999999999.99")]
     public decimal? BudgetAmount { get; set; }
+    [Range(typeof(decimal), "0", "9999999999999.99")]
+    public decimal? AwardAmount { get; set; }
     public DateTime? Deadline { get; set; }
     public string? Province { get; set; }
     public string? City { get; set; }
     public string? District { get; set; }
+    [MaxLength(200)]
     public string? ProjectRegion { get; set; }
+    [Required]
     public string Content { get; set; } = string.Empty;
+    [MaxLength(50)]
     public string? Publisher { get; set; }
     public DateTime? PublishTime { get; set; }
     public List<int>? AttachmentIds { get; set; }
     public bool IsTop { get; set; }
+    [Range(0, 1)]
     public int Status { get; set; } = 1;
 }
 
@@ -166,30 +182,74 @@ public class CreateAnnouncementDto
 /// </summary>
 public class UpdateAnnouncementDto
 {
+    [Required(ErrorMessage = "缺少内容版本，请重新打开编辑页面")]
+    [MaxLength(32)]
+    public string Version { get; set; } = string.Empty;
+    [MaxLength(255), RegularExpression(@".*\S.*", ErrorMessage = "标题不能为空")]
     public string? Title { get; set; }
     public string? NoticeType { get; set; }
     public string? ProcurementType { get; set; }
-    public string? Bidder { get; set; }
-    public string? Winner { get; set; }
-    public decimal? BudgetAmount { get; set; }
-    public DateTime? Deadline { get; set; }
-    public string? Province { get; set; }
-    public string? City { get; set; }
-    public string? District { get; set; }
+    private string? _bidder;
+    [MaxLength(255)]
+    public string? Bidder { get => _bidder; set { _bidder = value; BidderSpecified = true; } }
+    [JsonIgnore] public bool BidderSpecified { get; private set; }
+    private string? _winner;
+    [MaxLength(255)]
+    public string? Winner { get => _winner; set { _winner = value; WinnerSpecified = true; } }
+    [JsonIgnore] public bool WinnerSpecified { get; private set; }
+    private decimal? _budgetAmount;
+    private decimal? _awardAmount;
+    [Range(typeof(decimal), "0", "9999999999999.99")]
+    public decimal? BudgetAmount
+    {
+        get => _budgetAmount;
+        set { _budgetAmount = value; BudgetAmountSpecified = true; }
+    }
+    [Range(typeof(decimal), "0", "9999999999999.99")]
+    public decimal? AwardAmount
+    {
+        get => _awardAmount;
+        set { _awardAmount = value; AwardAmountSpecified = true; }
+    }
+    [JsonIgnore]
+    public bool BudgetAmountSpecified { get; private set; }
+    [JsonIgnore]
+    public bool AwardAmountSpecified { get; private set; }
+    private DateTime? _deadline;
+    public DateTime? Deadline { get => _deadline; set { _deadline = value; DeadlineSpecified = true; } }
+    [JsonIgnore] public bool DeadlineSpecified { get; private set; }
+    private string? _province;
+    [MaxLength(50)]
+    public string? Province { get => _province; set { _province = value; ProvinceSpecified = true; } }
+    [JsonIgnore] public bool ProvinceSpecified { get; private set; }
+    private string? _city;
+    [MaxLength(50)]
+    public string? City { get => _city; set { _city = value; CitySpecified = true; } }
+    [JsonIgnore] public bool CitySpecified { get; private set; }
+    private string? _district;
+    [MaxLength(50)]
+    public string? District { get => _district; set { _district = value; DistrictSpecified = true; } }
+    [JsonIgnore] public bool DistrictSpecified { get; private set; }
+    [MaxLength(200)]
     public string? ProjectRegion { get; set; }
     public string? Content { get; set; }
+    [MaxLength(50)]
     public string? Publisher { get; set; }
     public DateTime? PublishTime { get; set; }
-    public List<int>? AttachmentIds { get; set; }
+    private List<int>? _attachmentIds;
+    public List<int>? AttachmentIds { get => _attachmentIds; set { _attachmentIds = value; AttachmentIdsSpecified = true; } }
+    [JsonIgnore] public bool AttachmentIdsSpecified { get; private set; }
     public bool? IsTop { get; set; }
+    [Range(0, 1)]
     public int? Status { get; set; }
 }
 
 /// <summary>
 /// 公告查询DTO
 /// </summary>
-public class AnnouncementQueryDto
+public class AnnouncementQueryDto : IValidatableObject
 {
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) => HailongConsulting.API.Common.PaginationValidation.Validate(PageNumber, PageSize, StartDate, EndDate);
     public string? BusinessType { get; set; }
     public string? NoticeType { get; set; }
     public string? ProcurementType { get; set; }
@@ -199,7 +259,9 @@ public class AnnouncementQueryDto
     public string? Keyword { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
+    [Range(1, int.MaxValue)]
     public int PageNumber { get; set; } = 1;
+    [Range(1, 100)]
     public int PageSize { get; set; } = 10;
     public string? SortBy { get; set; } = "PublishTime";
     public string? SortOrder { get; set; } = "desc";

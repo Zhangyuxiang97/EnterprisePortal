@@ -1,8 +1,8 @@
 <template>
-  <div v-if="visible" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" @click="handleClose">
+  <dialog ref="dialog" aria-label="附件预览" class="fixed inset-0 m-0 h-full max-h-none w-full max-w-none items-center justify-center bg-transparent p-4" @click="handleClose" @cancel.prevent="handleClose" @close="handleClose">
     <div class="relative w-full max-w-6xl max-h-[90vh] bg-white rounded-xl shadow-2xl overflow-hidden" @click.stop>
       <!-- 头部 -->
-      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-hailong-primary/5 to-hailong-secondary/5">
+      <div class="flex flex-wrap gap-3 items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-hailong-primary/5 to-hailong-secondary/5">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 bg-hailong-primary/10 rounded-lg flex items-center justify-center">
             <svg class="w-5 h-5 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -16,7 +16,7 @@
           </div>
         </div>
         <button
-          @click="handleClose"
+          @click="handleClose" aria-label="关闭附件预览"
           class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
         >
           <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -34,7 +34,7 @@
 
         <!-- PDF预览 -->
         <div v-else-if="isPdf" class="w-full h-[70vh]">
-          <iframe :src="attachment.fileUrl" class="w-full h-full border-0 rounded-lg"></iframe>
+          <iframe :title="attachment.fileName" :src="attachment.fileUrl" class="w-full h-full border-0 rounded-lg"></iframe>
         </div>
 
         <!-- 文本文件预览 -->
@@ -55,7 +55,7 @@
             :href="attachment.fileUrl"
             target="_blank"
             download
-            class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white rounded-lg hover:shadow-lg transition-all font-medium"
+            class="portal-button portal-button--primary inline-flex items-center gap-2 px-6 py-3"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -66,7 +66,7 @@
       </div>
 
       <!-- 底部操作栏 -->
-      <div class="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50">
+      <div class="flex flex-wrap gap-3 items-center justify-between px-4 sm:px-6 py-4 border-t border-gray-200 bg-gray-50">
         <div class="text-sm text-gray-500">
           <span class="font-medium">文件类型:</span> {{ fileExtension.toUpperCase() }}
         </div>
@@ -74,7 +74,7 @@
           <a
             :href="attachment.fileUrl"
             target="_blank"
-            class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium flex items-center gap-2"
+            class="portal-button portal-button--secondary whitespace-nowrap px-4 py-2 gap-2"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -84,7 +84,7 @@
           <a
             :href="attachment.fileUrl"
             download
-            class="px-4 py-2 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white rounded-lg hover:shadow-lg transition-all font-medium flex items-center gap-2"
+            class="portal-button portal-button--primary whitespace-nowrap px-4 py-2 flex items-center gap-2"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -94,11 +94,12 @@
         </div>
       </div>
     </div>
-  </div>
+  </dialog>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { formatFileSize } from "@/utils/file"
+import { ref, computed, watch, nextTick } from 'vue'
 
 const props = defineProps({
   visible: {
@@ -114,6 +115,7 @@ const props = defineProps({
 const emit = defineEmits(['close'])
 
 const textContent = ref('')
+const dialog = ref(null)
 
 // 获取文件扩展名
 const fileExtension = computed(() => {
@@ -139,44 +141,38 @@ const isText = computed(() => {
   return textExts.includes(fileExtension.value)
 })
 
-// 格式化文件大小
-const formatFileSize = (bytes) => {
-  if (!bytes || bytes === 0) return '0 B'
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
-}
 
 // 关闭预览
 const handleClose = () => {
   emit('close')
 }
 
-// 加载文本内容
-const loadTextContent = async () => {
-  if (isText.value && props.visible) {
-    try {
-      const response = await fetch(props.attachment.fileUrl)
-      textContent.value = await response.text()
-    } catch (error) {
-      console.error('加载文本内容失败:', error)
-      textContent.value = '加载失败'
-    }
+// 切换附件和关闭时取消旧预览请求，HTTP 失败不会作为正文显示。
+watch([() => props.visible, () => props.attachment.fileUrl], async ([visible], _, onCleanup) => {
+  const controller = new AbortController()
+  onCleanup(() => controller.abort())
+  textContent.value = ''
+  await nextTick()
+  if (controller.signal.aborted) return
+  if (!visible) { dialog.value?.close(); return }
+  if (!dialog.value.open) dialog.value.showModal()
+  if (!isText.value) return
+  textContent.value = '正在加载…'
+  try {
+    const response = await fetch(props.attachment.fileUrl, { signal: controller.signal })
+    if (!response.ok) throw new Error('无法读取附件')
+    const content = await response.text()
+    if (!controller.signal.aborted) textContent.value = content
+  } catch {
+    if (!controller.signal.aborted) textContent.value = '加载失败，请关闭后重试，或下载文件查看。'
   }
-}
-
-// 监听visible变化
-watch(() => props.visible, (newVal) => {
-  if (newVal) {
-    loadTextContent()
-  } else {
-    textContent.value = ''
-  }
-})
+}, { immediate: true })
 </script>
 
 <style scoped>
+dialog[open] { display: flex; }
+dialog:not([open]) { display: none; }
+dialog::backdrop { background: rgb(0 0 0 / .5); backdrop-filter: blur(4px); }
 /* 滚动条样式 */
 .overflow-auto::-webkit-scrollbar {
   width: 8px;

@@ -4,10 +4,10 @@
       <template #header>
         <div class="card-header">
           <span>企业荣誉管理</span>
-          <el-button type="primary" icon="Plus" @click="handleAdd">新增荣誉</el-button>
+          <el-button v-if="canManage" type="primary" icon="Plus" @click="handleAdd">新增荣誉</el-button>
         </div>
       </template>
-      
+
       <!-- 搜索区域 -->
       <el-form :model="searchForm" inline class="search-form">
         <el-form-item label="荣誉级别">
@@ -23,14 +23,14 @@
           <el-button icon="Refresh" @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
-      
+
       <!-- 表格 -->
       <el-table :data="tableData" v-loading="loading" border stripe>
         <el-table-column type="index" label="序号" width="60" />
         <el-table-column prop="name" label="荣誉名称" min-width="200" />
         <el-table-column prop="honorLevel" label="荣誉级别" width="120" align="center">
           <template #default="{ row }">
-            <el-tag :type="getLevelType(row.honorLevel)">{{ row.honorLevel }}</el-tag>
+            <el-tag :type="getLevelType(row.honorLevel)">{{ row.honorLevel || '未注明' }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="awardOrganization" label="颁发机构" width="180" show-overflow-tooltip />
@@ -49,12 +49,12 @@
         </el-table-column>
         <el-table-column label="操作" width="150" fixed="right" align="center">
           <template #default="{ row }">
-            <el-button type="primary" size="small" link @click="handleEdit(row)">编辑</el-button>
-            <el-button type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
+            <el-button v-if="canManage" type="primary" size="small" link @click="handleEdit(row)">编辑</el-button>
+            <el-button v-if="canManage" type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
-      
+
       <!-- 分页 -->
       <el-pagination
         v-model:current-page="pagination.pageIndex"
@@ -62,35 +62,38 @@
         :total="pagination.total"
         :page-sizes="[10, 20, 50, 100]"
         layout="total, sizes, prev, pager, next, jumper"
-        @size-change="loadData"
+        @size-change="handleSearch"
         @current-change="loadData"
         style="margin-top: 20px; justify-content: flex-end;"
       />
     </el-card>
-    
+
     <!-- 新增/编辑对话框 -->
     <el-dialog
       v-model="dialogVisible"
+      class="editor-dialog"
+      :before-close="beforeEditorClose"
       :title="isEdit ? '编辑荣誉' : '新增荣誉'"
       width="700px"
       destroy-on-close
       :close-on-click-modal="false"
     >
-      <el-form 
-        ref="formRef" 
-        :model="formData" 
-        :rules="formRules" 
+      <p class="form-tip">获奖日期、荣誉级别无确切资料时可留空，保留证书原文即可。</p>
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
         label-width="100px"
       >
         <el-form-item label="荣誉名称" prop="name">
-          <el-input 
-            v-model="formData.name" 
-            placeholder="请输入荣誉名称（最多200个字符）" 
+          <el-input
+            v-model="formData.name"
+            placeholder="请输入荣誉名称（最多200个字符）"
             maxlength="200"
             show-word-limit
           />
         </el-form-item>
-        
+
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="荣誉级别" prop="honorLevel">
@@ -114,15 +117,15 @@
             </el-form-item>
           </el-col>
         </el-row>
-        
+
         <el-form-item label="颁发机构">
-          <el-input 
-            v-model="formData.awardOrganization" 
+          <el-input
+            v-model="formData.awardOrganization"
             placeholder="请输入颁发机构（最多200个字符）"
             maxlength="200"
           />
         </el-form-item>
-        
+
         <el-form-item label="荣誉图片">
           <FileUpload
             v-model="formData.imageId"
@@ -135,10 +138,10 @@
           />
           <div class="form-tip">建议上传荣誉证书或奖牌照片</div>
         </el-form-item>
-        
+
         <el-form-item label="荣誉描述">
-          <el-input 
-            v-model="formData.description" 
+          <el-input
+            v-model="formData.description"
             type="textarea"
             :rows="4"
             placeholder="请输入荣誉描述（最多500个字符）"
@@ -146,12 +149,12 @@
             show-word-limit
           />
         </el-form-item>
-        
+
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="排序">
-              <el-input-number 
-                v-model="formData.sortOrder" 
+              <el-input-number
+                v-model="formData.sortOrder"
                 :min="1"
                 :max="999"
                 placeholder="数字越小越靠前"
@@ -169,16 +172,19 @@
           </el-col>
         </el-row>
       </el-form>
-      
+
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSubmit" :loading="submitting">提交</el-button>
+        <el-button @click="handleCancel">取消</el-button>
+        <el-button type="primary" @click="handleSubmit" :loading="submitting" :disabled="activeUploads > 0">提交</el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
+import { notifyError } from '@/utils/errors'
+import { createLatestRequest } from '@/utils/latestRequest'
+import { useEditorForm } from '@/composables/useEditorForm'
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { systemConfigApi } from '@/api'
@@ -218,18 +224,14 @@ const formData = reactive({
   sortOrder: 1,
   status: true
 })
+const { markSaved, handleCancel, beforeEditorClose, canManage, activeUploads } = useEditorForm(formData, dialogVisible, submitting)
+
 
 // 表单验证规则
 const formRules = {
   name: [
     { required: true, message: '请输入荣誉名称', trigger: 'blur' },
     { max: 200, message: '荣誉名称长度不能超过200个字符', trigger: 'blur' }
-  ],
-  honorLevel: [
-    { required: true, message: '请选择荣誉级别', trigger: 'change' }
-  ],
-  awardDate: [
-    { required: true, message: '请选择获奖日期', trigger: 'change' }
   ]
 }
 
@@ -257,7 +259,9 @@ const formatDate = (dateStr) => {
 /**
  * 加载数据
  */
+const listRequests = createLatestRequest()
 const loadData = async () => {
+  const requestId = listRequests.begin()
   loading.value = true
   try {
     const params = {
@@ -265,26 +269,25 @@ const loadData = async () => {
       page: pagination.pageIndex,
       pageSize: pagination.pageSize
     }
-    
+
     const res = await systemConfigApi.honors.getList(params)
-    
+    if (!listRequests.isCurrent(requestId)) return
+
     if (res.success && res.data) {
-      // 后端返回的是数组，不是分页对象
-      if (Array.isArray(res.data)) {
-        tableData.value = res.data
-        pagination.total = res.data.length
-      } else {
-        tableData.value = res.data.items || res.data || []
-        pagination.total = res.data.totalCount || res.data.length || 0
-      }
+      const items = (res.data || []).filter(item => !params.honorLevel || item.honorLevel === params.honorLevel)
+      pagination.total = items.length
+      pagination.pageIndex = Math.min(pagination.pageIndex, Math.max(1, Math.ceil(items.length / pagination.pageSize)))
+      const start = (pagination.pageIndex - 1) * pagination.pageSize
+      tableData.value = items.slice(start, start + pagination.pageSize)
     } else {
       ElMessage.error(res.message || '加载数据失败')
     }
   } catch (error) {
-    console.error('加载数据失败:', error)
-    ElMessage.error('加载数据失败，请稍后重试')
+    if (!listRequests.isCurrent(requestId)) return
+
+    notifyError(error, '加载数据失败，请稍后重试')
   } finally {
-    loading.value = false
+    if (listRequests.isCurrent(requestId)) loading.value = false
   }
 }
 
@@ -333,6 +336,7 @@ const handleEdit = async (row) => {
     if (res.success && res.data) {
       Object.assign(formData, {
         id: res.data.id,
+        version: res.data.version,
         name: res.data.name,
         honorLevel: res.data.honorLevel,
         awardOrganization: res.data.awardOrganization || '',
@@ -347,8 +351,8 @@ const handleEdit = async (row) => {
       ElMessage.error(res.message || '获取详情失败')
     }
   } catch (error) {
-    console.error('获取详情失败:', error)
-    ElMessage.error('获取详情失败，请稍后重试')
+
+    notifyError(error, '获取详情失败，请稍后重试')
   }
 }
 
@@ -366,7 +370,7 @@ const handleDelete = async (row) => {
         type: 'warning'
       }
     )
-    
+
     const res = await systemConfigApi.honors.delete(row.id)
     if (res.success) {
       ElMessage.success(res.message || '删除成功')
@@ -379,8 +383,8 @@ const handleDelete = async (row) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('删除失败:', error)
-      ElMessage.error('删除失败，请稍后重试')
+
+      notifyError(error, '删除失败，请稍后重试')
     }
   }
 }
@@ -390,44 +394,46 @@ const handleDelete = async (row) => {
  */
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   try {
     await formRef.value.validate()
   } catch (error) {
     ElMessage.warning('请正确填写表单')
     return
   }
-  
+
   submitting.value = true
   try {
     const submitData = {
+      version: formData.version,
       name: formData.name,
-      honorLevel: formData.honorLevel,
+      honorLevel: formData.honorLevel || null,
       awardOrganization: formData.awardOrganization || null,
-      awardDate: formData.awardDate,
+      awardDate: formData.awardDate || null,
       imageId: formData.imageId && formData.imageId.length > 0 ? formData.imageId[0] : null,
       description: formData.description || null,
       sortOrder: formData.sortOrder,
       status: formData.status
     }
-    
+
     let res
     if (isEdit.value) {
       res = await systemConfigApi.honors.update(formData.id, submitData)
     } else {
       res = await systemConfigApi.honors.create(submitData)
     }
-    
+
     if (res.success) {
       ElMessage.success(res.message || (isEdit.value ? '更新成功' : '创建成功'))
+      markSaved()
       dialogVisible.value = false
       loadData()
     } else {
       ElMessage.error(res.message || (isEdit.value ? '更新失败' : '创建失败'))
     }
   } catch (error) {
-    console.error('提交失败:', error)
-    ElMessage.error(isEdit.value ? '更新失败，请稍后重试' : '创建失败，请稍后重试')
+
+    notifyError(error, isEdit.value ? '更新失败，请稍后重试' : '创建失败，请稍后重试')
   } finally {
     submitting.value = false
   }

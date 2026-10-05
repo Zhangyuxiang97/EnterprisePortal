@@ -14,6 +14,7 @@
 </template>
 
 <script setup>
+import { notifyError } from '@/utils/errors'
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { systemApi } from '@/api'
 import { ElMessage } from 'element-plus'
@@ -79,7 +80,7 @@ const cascaderProps = {
   value: 'code',
   label: 'name',
   children: 'children',
-  checkStrictly: false,
+  checkStrictly: true,
   emitPath: true
 }
 
@@ -113,8 +114,8 @@ const buildRegionTree = async () => {
 
     return filterTreeByLevel(tree)
   } catch (error) {
-    console.error('加载区域数据失败:', error)
-    ElMessage.error('加载区域数据失败')
+
+    notifyError(error, '加载区域数据失败')
     return []
   }
 }
@@ -140,10 +141,10 @@ const initRegionData = async () => {
   // 开始加载
   isInitializing.value = true
   regionDataCache.loading = true
-  
+
   regionDataCache.loadPromise = buildRegionTree()
   const data = await regionDataCache.loadPromise
-  
+
   regionDataCache.data = data
   regionDataCache.loading = false
   regionOptions.value = data
@@ -181,7 +182,7 @@ const findRegionCodeByName = (name, tree) => {
 // 处理选择变化
 const handleChange = (value) => {
   emit('update:modelValue', value)
-  
+
   // 获取选中的区域信息
   if (value && value.length > 0) {
     const regionInfo = {
@@ -223,12 +224,25 @@ defineExpose({
   },
   getValue: () => selectedRegion.value,
   findCodeByName: (name) => findRegionCodeByName(name, regionOptions.value),
-  isDataLoaded: () => regionOptions.value.length > 0
+  isDataLoaded: () => regionOptions.value.length > 0,
+  resolvePath: async (values) => {
+    await initRegionData()
+    let nodes = regionOptions.value
+    const result = []
+    for (const value of values) {
+      if (!value) break
+      const match = nodes.find(node => node.code === value || node.name === value)
+      if (!match) throw new Error('历史地区未匹配到字典，请重新选择已确认的地区')
+      result.push(match.code)
+      nodes = match.children || []
+    }
+    return result
+  }
 })
 
 onMounted(async () => {
   await initRegionData()
-  
+
   // 设置初始值
   if (props.modelValue && props.modelValue.length > 0) {
     selectedRegion.value = [...props.modelValue]

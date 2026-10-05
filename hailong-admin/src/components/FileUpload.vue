@@ -3,8 +3,7 @@
     <el-upload
       ref="uploadRef"
       v-model:file-list="fileList"
-      :action="uploadUrl"
-      :headers="uploadHeaders"
+      :http-request="performUpload"
       :data="uploadData"
       :on-success="handleSuccess"
       :on-error="handleError"
@@ -34,7 +33,7 @@
         </div>
       </template>
     </el-upload>
-    
+
     <!-- 图片预览对话框 -->
     <el-dialog v-model="previewVisible" title="图片预览" width="800px">
       <img :src="previewUrl" style="width: 100%" alt="预览图片" />
@@ -43,12 +42,13 @@
 </template>
 
 <script setup>
+import { notifyError } from '@/utils/errors'
+import { inject, onBeforeUnmount } from 'vue'
+import { uploadOptions, loadUploadOptions, validateUpload } from '@/utils/upload'
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Upload, Plus } from '@element-plus/icons-vue'
-import { tokenUtils } from '@/utils/auth'
-import { API_CONFIG } from '@/config/api.config'
-import { getAttachmentDetail } from '@/api/attachment'
+import { getAttachmentDetail, uploadAttachment } from '@/api/attachment'
 
 const props = defineProps({
   modelValue: {
@@ -73,7 +73,7 @@ const props = defineProps({
   // 最大文件大小（MB）
   maxSize: {
     type: Number,
-    default: 10
+    default: Infinity // 默认跟随后端限制；业务页面仍可设置更小的上限。
   },
   // 最多上传文件数量
   limit: {
@@ -112,6 +112,15 @@ const emit = defineEmits(['update:modelValue', 'change'])
 
 // 上传组件引用
 const uploadRef = ref()
+const activeUploads = inject('editorActiveUploads', ref(0))
+const pendingUploads = new Set()
+const uploadControllers = new Set()
+const finishUpload = file => { if (pendingUploads.delete(file.uid)) activeUploads.value-- }
+onBeforeUnmount(() => {
+  for (const controller of uploadControllers) controller.abort()
+  activeUploads.value -= pendingUploads.size
+  pendingUploads.clear()
+})
 
 // 文件列表
 const fileList = ref([])
@@ -120,14 +129,20 @@ const fileList = ref([])
 const previewVisible = ref(false)
 const previewUrl = ref('')
 
-// 上传地址
-const uploadUrl = computed(() => `${API_CONFIG.baseURL}/attachments/upload`)
-
-// 上传请求头
-const uploadHeaders = computed(() => {
-  const token = tokenUtils.getToken()
-  return token ? { Authorization: `Bearer ${token}` } : {}
-})
+// 与普通请求共用认证刷新，组件销毁时终止仍在上传的请求。
+const performUpload = ({ file, onProgress }) => {
+  const form = new FormData()
+  form.append('file', file)
+  for (const [key, value] of Object.entries(uploadData.value)) if (value !== undefined && value !== null) form.append(key, value)
+  const controller = new AbortController()
+  uploadControllers.add(controller)
+  const pending = uploadAttachment(form, {
+    signal: controller.signal,
+    onUploadProgress: event => onProgress({ percent: event.total ? event.loaded / event.total * 100 : 0 })
+  }).finally(() => uploadControllers.delete(controller))
+  pending.abort = () => controller.abort()
+  return pending
+}
 
 // 上传附加数据（包含关联类型和关联ID）
 const uploadData = computed(() => {
@@ -152,81 +167,47 @@ const fileTypeText = computed(() => {
 })
 
 // 允许的文件类型配置
-const fileTypeConfig = {
-  image: {
-    extensions: ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'],
-    accept: 'image/*'
-  },
-  document: {
-    extensions: ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.txt', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'],
-    accept: '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif,.bmp,.webp,.svg,image/*'
-  },
-  video: {
-    extensions: ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.mkv', '.webm'],
-    accept: 'video/*'
-  }
-}
-
-// 计算accept属性
-const computedAccept = computed(() => {
-  if (props.accept) return props.accept
-  return fileTypeConfig[props.fileType]?.accept || '*'
-})
+const allowedExtensions = computed(() => props.fileType === 'document'
+  ? [...uploadOptions.document, ...uploadOptions.image]
+  : (uploadOptions[props.fileType] || [...uploadOptions.document, ...uploadOptions.image, ...uploadOptions.video]))
+const effectiveMaxSize = computed(() => Math.min(props.maxSize, uploadOptions.maxFileSize / 1024 / 1024))
+const computedAccept = computed(() => props.accept || allowedExtensions.value.join(','))
 
 // 提示文本
 const tipText = computed(() => {
-  const sizeText = `单个文件不超过 ${props.maxSize}MB`
+  const sizeText = `单个文件不超过 ${effectiveMaxSize.value}MB`
   const limitText = props.limit > 1 ? `，最多上传 ${props.limit} 个` : ''
-  
+
   let typeText = ''
   if (props.fileType === 'image') {
-    typeText = '支持 JPG、PNG、GIF、BMP、WEBP、SVG 等图片格式'
+    typeText = '支持 JPG、PNG、GIF、BMP、WEBP、ICO 等图片格式'
   } else if (props.fileType === 'document') {
     typeText = '支持 PDF、DOC、DOCX、XLS、XLSX、PPT、PPTX、TXT 等文档格式，以及 JPG、PNG、GIF 等图片格式'
   } else if (props.fileType === 'video') {
     typeText = '支持 MP4、AVI、MOV、WMV、FLV、MKV、WEBM 等视频格式'
   }
-  
+
   return `${typeText}，${sizeText}${limitText}`
 })
 
 /**
  * 初始化文件列表
  */
+let fileListRevision = 0
 const initFileList = async () => {
-  if (props.modelValue && props.modelValue.length > 0) {
-    if (props.returnType === 'id') {
-      // ID类型：从后端获取文件信息
-      try {
-        const ids = props.modelValue.filter(id => typeof id === 'number')
-        const filePromises = ids.map(id => getAttachmentDetail(id))
-        const responses = await Promise.all(filePromises)
-        
-        fileList.value = responses
-          .filter(res => res.success && res.data)
-          .map((res, index) => ({
-            name: res.data.fileName,
-            url: res.data.fileUrl,
-            id: res.data.id,
-            uid: Date.now() + index,
-            status: 'success',
-            response: res.data
-          }))
-      } catch (error) {
-        console.error('初始化文件列表失败:', error)
-        fileList.value = []
-      }
-    } else {
-      // URL类型，直接使用
-      fileList.value = props.modelValue.map((url, index) => ({
-        name: getFileName(url),
-        url: url,
-        uid: Date.now() + index,
-        status: 'success'
-      }))
-    }
+  const revision = ++fileListRevision
+  const values = [...(props.modelValue || [])]
+  if (props.returnType === 'id') {
+    const ids = values.filter(id => typeof id === 'number')
+    const responses = await Promise.allSettled(ids.map(id => getAttachmentDetail(id)))
+    if (revision !== fileListRevision) return
+    fileList.value = responses.map((result, index) => {
+      const data = result.status === 'fulfilled' && result.value.success ? result.value.data : null
+      return { name: data?.fileName || `附件 #${ids[index]}（暂无法读取）`, url: data?.fileUrl,
+        id: ids[index], uid: -ids[index], status: 'success', response: data }
+    })
   } else {
-    fileList.value = []
+    fileList.value = values.map((url, index) => ({ name: getFileName(url), url, uid: -(index + 1), status: 'success' }))
   }
 }
 
@@ -252,33 +233,26 @@ watch(() => props.modelValue, (newVal) => {
 /**
  * 上传前校验
  */
-const beforeUpload = (file) => {
-  // 检查文件类型
-  const fileName = file.name.toLowerCase()
-  const config = fileTypeConfig[props.fileType]
-  
-  if (config && config.extensions) {
-    const isValidType = config.extensions.some(ext => fileName.endsWith(ext))
-    if (!isValidType) {
-      ElMessage.error(`只支持上传 ${config.extensions.join(', ')} 格式的文件`)
-      return false
-    }
-  }
-  
-  // 检查文件大小
-  const maxSize = props.maxSize * 1024 * 1024
-  if (file.size > maxSize) {
-    ElMessage.error(`文件大小不能超过 ${props.maxSize}MB`)
+const beforeUpload = async (file) => {
+  pendingUploads.add(file.uid)
+  activeUploads.value++
+  try {
+    await loadUploadOptions()
+    const error = validateUpload(file, allowedExtensions.value, effectiveMaxSize.value * 1024 * 1024)
+    if (error) { finishUpload(file); ElMessage.error(error); return false }
+    return true
+  } catch {
+    finishUpload(file)
+    ElMessage.error('无法读取上传限制，请稍后重试')
     return false
   }
-  
-  return true
 }
 
 /**
  * 上传成功
  */
 const handleSuccess = (response, file, fileListParam) => {
+  finishUpload(file)
   if (response.success && response.data) {
     // 更新文件列表中的URL和ID
     const index = fileListParam.findIndex(f => f.uid === file.uid)
@@ -289,7 +263,7 @@ const handleSuccess = (response, file, fileListParam) => {
       fileListParam[index].name = response.data.fileName || file.name
       fileListParam[index].status = 'success'
     }
-    
+
     // 立即更新值
     updateValue()
     ElMessage.success('文件上传成功')
@@ -307,9 +281,9 @@ const handleSuccess = (response, file, fileListParam) => {
  * 上传失败
  */
 const handleError = (error, file, fileListParam) => {
-  console.error('文件上传失败:', error)
-  ElMessage.error('文件上传失败，请重试')
-  
+  finishUpload(file)
+  notifyError(error, '文件上传失败，请重试')
+
   // 移除失败的文件
   const index = fileListParam.findIndex(f => f.uid === file.uid)
   if (index > -1) {
@@ -321,6 +295,7 @@ const handleError = (error, file, fileListParam) => {
  * 移除文件
  */
 const handleRemove = (file, fileListParam) => {
+  finishUpload(file)
   // 延迟更新，确保文件已从列表中移除
   nextTick(() => {
     updateValue()
@@ -408,6 +383,7 @@ defineExpose({
 
 // 组件挂载时初始化
 onMounted(() => {
+  loadUploadOptions().catch(() => {})
   initFileList()
 })
 </script>

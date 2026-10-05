@@ -21,12 +21,12 @@ public interface IAnnouncementService : IAnnouncementStatisticsExtension
     /// <summary>
     /// 根据ID获取公告
     /// </summary>
-    Task<AnnouncementDto?> GetByIdAsync(int id);
+    Task<AnnouncementDto?> GetByIdAsync(int id, bool includeDisabled = false);
     
     /// <summary>
     /// 分页查询公告
     /// </summary>
-    Task<PagedResult<AnnouncementDto>> GetPagedAsync(AnnouncementQueryDto queryDto);
+    Task<PagedResult<AnnouncementListDto>> GetPagedAsync(AnnouncementQueryDto queryDto, bool includeDisabled = false);
 
     /// <summary>
     /// 获取仅包含有公告数据的区域筛选项及数量

@@ -35,7 +35,7 @@ public class ConfigController : ControllerBase
     //         var banners = await _configService.GetAllBannersAsync();
     //         return Ok(ApiResponse<IEnumerable<CarouselBannerDto>>.SuccessResult(banners, "获取轮播图列表成功"));
     //     }
-    //     catch (Exception ex)
+    //     catch (Exception ex) when (!ApiErrors.IsExpected(ex))
     //     {
     //         _logger.LogError(ex, "获取轮播图列表失败");
     //         return StatusCode(500, ApiResponse<IEnumerable<CarouselBannerDto>>.FailResult("获取轮播图列表失败"));
@@ -57,7 +57,7 @@ public class ConfigController : ControllerBase
     //         }
     //         return Ok(ApiResponse<CarouselBannerDto>.SuccessResult(banner, "获取轮播图成功"));
     //     }
-    //     catch (Exception ex)
+    //     catch (Exception ex) when (!ApiErrors.IsExpected(ex))
     //     {
     //         _logger.LogError(ex, "获取轮播图失败，ID: {Id}", id);
     //         return StatusCode(500, ApiResponse<CarouselBannerDto>.FailResult("获取轮播图失败"));
@@ -76,7 +76,7 @@ public class ConfigController : ControllerBase
     //         var banner = await _configService.CreateBannerAsync(dto);
     //         return Ok(ApiResponse<CarouselBannerDto>.SuccessResult(banner, "创建轮播图成功"));
     //     }
-    //     catch (Exception ex)
+    //     catch (Exception ex) when (!ApiErrors.IsExpected(ex))
     //     {
     //         _logger.LogError(ex, "创建轮播图失败");
     //         return StatusCode(500, ApiResponse<CarouselBannerDto>.FailResult("创建轮播图失败"));
@@ -99,7 +99,7 @@ public class ConfigController : ControllerBase
     //         }
     //         return Ok(ApiResponse<bool>.SuccessResult(true, "更新轮播图成功"));
     //     }
-    //     catch (Exception ex)
+    //     catch (Exception ex) when (!ApiErrors.IsExpected(ex))
     //     {
     //         _logger.LogError(ex, "更新轮播图失败，ID: {Id}", id);
     //         return StatusCode(500, ApiResponse<bool>.FailResult("更新轮播图失败"));
@@ -122,7 +122,7 @@ public class ConfigController : ControllerBase
     //         }
     //         return Ok(ApiResponse<bool>.SuccessResult(true, "删除轮播图成功"));
     //     }
-    //     catch (Exception ex)
+    //     catch (Exception ex) when (!ApiErrors.IsExpected(ex))
     //     {
     //         _logger.LogError(ex, "删除轮播图失败，ID: {Id}", id);
     //         return StatusCode(500, ApiResponse<bool>.FailResult("删除轮播图失败"));
@@ -137,21 +137,27 @@ public class ConfigController : ControllerBase
     /// 获取企业简介
     /// </summary>
     [HttpGet("company-intro")]
-    public async Task<ActionResult<ApiResponse<CompanyProfileDto>>> GetCompanyProfile()
+    public Task<ActionResult<ApiResponse<CompanyProfileDto>>> GetCompanyProfile() => GetCompanyProfileCore(false);
+
+    [HttpGet("manage/company-intro")]
+    [Authorize(Roles = "admin,user")]
+    public Task<ActionResult<ApiResponse<CompanyProfileDto>>> GetCompanyProfileForManagement() => GetCompanyProfileCore(true);
+
+    private async Task<ActionResult<ApiResponse<CompanyProfileDto>>> GetCompanyProfileCore(bool includeDisabled)
     {
         try
         {
             var profile = await _configService.GetCompanyProfileAsync();
-            if (profile == null)
+            if (profile == null || (!includeDisabled && !profile.Status))
             {
                 return NotFound(ApiResponse<CompanyProfileDto>.FailResult("企业简介不存在"));
             }
             return Ok(ApiResponse<CompanyProfileDto>.SuccessResult(profile, "获取企业简介成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取企业简介失败");
-            return StatusCode(500, ApiResponse<CompanyProfileDto>.FailResult("获取企业简介失败"));
+            throw;
         }
     }
 
@@ -167,10 +173,10 @@ public class ConfigController : ControllerBase
             var result = await _configService.UpdateCompanyProfileAsync(dto);
             return Ok(ApiResponse<bool>.SuccessResult(result, "更新企业简介成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "更新企业简介失败");
-            return StatusCode(500, ApiResponse<bool>.FailResult("更新企业简介失败"));
+            throw;
         }
     }
 
@@ -182,17 +188,23 @@ public class ConfigController : ControllerBase
     /// 获取所有重要业绩
     /// </summary>
     [HttpGet("achievements")]
-    public async Task<ActionResult<ApiResponse<IEnumerable<MajorAchievementDto>>>> GetAchievements()
+    public Task<ActionResult<ApiResponse<IEnumerable<MajorAchievementDto>>>> GetAchievements() => GetAchievementsCore(false);
+
+    [HttpGet("manage/achievements")]
+    [Authorize(Roles = "admin,user")]
+    public Task<ActionResult<ApiResponse<IEnumerable<MajorAchievementDto>>>> GetAchievementsForManagement() => GetAchievementsCore(true);
+
+    private async Task<ActionResult<ApiResponse<IEnumerable<MajorAchievementDto>>>> GetAchievementsCore(bool includeDisabled)
     {
         try
         {
             var achievements = await _configService.GetAllAchievementsAsync();
-            return Ok(ApiResponse<IEnumerable<MajorAchievementDto>>.SuccessResult(achievements, "获取重要业绩列表成功"));
+            return Ok(ApiResponse<IEnumerable<MajorAchievementDto>>.SuccessResult(includeDisabled ? achievements : achievements.Where(x => x.Status), "获取重要业绩列表成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取重要业绩列表失败");
-            return StatusCode(500, ApiResponse<IEnumerable<MajorAchievementDto>>.FailResult("获取重要业绩列表失败"));
+            throw;
         }
     }
 
@@ -200,21 +212,27 @@ public class ConfigController : ControllerBase
     /// 根据ID获取重要业绩
     /// </summary>
     [HttpGet("achievements/{id}")]
-    public async Task<ActionResult<ApiResponse<MajorAchievementDto>>> GetAchievement(int id)
+    public Task<ActionResult<ApiResponse<MajorAchievementDto>>> GetAchievement(int id) => GetAchievementCore(id, false);
+
+    [HttpGet("manage/achievements/{id}")]
+    [Authorize(Roles = "admin,user")]
+    public Task<ActionResult<ApiResponse<MajorAchievementDto>>> GetAchievementForManagement(int id) => GetAchievementCore(id, true);
+
+    private async Task<ActionResult<ApiResponse<MajorAchievementDto>>> GetAchievementCore(int id, bool includeDisabled)
     {
         try
         {
             var achievement = await _configService.GetAchievementByIdAsync(id);
-            if (achievement == null)
+            if (achievement == null || (!includeDisabled && !achievement.Status))
             {
                 return NotFound(ApiResponse<MajorAchievementDto>.FailResult("重要业绩不存在"));
             }
             return Ok(ApiResponse<MajorAchievementDto>.SuccessResult(achievement, "获取重要业绩成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取重要业绩失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<MajorAchievementDto>.FailResult("获取重要业绩失败"));
+            throw;
         }
     }
 
@@ -230,10 +248,10 @@ public class ConfigController : ControllerBase
             var achievement = await _configService.CreateAchievementAsync(dto);
             return Ok(ApiResponse<MajorAchievementDto>.SuccessResult(achievement, "创建重要业绩成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "创建重要业绩失败");
-            return StatusCode(500, ApiResponse<MajorAchievementDto>.FailResult("创建重要业绩失败"));
+            throw;
         }
     }
 
@@ -253,10 +271,10 @@ public class ConfigController : ControllerBase
             }
             return Ok(ApiResponse<bool>.SuccessResult(true, "更新重要业绩成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "更新重要业绩失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("更新重要业绩失败"));
+            throw;
         }
     }
 
@@ -276,10 +294,10 @@ public class ConfigController : ControllerBase
             }
             return Ok(ApiResponse<bool>.SuccessResult(true, "删除重要业绩成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "删除重要业绩失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("删除重要业绩失败"));
+            throw;
         }
     }
 
@@ -291,17 +309,23 @@ public class ConfigController : ControllerBase
     /// 获取所有企业荣誉
     /// </summary>
     [HttpGet("honors")]
-    public async Task<ActionResult<ApiResponse<IEnumerable<CompanyHonorDto>>>> GetHonors()
+    public Task<ActionResult<ApiResponse<IEnumerable<CompanyHonorDto>>>> GetHonors() => GetHonorsCore(false);
+
+    [HttpGet("manage/honors")]
+    [Authorize(Roles = "admin,user")]
+    public Task<ActionResult<ApiResponse<IEnumerable<CompanyHonorDto>>>> GetHonorsForManagement() => GetHonorsCore(true);
+
+    private async Task<ActionResult<ApiResponse<IEnumerable<CompanyHonorDto>>>> GetHonorsCore(bool includeDisabled)
     {
         try
         {
             var honors = await _configService.GetAllHonorsAsync();
-            return Ok(ApiResponse<IEnumerable<CompanyHonorDto>>.SuccessResult(honors, "获取企业荣誉列表成功"));
+            return Ok(ApiResponse<IEnumerable<CompanyHonorDto>>.SuccessResult(includeDisabled ? honors : honors.Where(x => x.Status), "获取企业荣誉列表成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取企业荣誉列表失败");
-            return StatusCode(500, ApiResponse<IEnumerable<CompanyHonorDto>>.FailResult("获取企业荣誉列表失败"));
+            throw;
         }
     }
 
@@ -309,21 +333,27 @@ public class ConfigController : ControllerBase
     /// 根据ID获取企业荣誉
     /// </summary>
     [HttpGet("honors/{id}")]
-    public async Task<ActionResult<ApiResponse<CompanyHonorDto>>> GetHonor(int id)
+    public Task<ActionResult<ApiResponse<CompanyHonorDto>>> GetHonor(int id) => GetHonorCore(id, false);
+
+    [HttpGet("manage/honors/{id}")]
+    [Authorize(Roles = "admin,user")]
+    public Task<ActionResult<ApiResponse<CompanyHonorDto>>> GetHonorForManagement(int id) => GetHonorCore(id, true);
+
+    private async Task<ActionResult<ApiResponse<CompanyHonorDto>>> GetHonorCore(int id, bool includeDisabled)
     {
         try
         {
             var honor = await _configService.GetHonorByIdAsync(id);
-            if (honor == null)
+            if (honor == null || (!includeDisabled && !honor.Status))
             {
                 return NotFound(ApiResponse<CompanyHonorDto>.FailResult("企业荣誉不存在"));
             }
             return Ok(ApiResponse<CompanyHonorDto>.SuccessResult(honor, "获取企业荣誉成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取企业荣誉失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<CompanyHonorDto>.FailResult("获取企业荣誉失败"));
+            throw;
         }
     }
 
@@ -339,10 +369,10 @@ public class ConfigController : ControllerBase
             var honor = await _configService.CreateHonorAsync(dto);
             return Ok(ApiResponse<CompanyHonorDto>.SuccessResult(honor, "创建企业荣誉成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "创建企业荣誉失败");
-            return StatusCode(500, ApiResponse<CompanyHonorDto>.FailResult("创建企业荣誉失败"));
+            throw;
         }
     }
 
@@ -362,10 +392,10 @@ public class ConfigController : ControllerBase
             }
             return Ok(ApiResponse<bool>.SuccessResult(true, "更新企业荣誉成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "更新企业荣誉失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("更新企业荣誉失败"));
+            throw;
         }
     }
 
@@ -385,10 +415,10 @@ public class ConfigController : ControllerBase
             }
             return Ok(ApiResponse<bool>.SuccessResult(true, "删除企业荣誉成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "删除企业荣誉失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("删除企业荣誉失败"));
+            throw;
         }
     }
 
@@ -407,7 +437,7 @@ public class ConfigController : ControllerBase
     //         var links = await _configService.GetAllLinksAsync();
     //         return Ok(ApiResponse<IEnumerable<FriendlyLinkDto>>.SuccessResult(links, "获取友情链接列表成功"));
     //     }
-    //     catch (Exception ex)
+    //     catch (Exception ex) when (!ApiErrors.IsExpected(ex))
     //     {
     //         _logger.LogError(ex, "获取友情链接列表失败");
     //         return StatusCode(500, ApiResponse<IEnumerable<FriendlyLinkDto>>.FailResult("获取友情链接列表失败"));
@@ -429,7 +459,7 @@ public class ConfigController : ControllerBase
     //         }
     //         return Ok(ApiResponse<FriendlyLinkDto>.SuccessResult(link, "获取友情链接成功"));
     //     }
-    //     catch (Exception ex)
+    //     catch (Exception ex) when (!ApiErrors.IsExpected(ex))
     //     {
     //         _logger.LogError(ex, "获取友情链接失败，ID: {Id}", id);
     //         return StatusCode(500, ApiResponse<FriendlyLinkDto>.FailResult("获取友情链接失败"));
@@ -448,7 +478,7 @@ public class ConfigController : ControllerBase
     //         var link = await _configService.CreateLinkAsync(dto);
     //         return Ok(ApiResponse<FriendlyLinkDto>.SuccessResult(link, "创建友情链接成功"));
     //     }
-    //     catch (Exception ex)
+    //     catch (Exception ex) when (!ApiErrors.IsExpected(ex))
     //     {
     //         _logger.LogError(ex, "创建友情链接失败");
     //         return StatusCode(500, ApiResponse<FriendlyLinkDto>.FailResult("创建友情链接失败"));
@@ -471,7 +501,7 @@ public class ConfigController : ControllerBase
     //         }
     //         return Ok(ApiResponse<bool>.SuccessResult(true, "更新友情链接成功"));
     //     }
-    //     catch (Exception ex)
+    //     catch (Exception ex) when (!ApiErrors.IsExpected(ex))
     //     {
     //         _logger.LogError(ex, "更新友情链接失败，ID: {Id}", id);
     //         return StatusCode(500, ApiResponse<bool>.FailResult("更新友情链接失败"));
@@ -494,7 +524,7 @@ public class ConfigController : ControllerBase
     //         }
     //         return Ok(ApiResponse<bool>.SuccessResult(true, "删除友情链接成功"));
     //     }
-    //     catch (Exception ex)
+    //     catch (Exception ex) when (!ApiErrors.IsExpected(ex))
     //     {
     //         _logger.LogError(ex, "删除友情链接失败，ID: {Id}", id);
     //         return StatusCode(500, ApiResponse<bool>.FailResult("删除友情链接失败"));
@@ -516,10 +546,10 @@ public class ConfigController : ControllerBase
             var statistics = await _configService.GetVisitStatisticsAsync();
             return Ok(ApiResponse<VisitStatisticDto>.SuccessResult(statistics, "获取访问统计成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取访问统计失败");
-            return StatusCode(500, ApiResponse<VisitStatisticDto>.FailResult("获取访问统计失败"));
+            throw;
         }
     }
 
@@ -537,10 +567,10 @@ public class ConfigController : ControllerBase
             await _configService.RecordVisitAsync(dto, ipAddress, userAgent);
             return Ok(ApiResponse<bool>.SuccessResult(true, "记录访问成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "记录访问失败");
-            return StatusCode(500, ApiResponse<bool>.FailResult("记录访问失败"));
+            throw;
         }
     }
 
@@ -552,17 +582,23 @@ public class ConfigController : ControllerBase
     /// 获取所有业务范围
     /// </summary>
     [HttpGet("business-scope")]
-    public async Task<ActionResult<ApiResponse<IEnumerable<BusinessScopeDto>>>> GetBusinessScopes()
+    public Task<ActionResult<ApiResponse<IEnumerable<BusinessScopeDto>>>> GetBusinessScopes() => GetBusinessScopesCore(false);
+
+    [HttpGet("manage/business-scope")]
+    [Authorize(Roles = "admin,user")]
+    public Task<ActionResult<ApiResponse<IEnumerable<BusinessScopeDto>>>> GetBusinessScopesForManagement() => GetBusinessScopesCore(true);
+
+    private async Task<ActionResult<ApiResponse<IEnumerable<BusinessScopeDto>>>> GetBusinessScopesCore(bool includeDisabled)
     {
         try
         {
             var scopes = await _configService.GetAllBusinessScopesAsync();
-            return Ok(ApiResponse<IEnumerable<BusinessScopeDto>>.SuccessResult(scopes, "获取业务范围列表成功"));
+            return Ok(ApiResponse<IEnumerable<BusinessScopeDto>>.SuccessResult(includeDisabled ? scopes : scopes.Where(x => x.Status), "获取业务范围列表成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取业务范围列表失败");
-            return StatusCode(500, ApiResponse<IEnumerable<BusinessScopeDto>>.FailResult("获取业务范围列表失败"));
+            throw;
         }
     }
 
@@ -570,21 +606,27 @@ public class ConfigController : ControllerBase
     /// 根据ID获取业务范围
     /// </summary>
     [HttpGet("business-scope/{id}")]
-    public async Task<ActionResult<ApiResponse<BusinessScopeDto>>> GetBusinessScope(int id)
+    public Task<ActionResult<ApiResponse<BusinessScopeDto>>> GetBusinessScope(int id) => GetBusinessScopeCore(id, false);
+
+    [HttpGet("manage/business-scope/{id}")]
+    [Authorize(Roles = "admin,user")]
+    public Task<ActionResult<ApiResponse<BusinessScopeDto>>> GetBusinessScopeForManagement(int id) => GetBusinessScopeCore(id, true);
+
+    private async Task<ActionResult<ApiResponse<BusinessScopeDto>>> GetBusinessScopeCore(int id, bool includeDisabled)
     {
         try
         {
             var scope = await _configService.GetBusinessScopeByIdAsync(id);
-            if (scope == null)
+            if (scope == null || (!includeDisabled && !scope.Status))
             {
                 return NotFound(ApiResponse<BusinessScopeDto>.FailResult("业务范围不存在"));
             }
             return Ok(ApiResponse<BusinessScopeDto>.SuccessResult(scope, "获取业务范围成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取业务范围失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<BusinessScopeDto>.FailResult("获取业务范围失败"));
+            throw;
         }
     }
 
@@ -600,10 +642,10 @@ public class ConfigController : ControllerBase
             var scope = await _configService.CreateBusinessScopeAsync(dto);
             return Ok(ApiResponse<BusinessScopeDto>.SuccessResult(scope, "创建业务范围成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "创建业务范围失败");
-            return StatusCode(500, ApiResponse<BusinessScopeDto>.FailResult("创建业务范围失败"));
+            throw;
         }
     }
 
@@ -623,10 +665,10 @@ public class ConfigController : ControllerBase
             }
             return Ok(ApiResponse<bool>.SuccessResult(true, "更新业务范围成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "更新业务范围失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("更新业务范围失败"));
+            throw;
         }
     }
 
@@ -646,10 +688,10 @@ public class ConfigController : ControllerBase
             }
             return Ok(ApiResponse<bool>.SuccessResult(true, "删除业务范围成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "删除业务范围失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("删除业务范围失败"));
+            throw;
         }
     }
 
@@ -661,17 +703,23 @@ public class ConfigController : ControllerBase
     /// 获取所有企业资质
     /// </summary>
     [HttpGet("qualifications")]
-    public async Task<ActionResult<ApiResponse<IEnumerable<CompanyQualificationDto>>>> GetQualifications()
+    public Task<ActionResult<ApiResponse<IEnumerable<CompanyQualificationDto>>>> GetQualifications() => GetQualificationsCore(false);
+
+    [HttpGet("manage/qualifications")]
+    [Authorize(Roles = "admin,user")]
+    public Task<ActionResult<ApiResponse<IEnumerable<CompanyQualificationDto>>>> GetQualificationsForManagement() => GetQualificationsCore(true);
+
+    private async Task<ActionResult<ApiResponse<IEnumerable<CompanyQualificationDto>>>> GetQualificationsCore(bool includeDisabled)
     {
         try
         {
             var qualifications = await _configService.GetAllQualificationsAsync();
-            return Ok(ApiResponse<IEnumerable<CompanyQualificationDto>>.SuccessResult(qualifications, "获取企业资质列表成功"));
+            return Ok(ApiResponse<IEnumerable<CompanyQualificationDto>>.SuccessResult(includeDisabled ? qualifications : qualifications.Where(x => x.Status), "获取企业资质列表成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取企业资质列表失败");
-            return StatusCode(500, ApiResponse<IEnumerable<CompanyQualificationDto>>.FailResult("获取企业资质列表失败"));
+            throw;
         }
     }
 
@@ -679,21 +727,27 @@ public class ConfigController : ControllerBase
     /// 根据ID获取企业资质
     /// </summary>
     [HttpGet("qualifications/{id}")]
-    public async Task<ActionResult<ApiResponse<CompanyQualificationDto>>> GetQualification(int id)
+    public Task<ActionResult<ApiResponse<CompanyQualificationDto>>> GetQualification(int id) => GetQualificationCore(id, false);
+
+    [HttpGet("manage/qualifications/{id}")]
+    [Authorize(Roles = "admin,user")]
+    public Task<ActionResult<ApiResponse<CompanyQualificationDto>>> GetQualificationForManagement(int id) => GetQualificationCore(id, true);
+
+    private async Task<ActionResult<ApiResponse<CompanyQualificationDto>>> GetQualificationCore(int id, bool includeDisabled)
     {
         try
         {
             var qualification = await _configService.GetQualificationByIdAsync(id);
-            if (qualification == null)
+            if (qualification == null || (!includeDisabled && !qualification.Status))
             {
                 return NotFound(ApiResponse<CompanyQualificationDto>.FailResult("企业资质不存在"));
             }
             return Ok(ApiResponse<CompanyQualificationDto>.SuccessResult(qualification, "获取企业资质成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取企业资质失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<CompanyQualificationDto>.FailResult("获取企业资质失败"));
+            throw;
         }
     }
 
@@ -709,10 +763,10 @@ public class ConfigController : ControllerBase
             var qualification = await _configService.CreateQualificationAsync(dto);
             return Ok(ApiResponse<CompanyQualificationDto>.SuccessResult(qualification, "创建企业资质成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "创建企业资质失败");
-            return StatusCode(500, ApiResponse<CompanyQualificationDto>.FailResult("创建企业资质失败"));
+            throw;
         }
     }
 
@@ -732,10 +786,10 @@ public class ConfigController : ControllerBase
             }
             return Ok(ApiResponse<bool>.SuccessResult(true, "更新企业资质成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "更新企业资质失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("更新企业资质失败"));
+            throw;
         }
     }
 
@@ -755,10 +809,10 @@ public class ConfigController : ControllerBase
             }
             return Ok(ApiResponse<bool>.SuccessResult(true, "删除企业资质成功"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "删除企业资质失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("删除企业资质失败"));
+            throw;
         }
     }
 

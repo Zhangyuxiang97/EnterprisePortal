@@ -7,6 +7,7 @@
     "transform": "node transform-data.js",
     "preview": "start preview.html",
     "generate-initial-sql": "node generate-initial-announcement-sql.js",
+    "generate-access-initial-sql": "node generate-access-initial-data.js",
     "generate-region-batches": "node generate-region-initialization-batches.js"
   },
   "dependencies": {

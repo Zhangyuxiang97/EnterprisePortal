@@ -14,8 +14,9 @@ import request from './request'
  * @param {string} params.sortOrder - 排序方式 (asc/desc)
  * @returns {Promise}
  */
-export function getInfoPublicationList(params) {
+export function getInfoPublicationList(params, options = {}) {
   return request({
+    ...options,
     url: '/info-publications',
     method: 'get',
     params: {
@@ -37,8 +38,9 @@ export function getInfoPublicationList(params) {
  * @param {number} id - 信息发布ID
  * @returns {Promise}
  */
-export function getInfoPublicationDetail(id) {
+export function getInfoPublicationDetail(id, options = {}) {
   return request({
+    ...options,
     url: `/info-publications/${id}`,
     method: 'get'
   })
@@ -49,8 +51,9 @@ export function getInfoPublicationDetail(id) {
  * @param {Object} params - 查询参数
  * @returns {Promise}
  */
-export function getCompanyNewsList(params) {
+export function getCompanyNewsList(params, options = {}) {
   return request({
+    ...options,
     url: '/info-publications/company-news',
     method: 'get',
     params: {
@@ -71,8 +74,9 @@ export function getCompanyNewsList(params) {
  * @param {Object} params - 查询参数
  * @returns {Promise}
  */
-export function getPolicyRegulationsList(params) {
+export function getPolicyRegulationsList(params, options = {}) {
   return request({
+    ...options,
     url: '/info-publications/policy-regulations',
     method: 'get',
     params: {
@@ -93,8 +97,9 @@ export function getPolicyRegulationsList(params) {
  * @param {Object} params - 查询参数
  * @returns {Promise}
  */
-export function getPolicyInfoList(params) {
+export function getPolicyInfoList(params, options = {}) {
   return request({
+    ...options,
     url: '/info-publications/policy-info',
     method: 'get',
     params: {
@@ -115,8 +120,9 @@ export function getPolicyInfoList(params) {
  * @param {Object} params - 查询参数
  * @returns {Promise}
  */
-export function getNoticesList(params) {
+export function getNoticesList(params, options = {}) {
   return request({
+    ...options,
     url: '/info-publications/notices',
     method: 'get',
     params: {

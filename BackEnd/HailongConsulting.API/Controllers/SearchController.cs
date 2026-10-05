@@ -36,10 +36,10 @@ public class SearchController : ControllerBase
             var result = await _searchService.SearchAsync(request);
             return Ok(ApiResponse<GlobalSearchResponseDto>.SuccessResult(result));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "全局搜索失败");
-            return StatusCode(500, ApiResponse<GlobalSearchResponseDto>.FailResult("搜索失败，请稍后重试"));
+            throw;
         }
     }
 }

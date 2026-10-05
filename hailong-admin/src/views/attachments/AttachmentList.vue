@@ -93,10 +93,11 @@
           </template>
         </el-table-column>
         <el-table-column prop="createdAt" label="上传时间" width="180" />
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="245" fixed="right">
           <template #default="{ row }">
             <el-button link type="primary" @click="handleView(row)">查看</el-button>
             <el-button link type="primary" @click="handleDownload(row)">下载</el-button>
+            <el-button link type="primary" @click="handleReferences(row)">引用</el-button>
             <el-button link type="danger" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
@@ -115,8 +116,8 @@
     </el-card>
 
     <!-- 上传对话框 -->
-    <el-dialog v-model="uploadDialogVisible" title="上传附件" width="600px" @close="handleDialogClose">
-      <el-form :model="uploadForm" label-width="100px">
+    <el-dialog v-model="uploadDialogVisible" title="上传附件" width="600px" :before-close="beforeUploadClose" @closed="handleDialogClose" :close-on-click-modal="false">
+      <el-form :disabled="uploading" :model="uploadForm" label-width="100px">
         <el-form-item label="附件分类" required>
           <el-select v-model="uploadForm.category" placeholder="请选择分类" style="width: 100%;">
             <el-option label="图片" value="image" />
@@ -138,9 +139,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="关联ID">
-          <el-input-number 
-            v-model="uploadForm.relatedId" 
-            :min="1" 
+          <el-input-number
+            v-model="uploadForm.relatedId"
+            :key="uploadForm.relatedType"
+            :min="1"
             placeholder="请输入关联ID（可选）"
             style="width: 100%;"
             :disabled="!uploadForm.relatedType"
@@ -149,12 +151,12 @@
         <el-form-item label="选择文件" required>
           <el-upload
             ref="uploadRef"
-            :action="getUploadAction"
-            :headers="uploadHeaders"
-            :on-success="handleUploadSuccess"
-            :on-error="handleUploadError"
-            :before-upload="beforeUpload"
-            :file-list="fileList"
+            :disabled="uploading"
+
+
+
+
+            v-model:file-list="fileList"
             :auto-upload="false"
             multiple
             drag
@@ -165,14 +167,14 @@
             </div>
             <template #tip>
               <div class="el-upload__tip">
-                支持图片、文档、视频等多种格式，单个文件不超过50MB
+                支持图片、文档、视频等多种格式，单个文件不超过 {{ uploadOptions.maxFileSize / 1024 / 1024 }}MB
               </div>
             </template>
           </el-upload>
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="uploadDialogVisible = false">取消</el-button>
+        <el-button :disabled="uploading" @click="uploadDialogVisible = false">取消</el-button>
         <el-button type="primary" @click="handleUploadConfirm" :loading="uploading">
           {{ uploading ? '上传中...' : '开始上传' }}
         </el-button>
@@ -182,11 +184,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { notifyError } from '@/utils/errors'
+import { createLatestRequest } from '@/utils/latestRequest'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Upload, Delete, Document, VideoPlay, Files, UploadFilled } from '@element-plus/icons-vue'
 import { attachmentApi } from '@/api'
-import { tokenUtils } from '@/utils/auth'
+import request from '@/api/request'
+import { uploadOptions, loadUploadOptions, validateUpload } from '@/utils/upload'
 
 // 搜索表单
 const searchForm = reactive({
@@ -201,6 +206,7 @@ const uploadForm = reactive({
   relatedType: '',
   relatedId: null
 })
+watch(() => uploadForm.relatedType, () => { uploadForm.relatedId = null })
 
 // 分页
 const pagination = reactive({
@@ -219,28 +225,17 @@ const uploadDialogVisible = ref(false)
 const uploadRef = ref(null)
 const fileList = ref([])
 const uploading = ref(false)
-const uploadAction = import.meta.env.VITE_API_BASE_URL + '/attachments/upload'
-const uploadHeaders = {
-  Authorization: `Bearer ${tokenUtils.getToken()}`
+const beforeUploadClose = (done) => {
+  if (uploading.value) return ElMessage.warning('文件正在上传，请等待完成')
+  done()
 }
-
-// 动态生成上传URL，包含查询参数
-const getUploadAction = computed(() => {
-  const params = new URLSearchParams()
-  params.append('category', uploadForm.category || 'other')
-  if (uploadForm.relatedType) {
-    params.append('relatedType', uploadForm.relatedType)
-  }
-  if (uploadForm.relatedId) {
-    params.append('relatedId', uploadForm.relatedId.toString())
-  }
-  return `${uploadAction}?${params.toString()}`
-})
 
 /**
  * 获取附件列表
  */
+const listRequests = createLatestRequest()
 const getAttachmentList = async () => {
+  const requestId = listRequests.begin()
   loading.value = true
   try {
     const params = {
@@ -249,21 +244,18 @@ const getAttachmentList = async () => {
       ...searchForm
     }
     const res = await attachmentApi.getAttachmentList(params)
-    console.log('附件列表响应:', res)
+    if (!listRequests.isCurrent(requestId)) return
     if (res.success && res.data) {
       tableData.value = res.data.items || []
       pagination.total = res.data.totalCount || 0
-      console.log('表格数据:', tableData.value)
-      console.log('总数:', pagination.total)
-    } else if (res.code === 200 && res.data) {
-      tableData.value = res.data.items || []
-      pagination.total = res.data.totalCount || 0
+
     }
   } catch (error) {
-    console.error('获取附件列表失败:', error)
-    ElMessage.error('获取附件列表失败')
+    if (!listRequests.isCurrent(requestId)) return
+
+    notifyError(error, '获取附件列表失败')
   } finally {
-    loading.value = false
+    if (listRequests.isCurrent(requestId)) loading.value = false
   }
 }
 
@@ -326,55 +318,63 @@ const handleDialogClose = () => {
   uploadRef.value?.clearFiles()
 }
 
-const beforeUpload = (file) => {
-  const maxSize = 50 * 1024 * 1024 // 50MB
-  if (file.size > maxSize) {
-    ElMessage.error('文件大小不能超过50MB')
-    return false
-  }
-  return true
-}
-
-const handleUploadSuccess = (response, file) => {
-  if (response.code === 200) {
-    ElMessage.success(`${file.name} 上传成功`)
-  } else {
-    ElMessage.error(`${file.name} 上传失败：${response.message}`)
-  }
-}
-
-const handleUploadError = (error, file) => {
-  ElMessage.error(`${file.name} 上传失败`)
-}
-
-const handleUploadConfirm = () => {
-  if (!uploadRef.value) return
-  
-  const files = uploadRef.value.uploadFiles
-  if (!files || files.length === 0) {
-    ElMessage.warning('请先选择文件')
-    return
-  }
-
-  if (!uploadForm.category) {
-    ElMessage.warning('请选择附件分类')
-    return
-  }
-
+const handleUploadConfirm = async () => {
+  if (uploading.value) return
+  const files = fileList.value.filter(file => file.status !== 'success')
+  if (!files.length) return ElMessage.warning('请先选择文件')
+  if (uploadForm.relatedType && !uploadForm.relatedId) return ElMessage.warning('请选择关联记录 ID，或清空关联类型')
   uploading.value = true
-  uploadRef.value.submit()
-  
-  // 等待上传完成
-  setTimeout(() => {
+  try {
+    await loadUploadOptions()
+    const extensions = uploadForm.category === 'other'
+      ? [...uploadOptions.image, ...uploadOptions.document, ...uploadOptions.video]
+      : uploadOptions[uploadForm.category]
+    let failed = 0
+    for (const file of files) {
+      try {
+        const error = validateUpload(file.raw, extensions)
+        if (error) throw new Error(error)
+        const data = new FormData()
+        data.append('file', file.raw)
+        data.append('category', uploadForm.category)
+        if (uploadForm.relatedType) {
+          data.append('relatedType', uploadForm.relatedType)
+          data.append('relatedId', String(uploadForm.relatedId))
+        }
+        file.status = 'uploading'
+        const res = await attachmentApi.uploadAttachment(data)
+        if (!res.success) throw new Error(res.message || '上传失败')
+        file.status = 'success'
+        file.url = res.data.fileUrl
+        file.response = res.data
+      } catch (error) {
+        failed++
+        file.status = 'fail'
+        notifyError(error, `${file.name}：${error.message || '上传失败，请重试'}`)
+      }
+    }
+    await getAttachmentList()
+    if (!failed) {
+      ElMessage.success(`${files.length} 个文件上传完成`)
+      uploadDialogVisible.value = false
+    }
+  } catch {
+    ElMessage.error('无法读取上传限制，请稍后重试')
+  } finally {
     uploading.value = false
-    uploadDialogVisible.value = false
-    getAttachmentList()
-  }, 2000)
+  }
 }
 
 /**
  * 查看附件
  */
+const handleReferences = async row => {
+  const res = await request({ url: `/attachments/${row.id}/references`, method: 'get' })
+  if (!res.success) return
+  const text = res.data.length ? res.data.map(item => `${item.type} #${item.id}：${item.title}`).join('\n') : '暂未发现已保存的内容引用；编辑中的草稿尚未计入。'
+  await ElMessageBox.alert(text, '附件引用', { confirmButtonText: '知道了', customClass: 'attachment-references' }).catch(() => {})
+}
+
 const handleView = (row) => {
   window.open(row.fileUrl, '_blank')
 }
@@ -398,13 +398,13 @@ const handleDelete = async (row) => {
       type: 'warning'
     })
     const res = await attachmentApi.deleteAttachment(row.id)
-    if (res.code === 200) {
+    if (res.success) {
       ElMessage.success('删除成功')
       getAttachmentList()
     }
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('删除失败')
+      notifyError(error, '删除失败')
     }
   }
 }
@@ -418,13 +418,13 @@ const handleBatchDelete = async () => {
       type: 'warning'
     })
     const res = await attachmentApi.batchDeleteAttachments(selectedIds.value)
-    if (res.code === 200) {
+    if (res.success) {
       ElMessage.success('删除成功')
       getAttachmentList()
     }
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('删除失败')
+      notifyError(error, '删除失败')
     }
   }
 }
@@ -485,6 +485,7 @@ const getRelatedTypeLabel = (relatedType) => {
 
 onMounted(() => {
   getAttachmentList()
+  loadUploadOptions().catch(() => {})
 })
 </script>
 

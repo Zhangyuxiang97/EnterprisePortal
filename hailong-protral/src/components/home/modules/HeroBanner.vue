@@ -23,42 +23,54 @@
     <!-- 主体标语 -->
     <div class="relative z-10 text-center text-white px-6 max-w-5xl mx-auto">
       <h1
-        class="text-4xl md:text-7xl font-extrabold mb-6 font-tech bg-gradient-to-r from-white via-slate-100 to-slate-200 bg-clip-text text-transparent animate-fade-in tracking-tight leading-tight"
+        class="text-4xl md:text-7xl font-extrabold mb-6 font-tech tracking-tight leading-tight"
+        :aria-label="slogan"
       >
-        {{ companyInfo.slogan }}
+        <SloganReveal :text="slogan" :ready="configReady" />
       </h1>
       <p class="text-lg md:text-2xl text-slate-300 mb-12 max-w-4xl mx-auto font-medium leading-relaxed">
         {{ companyInfo.description }}
       </p>
       
-      <button
-        @click="$emit('show-contact')"
-        class="inline-block px-12 py-4.5 bg-gradient-to-r from-hailong-primary to-hailong-secondary rounded-full text-white text-lg font-bold hover:shadow-2xl hover:shadow-blue-500/25 transition-all transform hover:scale-105 hover:-translate-y-0.5"
-      >
-        立即与我们咨询
-      </button>
+      <div class="mx-auto flex max-w-xs flex-col gap-4 sm:max-w-none sm:flex-row sm:justify-center">
+        <router-link to="/announcements" class="portal-button portal-button--primary px-9 py-3 text-base">查询招标与中标公告</router-link>
+        <button @click="$emit('show-contact')" class="portal-button portal-button--on-dark px-9 py-3 text-base">联系业务咨询</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { getCompanyInfo } from '@/utils/config'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { getCompanyInfo, loadSiteConfig } from '@/utils/config'
+import SloganReveal from './SloganReveal.vue'
 
 defineEmits(['show-contact'])
 
 const companyInfo = computed(() => getCompanyInfo())
+const slogan = computed(() => (companyInfo.value.slogan || '').trim())
+const configReady = ref(false)
+let mounted = false
 
 // 在组件挂载时生成固定的随机微粒坐标，避开在 Template 中随机渲染
 const starParticles = ref([])
 
 onMounted(() => {
+  mounted = true
+  // 配置读取结束后再展开，避免默认标语与后台标语各播放一次。
+  loadSiteConfig().then(() => {
+    if (mounted) configReady.value = true
+  })
   starParticles.value = Array.from({ length: 20 }, (_, i) => ({
     id: i,
     top: `${Math.random() * 100}%`,
     left: `${Math.random() * 100}%`,
     delay: `${Math.random() * 2}s`
   }))
+})
+
+onUnmounted(() => {
+  mounted = false
 })
 </script>
 

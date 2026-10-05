@@ -11,20 +11,20 @@
 export const getPieChartOption = (data, options = {}) => {
   // 为4个类型定义专属颜色
   const colorMap = {
-    '建设工程': '#10B981',      // 绿色
-    '政府采购-货物': '#3B82F6',  // 蓝色
-    '政府采购-服务': '#F59E0B',  // 橙色
-    '政府采购-工程': '#8B5CF6'   // 紫色
+    '建设工程': '#799391',      // 绿色
+    '政府采购-货物': '#245b85',  // 蓝色
+    '政府采购-服务': '#658eae',  // 橙色
+    '政府采购-工程': '#93aec3'   // 紫色
   }
   
   // 根据类型名称分配颜色
   const colors = data.map(item => colorMap[item.type] || '#6B7280')
   
   const defaultOptions = {
-    title: '交易类型占比',
+    title: '公告业务分类',
     showLegend: true,
-    radius: ['40%', '70%'],
-    center: ['40%', '55%']
+    radius: ['38%', '64%'],
+    center: ['50%', '46%']
   }
   
   const config = { ...defaultOptions, ...options }
@@ -41,31 +41,33 @@ export const getPieChartOption = (data, options = {}) => {
     } : undefined,
     tooltip: {
       trigger: 'item',
-      formatter: '{b}: {c}个 ({d}%)'
+      formatter: '{b}：{c} 条（{d}%）'
     },
     legend: config.showLegend ? {
-      orient: 'vertical',
-      right: 10,
-      top: 'center',
+      orient: 'horizontal',
+      left: 'center',
+      bottom: 12,
       textStyle: {
         fontSize: 12
       }
     } : undefined,
     series: [
       {
-        name: '项目类型',
+        name: '公告分类',
         type: 'pie',
         radius: config.radius,
         center: config.center,
-        avoidLabelOverlap: false,
+        avoidLabelOverlap: true,
         itemStyle: {
-          borderRadius: 10,
+          borderRadius: 4,
           borderColor: '#fff',
           borderWidth: 2
         },
         label: {
           show: true,
-          formatter: '{b}\n{d}%',
+          formatter: '{d}%',
+          position: 'inside',
+          color: '#fff',
           fontSize: 12
         },
         emphasis: {
@@ -77,7 +79,8 @@ export const getPieChartOption = (data, options = {}) => {
         },
         data: data.map(item => ({
           name: item.type,
-          value: item.count
+          value: item.count,
+          label: { show: item.percentage >= 4 }
         }))
       }
     ],
@@ -92,10 +95,10 @@ export const getPieChartOption = (data, options = {}) => {
  */
 export const getBarChartOption = (data, options = {}) => {
   const defaultOptions = {
-    title: '地区项目排行榜',
+    title: '地区公告排行',
     xAxisLabel: 'region',
     yAxisLabel: 'projectCount',
-    color: '#5470c6',
+    color: '#245b85',
     showLabel: true
   }
   
@@ -118,7 +121,7 @@ export const getBarChartOption = (data, options = {}) => {
       axisPointer: {
         type: 'shadow'
       },
-      formatter: '{b}: {c}个项目'
+      formatter: '{b}：{c} 条公告'
     },
     grid: {
       left: '3%',
@@ -138,14 +141,14 @@ export const getBarChartOption = (data, options = {}) => {
     },
     yAxis: {
       type: 'value',
-      name: '项目数量',
+      name: '公告数量',
       axisLabel: {
-        formatter: '{value}个'
+        formatter: '{value}条'
       }
     },
     series: [
       {
-        name: '项目数量',
+        name: '公告数量',
         type: 'bar',
         data: counts,
         itemStyle: {
@@ -156,7 +159,7 @@ export const getBarChartOption = (data, options = {}) => {
         label: config.showLabel ? {
           show: true,
           position: 'top',
-          formatter: '{c}个'
+          formatter: '{c}条'
         } : undefined
       }
     ]

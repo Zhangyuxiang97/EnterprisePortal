@@ -1,6 +1,8 @@
 using HailongConsulting.API.Common;
 using System.Net;
 using System.Text.Json;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace HailongConsulting.API.Middleware;
 
@@ -26,19 +28,26 @@ public class ExceptionHandlingMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unhandled exception occurred: {Message}", ex.Message);
+            if (ApiErrors.IsExpected(ex)) _logger.LogWarning("Request rejected: {Type}, TraceId: {TraceId}", ex.GetType().Name, context.TraceIdentifier);
+            else _logger.LogError(ex, "Unhandled exception. TraceId: {TraceId}", context.TraceIdentifier);
             await HandleExceptionAsync(context, ex);
         }
     }
 
     private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
+        if (context.Response.HasStarted) return;
+        context.Response.Clear();
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-
-        var response = ApiResponse.FailResponse(
-            exception.Message ?? "An error occurred while processing your request."
-        );
+        var conflict = exception is ContentConflictException or DbUpdateConcurrencyException;
+        var validation = exception is ValidationException;
+        context.Response.StatusCode = conflict ? 409 : validation ? 400 : 500;
+        var response = new {
+            success = false,
+            message = conflict ? new ContentConflictException().Message : validation ? exception.Message : "服务器暂时无法完成请求，请稍后重试。",
+            code = conflict ? "CONTENT_CONFLICT" : validation ? "VALIDATION_ERROR" : "INTERNAL_ERROR",
+            traceId = context.TraceIdentifier
+        };
 
         var options = new JsonSerializerOptions
         {

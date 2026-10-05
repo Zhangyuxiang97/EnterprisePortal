@@ -1,0 +1,13 @@
+{
+  "name": "hailong-portal-design-demos",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "海隆门户四种设计方向的独立静态演示",
+  "scripts": {
+    "dev": "node tools/serve.mjs",
+    "build": "node tools/build.mjs",
+    "preview": "node tools/serve.mjs --dist"
+  },
+  "engines": { "node": ">=18" }
+}

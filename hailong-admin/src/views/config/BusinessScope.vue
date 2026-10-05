@@ -4,10 +4,10 @@
       <template #header>
         <div class="card-header">
           <span>业务范围管理</span>
-          <el-button type="primary" icon="Plus" @click="handleAdd">新增业务范围</el-button>
+          <el-button v-if="canManage" type="primary" icon="Plus" @click="handleAdd">新增业务范围</el-button>
         </div>
       </template>
-      
+
       <!-- 表格 -->
       <el-table :data="tableData" v-loading="loading" border stripe row-key="id">
         <el-table-column type="index" label="序号" width="60" />
@@ -23,18 +23,20 @@
         </el-table-column>
         <el-table-column label="操作" width="200" fixed="right" align="center">
           <template #default="{ row }">
-            <el-button type="primary" size="small" link @click="handleEdit(row)">编辑</el-button>
+            <el-button v-if="canManage" type="primary" size="small" link @click="handleEdit(row)">编辑</el-button>
             <el-button type="success" size="small" link @click="handleSort(row, 'up')" :disabled="row.sortOrder === 1">上移</el-button>
             <el-button type="success" size="small" link @click="handleSort(row, 'down')">下移</el-button>
-            <el-button type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
+            <el-button v-if="canManage" type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
-    
+
     <!-- 新增/编辑对话框 -->
     <el-dialog
       v-model="dialogVisible"
+      class="editor-dialog"
+      :before-close="beforeEditorClose"
       :title="isEdit ? '编辑业务范围' : '新增业务范围'"
       width="800px"
       destroy-on-close
@@ -54,7 +56,7 @@
             show-word-limit
           />
         </el-form-item>
-        
+
         <el-form-item label="业务描述" prop="description">
           <el-input
             v-model="formData.description"
@@ -65,7 +67,7 @@
             show-word-limit
           />
         </el-form-item>
-        
+
         <el-form-item label="详细内容" prop="content">
           <RichEditor
             v-model="formData.content"
@@ -73,7 +75,7 @@
             placeholder="请输入详细内容..."
           />
         </el-form-item>
-        
+
         <el-form-item label="业务特点" prop="features">
           <el-tag
             v-for="(feature, index) in formData.features"
@@ -101,7 +103,7 @@
             + 添加特点
           </el-button>
         </el-form-item>
-        
+
         <el-form-item label="业务图片" prop="imageId">
           <FileUpload
             v-model="formData.imageId"
@@ -113,7 +115,7 @@
             :related-id="formData.id"
           />
         </el-form-item>
-        
+
         <el-form-item label="排序" prop="sortOrder">
           <el-input-number
             v-model="formData.sortOrder"
@@ -122,7 +124,7 @@
             placeholder="数字越小越靠前"
           />
         </el-form-item>
-        
+
         <el-form-item label="状态">
           <el-radio-group v-model="formData.status">
             <el-radio :value="true">启用</el-radio>
@@ -130,16 +132,19 @@
           </el-radio-group>
         </el-form-item>
       </el-form>
-      
+
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSubmit" :loading="submitting">提交</el-button>
+        <el-button @click="handleCancel">取消</el-button>
+        <el-button type="primary" @click="handleSubmit" :loading="submitting" :disabled="activeUploads > 0">提交</el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
+import { notifyError } from '@/utils/errors'
+import { createLatestRequest } from '@/utils/latestRequest'
+import { useEditorForm } from '@/composables/useEditorForm'
 import { ref, reactive, onMounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { systemConfigApi } from '@/api'
@@ -172,6 +177,8 @@ const formData = reactive({
   sortOrder: 1,
   status: true
 })
+const { markSaved, handleCancel, beforeEditorClose, canManage, activeUploads } = useEditorForm(formData, dialogVisible, submitting)
+
 
 // 表单验证规则
 const formRules = {
@@ -190,21 +197,25 @@ const formRules = {
 /**
  * 加载数据
  */
+const listRequests = createLatestRequest()
 const loadData = async () => {
+  const requestId = listRequests.begin()
   loading.value = true
   try {
     const res = await systemConfigApi.businessScope.getList()
-    
+    if (!listRequests.isCurrent(requestId)) return
+
     if (res.success && res.data) {
       tableData.value = res.data.sort((a, b) => a.sortOrder - b.sortOrder)
     } else {
       ElMessage.error(res.message || '加载数据失败')
     }
   } catch (error) {
-    console.error('加载数据失败:', error)
-    ElMessage.error('加载数据失败，请稍后重试')
+    if (!listRequests.isCurrent(requestId)) return
+
+    notifyError(error, '加载数据失败，请稍后重试')
   } finally {
-    loading.value = false
+    if (listRequests.isCurrent(requestId)) loading.value = false
   }
 }
 
@@ -236,6 +247,7 @@ const handleEdit = async (row) => {
     if (res.success && res.data) {
       Object.assign(formData, {
         id: res.data.id,
+        version: res.data.version,
         name: res.data.name,
         description: res.data.description || '',
         content: res.data.content || '',
@@ -249,8 +261,8 @@ const handleEdit = async (row) => {
       ElMessage.error(res.message || '获取详情失败')
     }
   } catch (error) {
-    console.error('获取详情失败:', error)
-    ElMessage.error('获取详情失败，请稍后重试')
+
+    notifyError(error, '获取详情失败，请稍后重试')
   }
 }
 
@@ -268,7 +280,7 @@ const handleDelete = async (row) => {
         type: 'warning'
       }
     )
-    
+
     const res = await systemConfigApi.businessScope.delete(row.id)
     if (res.success) {
       ElMessage.success(res.message || '删除成功')
@@ -278,8 +290,8 @@ const handleDelete = async (row) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('删除失败:', error)
-      ElMessage.error('删除失败，请稍后重试')
+
+      notifyError(error, '删除失败，请稍后重试')
     }
   }
 }
@@ -297,8 +309,8 @@ const handleSort = async (row, direction) => {
       ElMessage.error(res.message || '排序失败')
     }
   } catch (error) {
-    console.error('排序失败:', error)
-    ElMessage.error('排序失败，请稍后重试')
+
+    notifyError(error, '排序失败，请稍后重试')
   }
 }
 
@@ -329,17 +341,18 @@ const removeFeature = (index) => {
  */
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   try {
     await formRef.value.validate()
   } catch (error) {
     ElMessage.warning('请正确填写表单')
     return
   }
-  
+
   submitting.value = true
   try {
     const submitData = {
+      version: formData.version,
       name: formData.name,
       description: formData.description || null,
       content: formData.content || null,
@@ -348,24 +361,25 @@ const handleSubmit = async () => {
       sortOrder: formData.sortOrder,
       status: formData.status
     }
-    
+
     let res
     if (isEdit.value) {
       res = await systemConfigApi.businessScope.update(formData.id, submitData)
     } else {
       res = await systemConfigApi.businessScope.create(submitData)
     }
-    
+
     if (res.success) {
       ElMessage.success(res.message || (isEdit.value ? '更新成功' : '创建成功'))
+      markSaved()
       dialogVisible.value = false
       loadData()
     } else {
       ElMessage.error(res.message || (isEdit.value ? '更新失败' : '创建失败'))
     }
   } catch (error) {
-    console.error('提交失败:', error)
-    ElMessage.error(isEdit.value ? '更新失败，请稍后重试' : '创建失败，请稍后重试')
+
+    notifyError(error, isEdit.value ? '更新失败，请稍后重试' : '创建失败，请稍后重试')
   } finally {
     submitting.value = false
   }

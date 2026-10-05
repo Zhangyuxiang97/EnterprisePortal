@@ -7,6 +7,7 @@ namespace HailongConsulting.API.Models.DTOs;
 /// </summary>
 public class UserDto
 {
+    public bool IsLastActiveAdmin { get; set; }
     public int Id { get; set; }
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
@@ -48,8 +49,10 @@ public class CreateUserDto
 
     [Required(ErrorMessage = "角色不能为空")]
     [MaxLength(20, ErrorMessage = "角色长度不能超过20个字符")]
+    [RegularExpression("^(admin|user)$", ErrorMessage = "角色只能为管理员或普通用户")]
     public string Role { get; set; } = "user";
 
+    [Range(0, 1)]
     public sbyte Status { get; set; } = 1;
 }
 
@@ -72,8 +75,10 @@ public class UpdateUserDto
 
     [Required(ErrorMessage = "角色不能为空")]
     [MaxLength(20, ErrorMessage = "角色长度不能超过20个字符")]
+    [RegularExpression("^(admin|user)$", ErrorMessage = "角色只能为管理员或普通用户")]
     public string Role { get; set; } = "user";
 
+    [Range(0, 1)]
     public sbyte Status { get; set; } = 1;
 }
 
@@ -91,12 +96,15 @@ public class ResetPasswordDto
 /// <summary>
 /// 用户查询参数 DTO
 /// </summary>
-public class UserQueryDto
+public class UserQueryDto : IValidatableObject
 {
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) => HailongConsulting.API.Common.PaginationValidation.Validate(Page, PageSize);
     public string? Username { get; set; }
     public string? RealName { get; set; }
     public string? Role { get; set; }
     public sbyte? Status { get; set; }
+    [Range(1, int.MaxValue)]
     public int Page { get; set; } = 1;
+    [Range(1, 100)]
     public int PageSize { get; set; } = 10;
 }

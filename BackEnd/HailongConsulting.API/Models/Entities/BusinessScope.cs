@@ -7,8 +7,13 @@ namespace HailongConsulting.API.Models.Entities;
 /// 业务范围实体
 /// </summary>
 [Table("business_scope")]
-public class BusinessScope
+public class BusinessScope : IVersionedContent
 {
+    [ConcurrencyCheck]
+    [Column("version")]
+    [MaxLength(32)]
+    public string Version { get; set; } = Guid.NewGuid().ToString("N");
+
     /// <summary>
     /// 业务ID
     /// </summary>

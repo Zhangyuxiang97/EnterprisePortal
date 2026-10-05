@@ -1,4 +1,5 @@
 using Ganss.Xss;
+using System.Text.RegularExpressions;
 
 namespace HailongConsulting.API.Services;
 
@@ -14,6 +15,9 @@ public interface IHtmlContentSanitizer
 public sealed class HtmlContentSanitizer : IHtmlContentSanitizer
 {
     private readonly HtmlSanitizer _sanitizer = new();
+    private static readonly Regex InlineRasterImage = new(
+        @"\Adata:image/(?:png|jpeg|gif|webp);base64,[a-z0-9+/=\s]+\z",
+        RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.NonBacktracking);
 
     public HtmlContentSanitizer()
     {
@@ -21,6 +25,14 @@ public sealed class HtmlContentSanitizer : IHtmlContentSanitizer
         _sanitizer.AllowedSchemes.Add("http");
         _sanitizer.AllowedSchemes.Add("https");
         _sanitizer.AllowedSchemes.Add("mailto");
+        // 恢复的内嵌图片只允许出现在 img.src，不全局放开 data URI。
+        _sanitizer.RemovingAttribute += (_, e) =>
+        {
+            if (e.Reason == RemoveReason.NotAllowedUrlValue &&
+                e.Tag.LocalName == "img" && e.Attribute.Name == "src" &&
+                InlineRasterImage.IsMatch(e.Attribute.Value))
+                e.Cancel = true;
+        };
     }
 
     public string Sanitize(string? html) =>

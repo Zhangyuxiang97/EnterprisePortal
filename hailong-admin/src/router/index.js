@@ -1,3 +1,5 @@
+import { session } from '@/utils/session'
+import { useUserStore } from '@/stores/user'
 import { createRouter, createWebHistory } from 'vue-router'
 import { tokenUtils } from '@/utils/auth'
 
@@ -91,10 +93,16 @@ const routes = [
         ]
       },
       {
+        path: '/config/site-settings',
+        name: 'SiteSettings',
+        component: () => import('@/views/config/SiteSettings.vue'),
+        meta: { title: '门户站点设置', roles: ['admin'] }
+      },
+      {
         path: '/config',
         name: 'Config',
         redirect: '/config/company-profile',
-        meta: { title: '系统配置', icon: 'Setting', roles: ['admin'] },
+        meta: { title: '企业资料', icon: 'Setting', roles: ['admin'] },
         children: [
           // 轮播图管理 - 已暂时注释，不对接后台
           // {
@@ -103,11 +111,12 @@ const routes = [
           //   component: () => import('@/views/config/Banners.vue'),
           //   meta: { title: '轮播图管理', roles: ['admin'] }
           // },
+
           {
             path: '/config/company-profile',
             name: 'CompanyProfile',
             component: () => import('@/views/config/CompanyProfile.vue'),
-            meta: { title: '企业信息', roles: ['admin'] }
+            meta: { title: '企业简介', roles: ['admin'] }
           },
           {
             path: '/config/business-scope',
@@ -119,19 +128,19 @@ const routes = [
             path: '/config/qualifications',
             name: 'Qualifications',
             component: () => import('@/views/config/Qualifications.vue'),
-            meta: { title: '资质管理', roles: ['admin'] }
+            meta: { title: '企业资质', roles: ['admin'] }
           },
           {
             path: '/config/honors',
             name: 'Honors',
             component: () => import('@/views/config/Honors.vue'),
-            meta: { title: '荣誉管理', roles: ['admin'] }
+            meta: { title: '企业荣誉', roles: ['admin'] }
           },
           {
             path: '/config/achievements',
             name: 'Achievements',
             component: () => import('@/views/config/Achievements.vue'),
-            meta: { title: '重大业绩', roles: ['admin'] }
+            meta: { title: '重要业绩', roles: ['admin'] }
           }
           // 友情链接 - 已暂时注释
           // {
@@ -191,41 +200,18 @@ const router = createRouter({
 /**
  * 路由守卫 - 权限验证
  */
-router.beforeEach((to, from, next) => {
-  const token = tokenUtils.getToken()
-  const userInfo = tokenUtils.getUserInfo()
-  
-  // 设置页面标题
-  document.title = to.meta.title ? `${to.meta.title} - 海隆咨询后台管理` : '海隆咨询后台管理系统'
-  
-  // 如果访问登录页，直接放行
-  if (to.path === '/login') {
-    if (token) {
-      // 已登录则跳转到数据看板
-      next('/dashboard')
-    } else {
-      next()
-    }
-    return
-  }
-  
-  // 其他页面需要验证登录
-  if (!token) {
-    next('/login')
-    return
-  }
-  
-  // 验证角色权限
-  if (to.meta.roles && userInfo) {
-    const userRole = userInfo.role || 'user'
-    if (!to.meta.roles.includes(userRole)) {
-      // 没有权限，跳转到首页
-      next('/dashboard')
-      return
+router.beforeEach(async (to, from) => {
+  document.title = to.meta.title ? to.meta.title + ' - 海隆咨询后台管理' : '海隆咨询后台管理系统'
+  if (session.token && !session.verified) {
+    try { await useUserStore().getCurrentUser() }
+    catch {
+      if (session.token) return from.matched.length ? false : (to.path === '/login' ? true : '/login')
     }
   }
-  
-  next()
+  if (to.path === '/login') return session.token && session.verified ? '/dashboard' : true
+  if (!session.token || !session.verified) return '/login'
+  if (to.meta.roles && !to.meta.roles.includes(session.user?.role)) return '/dashboard'
+  return true
 })
 
 export default router

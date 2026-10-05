@@ -1,14 +1,6 @@
 <template>
-  <div id="app">
-    <router-view />
-  </div>
+  <PortalLayout><router-view /></PortalLayout>
 </template>
-
 <script setup>
+import PortalLayout from '@/layouts/PortalLayout.vue'
 </script>
-
-<style scoped>
-#app {
-  min-height: 100vh;
-}
-</style>

@@ -4,17 +4,17 @@
       <template #header>
         <div class="card-header">
           <span>新闻中心管理</span>
-          <el-button type="primary" icon="Plus" @click="handleAdd">新增新闻</el-button>
+          <el-button v-if="canManage" type="primary" icon="Plus" @click="handleAdd">新增新闻</el-button>
         </div>
       </template>
-      
+
       <!-- 搜索区域 -->
       <el-form :model="searchForm" inline class="search-form">
         <el-form-item label="关键词">
-          <el-input 
-            v-model="searchForm.keyword" 
-            placeholder="搜索标题、作者" 
-            clearable 
+          <el-input
+            v-model="searchForm.keyword"
+            placeholder="搜索标题、作者"
+            clearable
             style="width: 220px;"
           />
         </el-form-item>
@@ -23,6 +23,7 @@
             <el-option label="公司新闻" value="公司新闻" />
             <el-option label="行业动态" value="行业动态" />
             <el-option label="通知公告" value="通知公告" />
+            <el-option label="知识资讯" value="知识资讯" />
           </el-select>
         </el-form-item>
         <el-form-item label="时间范围">
@@ -41,7 +42,7 @@
           <el-button icon="Refresh" @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
-      
+
       <!-- 表格 -->
       <el-table :data="tableData" v-loading="loading" border stripe>
         <el-table-column type="index" label="序号" width="60" />
@@ -70,20 +71,20 @@
         </el-table-column>
         <el-table-column label="操作" width="200" fixed="right" align="center">
           <template #default="{ row }">
-            <el-button type="primary" size="small" link @click="handleEdit(row)">编辑</el-button>
-            <el-button 
-              :type="row.isTop ? 'warning' : 'success'" 
-              size="small" 
-              link 
+            <el-button type="primary" size="small" link @click="handleEdit(row)">{{ canManage ? '编辑' : '查看' }}</el-button>
+            <el-button v-if="canManage"
+              :type="row.isTop ? 'warning' : 'success'"
+              size="small"
+              link
               @click="handleToggleTop(row)"
             >
               {{ row.isTop ? '取消置顶' : '置顶' }}
             </el-button>
-            <el-button type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
+            <el-button v-if="canManage" type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
-      
+
       <!-- 分页 -->
       <el-pagination
         v-model:current-page="pagination.pageNumber"
@@ -96,30 +97,32 @@
         style="margin-top: 20px; justify-content: flex-end;"
       />
     </el-card>
-    
+
     <!-- 新增/编辑对话框 -->
     <el-dialog
       v-model="dialogVisible"
+      class="editor-dialog"
+      :before-close="beforeEditorClose"
       :title="isEdit ? '编辑新闻' : '新增新闻'"
       width="900px"
       destroy-on-close
       :close-on-click-modal="false"
     >
-      <el-form 
-        ref="formRef" 
-        :model="formData" 
-        :rules="formRules" 
+      <el-form :disabled="!canManage"
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
         label-width="100px"
       >
         <el-form-item label="新闻标题" prop="title">
-          <el-input 
-            v-model="formData.title" 
-            placeholder="请输入新闻标题（最多255个字符）" 
+          <el-input
+            v-model="formData.title"
+            placeholder="请输入新闻标题（最多255个字符）"
             maxlength="255"
             show-word-limit
           />
         </el-form-item>
-        
+
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="分类" prop="category">
@@ -127,6 +130,7 @@
                 <el-option label="公司新闻" value="公司新闻" />
                 <el-option label="行业动态" value="行业动态" />
                 <el-option label="通知公告" value="通知公告" />
+                <el-option label="知识资讯" value="知识资讯" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -140,7 +144,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        
+
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="发布人" prop="publisher">
@@ -163,7 +167,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        
+
         <el-form-item label="摘要" prop="summary">
           <el-input
             v-model="formData.summary"
@@ -174,7 +178,7 @@
             show-word-limit
           />
         </el-form-item>
-        
+
         <!-- 封面图片 - 暂时注释 -->
         <!-- <el-form-item label="封面图片" prop="coverImageId">
           <FileUpload
@@ -186,11 +190,11 @@
             @change="handleCoverImageChange"
           />
         </el-form-item> -->
-        
+
         <el-form-item label="新闻内容" prop="content">
-          <RichEditor v-model="formData.content" />
+          <RichEditor :disabled="!canManage" v-model="formData.content" />
         </el-form-item>
-        
+
         <el-form-item label="附件" prop="attachmentIds">
           <FileUpload
             v-model="formData.attachmentIds"
@@ -201,7 +205,7 @@
             :related-id="formData.id"
           />
         </el-form-item>
-        
+
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="是否置顶" prop="isTop">
@@ -218,16 +222,21 @@
           </el-col>
         </el-row>
       </el-form>
-      
+
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSubmit" :loading="submitting">提交</el-button>
+        <el-button @click="handleCancel">取消</el-button>
+        <el-button v-if="canManage" type="primary" @click="handleSubmit" :loading="submitting" :disabled="activeUploads > 0">提交</el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
+import { useContentSubmit } from '@/composables/useContentSubmit'
+import { notifyError } from '@/utils/errors'
+import { createLatestRequest } from '@/utils/latestRequest'
+import { useEditorForm } from '@/composables/useEditorForm'
+import { localDateTime, richContentRule } from '@/utils/form'
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { infoPublicationApi } from '@/api'
@@ -279,6 +288,8 @@ const formData = reactive({
   isTop: false,
   status: 1
 })
+const { markSaved, handleCancel, beforeEditorClose, canManage, activeUploads } = useEditorForm(formData, dialogVisible, submitting)
+
 
 // 封面图片ID数组（用于FileUpload组件）
 const coverImageIds = ref([])
@@ -297,9 +308,7 @@ const formRules = {
   category: [
     { required: true, message: '请选择分类', trigger: 'change' }
   ],
-  content: [
-    { required: true, message: '请输入新闻内容', trigger: 'blur' }
-  ],
+  content: [richContentRule],
   publishTime: [
     { required: true, message: '请选择发布时间', trigger: 'change' }
   ]
@@ -308,7 +317,9 @@ const formRules = {
 /**
  * 加载数据
  */
+const listRequests = createLatestRequest()
 const loadData = async () => {
+  const requestId = listRequests.begin()
   loading.value = true
   try {
     // 处理时间范围
@@ -319,7 +330,7 @@ const loadData = async () => {
       searchForm.startDate = ''
       searchForm.endDate = ''
     }
-    
+
     const params = {
       type: 'COMPANY_NEWS', // 固定为新闻中心
       keyword: searchForm.keyword || undefined,
@@ -329,9 +340,10 @@ const loadData = async () => {
       pageNumber: pagination.pageNumber,
       pageSize: pagination.pageSize
     }
-    
+
     const res = await infoPublicationApi.getInfoPublicationList(params)
-    
+    if (!listRequests.isCurrent(requestId)) return
+
     if (res.success && res.data) {
       tableData.value = res.data.items || []
       pagination.total = res.data.totalCount || 0
@@ -339,10 +351,11 @@ const loadData = async () => {
       ElMessage.error(res.message || '加载数据失败')
     }
   } catch (error) {
-    console.error('加载数据失败:', error)
-    ElMessage.error('加载数据失败，请稍后重试')
+    if (!listRequests.isCurrent(requestId)) return
+
+    notifyError(error, '加载数据失败，请稍后重试')
   } finally {
-    loading.value = false
+    if (listRequests.isCurrent(requestId)) loading.value = false
   }
 }
 
@@ -379,7 +392,7 @@ const handleAdd = () => {
     coverImageId: null,
     author: '',
     publisher: '',
-    publishTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    publishTime: localDateTime(),
     attachmentIds: [],
     isTop: false,
     status: 1
@@ -398,6 +411,7 @@ const handleEdit = async (row) => {
     if (res.success && res.data) {
       Object.assign(formData, {
         id: res.data.id,
+        version: res.data.version,
         type: res.data.type,
         category: res.data.category || '',
         title: res.data.title,
@@ -419,8 +433,8 @@ const handleEdit = async (row) => {
       ElMessage.error(res.message || '获取新闻详情失败')
     }
   } catch (error) {
-    console.error('获取新闻详情失败:', error)
-    ElMessage.error('获取新闻详情失败，请稍后重试')
+
+    notifyError(error, '获取新闻详情失败，请稍后重试')
   }
 }
 
@@ -431,9 +445,10 @@ const handleToggleTop = async (row) => {
   try {
     const newIsTop = !row.isTop
     const res = await infoPublicationApi.updateInfoPublication(row.id, {
+      version: row.version,
       isTop: newIsTop
     })
-    
+
     if (res.success) {
       ElMessage.success(newIsTop ? '置顶成功' : '取消置顶成功')
       loadData()
@@ -441,8 +456,8 @@ const handleToggleTop = async (row) => {
       ElMessage.error(res.message || '操作失败')
     }
   } catch (error) {
-    console.error('操作失败:', error)
-    ElMessage.error('操作失败，请稍后重试')
+
+    notifyError(error, '操作失败，请稍后重试')
   }
 }
 
@@ -452,15 +467,15 @@ const handleToggleTop = async (row) => {
 const handleDelete = async (row) => {
   try {
     await ElMessageBox.confirm(
-      `确定要删除新闻"${row.title}"吗？删除后将无法恢复。`, 
-      '删除确认', 
+      `确定要删除新闻"${row.title}"吗？删除后将无法恢复。`,
+      '删除确认',
       {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }
     )
-    
+
     const res = await infoPublicationApi.deleteInfoPublication(row.id)
     if (res.success) {
       ElMessage.success(res.message || '删除成功')
@@ -474,8 +489,8 @@ const handleDelete = async (row) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('删除失败:', error)
-      ElMessage.error('删除失败，请稍后重试')
+
+      notifyError(error, '删除失败，请稍后重试')
     }
   }
 }
@@ -483,19 +498,10 @@ const handleDelete = async (row) => {
 /**
  * 提交表单
  */
-const handleSubmit = async () => {
-  if (!formRef.value) return
-  
-  try {
-    await formRef.value.validate()
-  } catch (error) {
-    ElMessage.warning('请正确填写表单')
-    return
-  }
-  
-  submitting.value = true
-  try {
-    const submitData = {
+const handleSubmit = useContentSubmit({
+  formRef, submitting, isEdit, formData,
+  buildPayload: () => ({
+      version: formData.version,
       type: formData.type,
       category: formData.category,
       title: formData.title,
@@ -508,29 +514,10 @@ const handleSubmit = async () => {
       attachmentIds: formData.attachmentIds,
       isTop: formData.isTop,
       status: formData.status
-    }
-    
-    let res
-    if (isEdit.value) {
-      res = await infoPublicationApi.updateInfoPublication(formData.id, submitData)
-    } else {
-      res = await infoPublicationApi.createInfoPublication(submitData)
-    }
-    
-    if (res.success) {
-      ElMessage.success(res.message || (isEdit.value ? '更新成功' : '创建成功'))
-      dialogVisible.value = false
-      loadData()
-    } else {
-      ElMessage.error(res.message || (isEdit.value ? '更新失败' : '创建失败'))
-    }
-  } catch (error) {
-    console.error('提交失败:', error)
-    ElMessage.error(isEdit.value ? '更新失败，请稍后重试' : '创建失败，请稍后重试')
-  } finally {
-    submitting.value = false
-  }
-}
+    }),
+  create: infoPublicationApi.createInfoPublication, update: infoPublicationApi.updateInfoPublication,
+  onSaved: () => { markSaved(); dialogVisible.value = false; return loadData() }
+})
 
 onMounted(() => {
   loadData()

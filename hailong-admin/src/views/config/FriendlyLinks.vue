@@ -7,7 +7,7 @@
           <el-button type="primary" :icon="Plus" @click="handleAdd">新增链接</el-button>
         </div>
       </template>
-      
+
       <!-- 表格 -->
       <el-table :data="tableData" v-loading="loading" border stripe>
         <el-table-column type="index" label="序号" width="60" align="center" />
@@ -49,7 +49,7 @@
         </el-table-column>
       </el-table>
     </el-card>
-    
+
     <!-- 编辑对话框 -->
     <el-dialog
       v-model="dialogVisible"
@@ -67,11 +67,11 @@
         <el-form-item label="链接名称" prop="name">
           <el-input v-model="formData.name" placeholder="请输入链接名称" clearable />
         </el-form-item>
-        
+
         <el-form-item label="链接地址" prop="url">
           <el-input v-model="formData.url" placeholder="请输入链接URL，如：https://www.example.com" clearable />
         </el-form-item>
-        
+
         <el-form-item label="描述" prop="description">
           <el-input
             v-model="formData.description"
@@ -81,7 +81,7 @@
             clearable
           />
         </el-form-item>
-        
+
         <el-form-item label="Logo" prop="logoId">
           <FileUpload
             v-model="formData.logoId"
@@ -96,14 +96,14 @@
             建议尺寸：200x100px，支持 JPG、PNG 格式
           </div>
         </el-form-item>
-        
+
         <el-form-item label="排序" prop="sortOrder">
           <el-input-number v-model="formData.sortOrder" :min="0" :max="9999" />
           <span style="margin-left: 10px; color: #909399; font-size: 12px;">
             数字越小越靠前
           </span>
         </el-form-item>
-        
+
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="formData.status">
             <el-radio :label="1">启用</el-radio>
@@ -120,6 +120,7 @@
 </template>
 
 <script setup>
+import { notifyError } from '@/utils/errors'
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
@@ -169,8 +170,8 @@ const loadData = async () => {
       ElMessage.error(res.message || '加载数据失败')
     }
   } catch (error) {
-    console.error('加载数据失败:', error)
-    ElMessage.error('加载数据失败，请稍后重试')
+
+    notifyError(error, '加载数据失败，请稍后重试')
   } finally {
     loading.value = false
   }
@@ -197,6 +198,7 @@ const handleEdit = async (row) => {
     if (res.success && res.data) {
       Object.assign(formData, {
         id: res.data.id,
+        version: res.data.version,
         name: res.data.name,
         url: res.data.url,
         logoId: res.data.logoId,
@@ -209,8 +211,8 @@ const handleEdit = async (row) => {
       ElMessage.error(res.message || '获取详情失败')
     }
   } catch (error) {
-    console.error('获取详情失败:', error)
-    ElMessage.error('获取详情失败，请稍后重试')
+
+    notifyError(error, '获取详情失败，请稍后重试')
   }
 }
 
@@ -224,8 +226,8 @@ const handleSort = async (row, direction) => {
       ElMessage.error(res.message || '排序失败')
     }
   } catch (error) {
-    console.error('排序失败:', error)
-    ElMessage.error('排序失败，请稍后重试')
+
+    notifyError(error, '排序失败，请稍后重试')
   }
 }
 
@@ -240,7 +242,7 @@ const handleDelete = async (row) => {
         type: 'warning'
       }
     )
-    
+
     const res = await systemConfigApi.friendlyLinks.delete(row.id)
     if (res.success) {
       ElMessage.success(res.message || '删除成功')
@@ -250,25 +252,26 @@ const handleDelete = async (row) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('删除失败:', error)
-      ElMessage.error('删除失败，请稍后重试')
+
+      notifyError(error, '删除失败，请稍后重试')
     }
   }
 }
 
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   try {
     await formRef.value.validate()
   } catch (error) {
     ElMessage.warning('请正确填写表单')
     return
   }
-  
+
   submitting.value = true
   try {
     const submitData = {
+      version: formData.version,
       name: formData.name,
       url: formData.url,
       logoId: formData.logoId,
@@ -276,14 +279,14 @@ const handleSubmit = async () => {
       sortOrder: formData.sortOrder,
       status: formData.status
     }
-    
+
     let res
     if (isEdit.value) {
       res = await systemConfigApi.friendlyLinks.update(formData.id, submitData)
     } else {
       res = await systemConfigApi.friendlyLinks.create(submitData)
     }
-    
+
     if (res.success) {
       ElMessage.success(res.message || (isEdit.value ? '更新成功' : '创建成功'))
       dialogVisible.value = false
@@ -292,8 +295,8 @@ const handleSubmit = async () => {
       ElMessage.error(res.message || (isEdit.value ? '更新失败' : '创建失败'))
     }
   } catch (error) {
-    console.error('提交失败:', error)
-    ElMessage.error(isEdit.value ? '更新失败，请稍后重试' : '创建失败，请稍后重试')
+
+    notifyError(error, isEdit.value ? '更新失败，请稍后重试' : '创建失败，请稍后重试')
   } finally {
     submitting.value = false
   }

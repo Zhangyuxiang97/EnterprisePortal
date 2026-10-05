@@ -16,8 +16,9 @@ import request from './request'
  * @param {number} params.pageSize - 每页数量
  * @returns {Promise}
  */
-export function getAnnouncementList(params) {
+export function getAnnouncementList(params, options = {}) {
   return request({
+    ...options,
     url: '/announcements',
     method: 'get',
     params: {
@@ -41,8 +42,9 @@ export function getAnnouncementList(params) {
  * @param {Object} params - 与公告列表一致的筛选参数
  * @returns {Promise}
  */
-export function getAnnouncementRegionOptions(params = {}) {
+export function getAnnouncementRegionOptions(params = {}, options = {}) {
   return request({
+    ...options,
     url: '/announcements/region-options',
     method: 'get',
     params: {
@@ -64,8 +66,9 @@ export function getAnnouncementRegionOptions(params = {}) {
  * @param {string} hashId - 公告hashId
  * @returns {Promise}
  */
-export function getAnnouncementByHash(hashId) {
+export function getAnnouncementByHash(hashId, options = {}) {
   return request({
+    ...options,
     url: `/announcements/by-hash/${hashId}`,
     method: 'get'
   })
@@ -76,8 +79,9 @@ export function getAnnouncementByHash(hashId) {
  * @param {Object} params - 查询参数
  * @returns {Promise}
  */
-export function getGovProcurementList(params) {
+export function getGovProcurementList(params, options = {}) {
   return request({
+    ...options,
     url: '/announcements/gov-procurement',
     method: 'get',
     params: {
@@ -100,8 +104,9 @@ export function getGovProcurementList(params) {
  * @param {Object} params - 查询参数
  * @returns {Promise}
  */
-export function getConstructionList(params) {
+export function getConstructionList(params, options = {}) {
   return request({
+    ...options,
     url: '/announcements/construction',
     method: 'get',
     params: {

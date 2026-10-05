@@ -35,10 +35,10 @@ public class RegionDictionaryController : ControllerBase
             var regions = await _regionService.GetRegionsAsync(query);
             return Ok(ApiResponse<List<RegionDictionaryDto>>.SuccessResult(regions));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取区域列表失败");
-            return StatusCode(500, ApiResponse<object>.FailResult("获取区域列表失败"));
+            throw;
         }
     }
 
@@ -53,10 +53,10 @@ public class RegionDictionaryController : ControllerBase
             var tree = await _regionService.GetRegionTreeAsync();
             return Ok(ApiResponse<List<RegionTreeNodeDto>>.SuccessResult(tree));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取区域树形结构失败");
-            return StatusCode(500, ApiResponse<object>.FailResult("获取区域树形结构失败"));
+            throw;
         }
     }
 
@@ -71,10 +71,10 @@ public class RegionDictionaryController : ControllerBase
             var provinces = await _regionService.GetProvincesAsync();
             return Ok(ApiResponse<List<RegionDictionaryDto>>.SuccessResult(provinces));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取省份列表失败");
-            return StatusCode(500, ApiResponse<object>.FailResult("获取省份列表失败"));
+            throw;
         }
     }
 
@@ -94,10 +94,10 @@ public class RegionDictionaryController : ControllerBase
             var cities = await _regionService.GetCitiesAsync(provinceCode);
             return Ok(ApiResponse<List<RegionDictionaryDto>>.SuccessResult(cities));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取城市列表失败: {ProvinceCode}", provinceCode);
-            return StatusCode(500, ApiResponse<object>.FailResult("获取城市列表失败"));
+            throw;
         }
     }
 
@@ -117,10 +117,10 @@ public class RegionDictionaryController : ControllerBase
             var districts = await _regionService.GetDistrictsAsync(cityCode);
             return Ok(ApiResponse<List<RegionDictionaryDto>>.SuccessResult(districts));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取区县列表失败: {CityCode}", cityCode);
-            return StatusCode(500, ApiResponse<object>.FailResult("获取区县列表失败"));
+            throw;
         }
     }
 
@@ -140,10 +140,10 @@ public class RegionDictionaryController : ControllerBase
 
             return Ok(ApiResponse<RegionDictionaryDto>.SuccessResult(region));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取区域详情失败: {Id}", id);
-            return StatusCode(500, ApiResponse<object>.FailResult("获取区域详情失败"));
+            throw;
         }
     }
 
@@ -163,10 +163,10 @@ public class RegionDictionaryController : ControllerBase
 
             return Ok(ApiResponse<RegionDictionaryDto>.SuccessResult(region));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "获取区域详情失败: {RegionCode}", regionCode);
-            return StatusCode(500, ApiResponse<object>.FailResult("获取区域详情失败"));
+            throw;
         }
     }
 
@@ -187,10 +187,10 @@ public class RegionDictionaryController : ControllerBase
             _logger.LogWarning(ex, "创建区域失败: {Message}", ex.Message);
             return BadRequest(ApiResponse<object>.FailResult(ex.Message));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "创建区域失败");
-            return StatusCode(500, ApiResponse<object>.FailResult("创建区域失败"));
+            throw;
         }
     }
 
@@ -211,10 +211,10 @@ public class RegionDictionaryController : ControllerBase
             _logger.LogWarning(ex, "更新区域失败: {Message}", ex.Message);
             return NotFound(ApiResponse<object>.FailResult(ex.Message));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "更新区域失败: {Id}", id);
-            return StatusCode(500, ApiResponse<object>.FailResult("更新区域失败"));
+            throw;
         }
     }
 
@@ -240,10 +240,10 @@ public class RegionDictionaryController : ControllerBase
             _logger.LogWarning(ex, "删除区域失败: {Message}", ex.Message);
             return BadRequest(ApiResponse<object>.FailResult(ex.Message));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "删除区域失败: {Id}", id);
-            return StatusCode(500, ApiResponse<object>.FailResult("删除区域失败"));
+            throw;
         }
     }
 
@@ -259,10 +259,10 @@ public class RegionDictionaryController : ControllerBase
             var count = await _regionService.ImportRegionsAsync(regions);
             return Ok(ApiResponse<object>.SuccessResult(new { importedCount = count }, $"成功导入 {count} 条记录"));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!ApiErrors.IsExpected(ex))
         {
             _logger.LogError(ex, "批量导入区域数据失败");
-            return StatusCode(500, ApiResponse<object>.FailResult("批量导入区域数据失败"));
+            throw;
         }
     }
 }

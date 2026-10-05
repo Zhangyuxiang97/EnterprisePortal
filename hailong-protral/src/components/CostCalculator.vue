@@ -87,7 +87,7 @@
         <button
           @click="calculate"
           :disabled="!canCalculate"
-          class="w-full py-4 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white rounded-lg font-bold text-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          class="portal-button portal-button--primary w-full py-4 text-lg"
         >
           开始计算
         </button>

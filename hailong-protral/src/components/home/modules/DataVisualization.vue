@@ -1,6 +1,6 @@
 <template>
   <!-- 交易数据可视化 -->
-  <div class="py-24 bg-gradient-to-b from-white via-slate-50/50 to-gray-50/50">
+  <div class="home-section">
     <div class="container-wide">
       <div class="text-center mb-16">
         <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 font-tech tracking-tight">交易数据可视化</h2>
@@ -12,6 +12,7 @@
         <p class="mt-4 text-slate-400 text-sm">正在加载统计分析数据...</p>
       </div>
       
+      <AsyncState v-else-if="fetchError" :error="fetchError" @retry="loadStatistics" />
       <div v-else-if="!statistics.totalProjects" class="text-center py-20 bg-white rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
         <div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mx-auto mb-4">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,11 +179,13 @@
 </template>
 
 <script setup>
+import AsyncState from "@/components/common/AsyncState.vue"
 import { ref, computed, onMounted } from 'vue'
 import { getStatisticsOverview } from '@/api/home'
 
 // 统计数据
 const statisticsLoading = ref(false)
+const fetchError = ref('')
 const statistics = ref({
   totalProjects: 0,
   totalAmount: 0,
@@ -242,8 +245,10 @@ const getProjectTypeCount = (type) => {
 // 加载统计数据
 const loadStatistics = async () => {
   statisticsLoading.value = true
+  fetchError.value = ''
   try {
     const response = await getStatisticsOverview()
+    if (!response.success || !response.data) throw new Error('加载失败')
     if (response.success && response.data) {
       statistics.value = {
         totalProjects: response.data.totalProjects || 0,
@@ -253,6 +258,7 @@ const loadStatistics = async () => {
       }
     }
   } catch (error) {
+    fetchError.value = '内容加载失败，请稍后重试'
     console.error('加载统计数据失败:', error)
   } finally {
     statisticsLoading.value = false

@@ -38,7 +38,9 @@ public class InfoPublicationRepository : Repository<InfoPublication>, IInfoPubli
         string? category,
         string? keyword,
         int pageIndex,
-        int pageSize)
+        int pageSize,
+        DateTime? startDate = null, DateTime? endDate = null,
+        string? sortBy = null, string? sortOrder = null)
     {
         var query = _dbSet.Where(i => i.IsDeleted == 0);
 
@@ -55,11 +57,26 @@ public class InfoPublicationRepository : Repository<InfoPublication>, IInfoPubli
                 (i.Summary != null && i.Summary.Contains(keyword)));
         }
 
+        if (startDate.HasValue) query = query.Where(i => i.PublishTime >= startDate.Value.Date);
+        if (endDate.HasValue) {
+            var exclusiveEnd = endDate.Value.Date.AddDays(1);
+            query = query.Where(i => i.PublishTime < exclusiveEnd);
+        }
         var totalCount = await query.CountAsync();
+        var ordered = query.OrderByDescending(i => i.IsTop);
+        var ascending = string.Equals(sortOrder, "asc", StringComparison.OrdinalIgnoreCase);
+        ordered = sortBy?.ToLowerInvariant() switch {
+            "createdat" => ascending ? ordered.ThenBy(i => i.CreatedAt) : ordered.ThenByDescending(i => i.CreatedAt),
+            "viewcount" => ascending ? ordered.ThenBy(i => i.ViewCount) : ordered.ThenByDescending(i => i.ViewCount),
+            _ => ascending ? ordered.ThenBy(i => i.PublishTime) : ordered.ThenByDescending(i => i.PublishTime)
+        };
 
-        var items = await query
-            .OrderByDescending(i => i.IsTop)  // 置顶优先
-            .ThenByDescending(i => i.PublishTime)  // 然后按发布时间排序
+        var items = await ordered.ThenByDescending(i => i.Id).AsNoTracking()
+            .Select(p => new InfoPublication {
+                Id=p.Id, Type=p.Type, Category=p.Category, Title=p.Title, Summary=p.Summary, DocumentNumber=p.DocumentNumber,
+                CoverImageId=p.CoverImageId, Author=p.Author, Publisher=p.Publisher, PublishTime=p.PublishTime,
+                ViewCount=p.ViewCount, IsTop=p.IsTop, Status=p.Status, CreatedAt=p.CreatedAt, UpdatedAt=p.UpdatedAt, Version=p.Version
+            })
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -79,12 +96,14 @@ public class InfoPublicationRepository : Repository<InfoPublication>, IInfoPubli
 
     public async Task IncrementViewCountAsync(int id)
     {
-        var publication = await _dbSet.FindAsync(id);
-        if (publication != null)
+        if (_context.Database.IsRelational())
         {
-            publication.ViewCount++;
-            publication.UpdatedAt = DateTime.UtcNow;
+            await _dbSet.Where(a => a.Id == id && a.IsDeleted == 0 && a.Status == 1)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(a => a.ViewCount, a => a.ViewCount + 1));
+            return;
         }
+        var entity = await _dbSet.FirstOrDefaultAsync(a => a.Id == id && a.IsDeleted == 0 && a.Status == 1);
+        if (entity != null) { entity.ViewCount++; await _context.SaveChangesAsync(); }
     }
 
     public async Task<(IEnumerable<InfoPublication> Items, int TotalCount)> GetPagedPublicationsForPortalAsync(
@@ -92,7 +111,9 @@ public class InfoPublicationRepository : Repository<InfoPublication>, IInfoPubli
         string? category,
         string? keyword,
         int pageIndex,
-        int pageSize)
+        int pageSize,
+        DateTime? startDate = null, DateTime? endDate = null,
+        string? sortBy = null, string? sortOrder = null)
     {
         // 门户查询：只返回启用状态的数据
         var query = _dbSet.Where(i => i.IsDeleted == 0 && i.Status == 1);
@@ -110,11 +131,26 @@ public class InfoPublicationRepository : Repository<InfoPublication>, IInfoPubli
                 (i.Summary != null && i.Summary.Contains(keyword)));
         }
 
+        if (startDate.HasValue) query = query.Where(i => i.PublishTime >= startDate.Value.Date);
+        if (endDate.HasValue) {
+            var exclusiveEnd = endDate.Value.Date.AddDays(1);
+            query = query.Where(i => i.PublishTime < exclusiveEnd);
+        }
         var totalCount = await query.CountAsync();
+        var ordered = query.OrderByDescending(i => i.IsTop);
+        var ascending = string.Equals(sortOrder, "asc", StringComparison.OrdinalIgnoreCase);
+        ordered = sortBy?.ToLowerInvariant() switch {
+            "createdat" => ascending ? ordered.ThenBy(i => i.CreatedAt) : ordered.ThenByDescending(i => i.CreatedAt),
+            "viewcount" => ascending ? ordered.ThenBy(i => i.ViewCount) : ordered.ThenByDescending(i => i.ViewCount),
+            _ => ascending ? ordered.ThenBy(i => i.PublishTime) : ordered.ThenByDescending(i => i.PublishTime)
+        };
 
-        var items = await query
-            .OrderByDescending(i => i.IsTop)  // 置顶优先
-            .ThenByDescending(i => i.PublishTime)  // 然后按发布时间排序
+        var items = await ordered.ThenByDescending(i => i.Id).AsNoTracking()
+            .Select(p => new InfoPublication {
+                Id=p.Id, Type=p.Type, Category=p.Category, Title=p.Title, Summary=p.Summary, DocumentNumber=p.DocumentNumber,
+                CoverImageId=p.CoverImageId, Author=p.Author, Publisher=p.Publisher, PublishTime=p.PublishTime,
+                ViewCount=p.ViewCount, IsTop=p.IsTop, Status=p.Status, CreatedAt=p.CreatedAt, UpdatedAt=p.UpdatedAt, Version=p.Version
+            })
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();

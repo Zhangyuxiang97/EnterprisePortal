@@ -13,6 +13,8 @@ public class Repository<T> : IRepository<T> where T : class
     protected readonly ApplicationDbContext _context;
     protected readonly DbSet<T> _dbSet;
 
+    public IQueryable<T> Query() => _dbSet.AsNoTracking();
+
     public Repository(ApplicationDbContext context)
     {
         _context = context;

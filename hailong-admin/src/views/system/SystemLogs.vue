@@ -104,18 +104,18 @@
         <el-descriptions-item label="操作描述" :span="2">{{ detailData.description }}</el-descriptions-item>
         <el-descriptions-item label="浏览器信息" :span="2">{{ detailData.userAgent }}</el-descriptions-item>
         <el-descriptions-item label="请求参数" :span="2">
-          <el-input 
-            v-model="detailData.requestData" 
-            type="textarea" 
-            :rows="4" 
+          <el-input
+            v-model="detailData.requestData"
+            type="textarea"
+            :rows="4"
             readonly
           />
         </el-descriptions-item>
         <el-descriptions-item label="响应结果" :span="2">
-          <el-input 
-            v-model="detailData.responseData" 
-            type="textarea" 
-            :rows="4" 
+          <el-input
+            v-model="detailData.responseData"
+            type="textarea"
+            :rows="4"
             readonly
           />
         </el-descriptions-item>
@@ -125,6 +125,10 @@
 </template>
 
 <script setup>
+import { useLatestRequest } from '@/composables/useLatestRequest'
+const loadDataRequest = useLatestRequest()
+
+import { notifyError } from '@/utils/errors'
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { systemApi } from '@/api'
@@ -175,26 +179,28 @@ const getOperationTypeTag = (type) => {
 }
 
 const loadData = async () => {
+  const requestId = loadDataRequest.begin()
   loading.value = true
   try {
     const params = {
       page: pagination.page,
       pageSize: pagination.pageSize
     }
-    
+
     // 添加搜索条件
     if (searchForm.action) params.action = searchForm.action
     if (searchForm.username) params.username = searchForm.username
     if (searchForm.module) params.module = searchForm.module
     if (searchForm.ipAddress) params.ipAddress = searchForm.ipAddress
-    
+
     // 处理日期范围
     if (searchForm.dateRange && searchForm.dateRange.length === 2) {
       params.startDate = searchForm.dateRange[0]
       params.endDate = searchForm.dateRange[1]
     }
-    
+
     const res = await systemApi.logs.getList(params)
+    if (!loadDataRequest.isCurrent(requestId)) return
     if (res.success) {
       tableData.value = res.data?.items || []
       pagination.total = res.data?.totalCount || 0
@@ -202,10 +208,14 @@ const loadData = async () => {
       ElMessage.error(res.message || '加载数据失败')
     }
   } catch (error) {
-    console.error('加载数据失败:', error)
-    ElMessage.error('加载数据失败，请稍后重试')
+    if (!loadDataRequest.isCurrent(requestId)) return
+
+    notifyError(error, '加载数据失败，请稍后重试')
   } finally {
+    if (loadDataRequest.isCurrent(requestId)) {
     loading.value = false
+
+    }
   }
 }
 
@@ -233,15 +243,15 @@ const handleViewDetail = (row) => {
 const handleClearLogs = async () => {
   try {
     await ElMessageBox.confirm(
-      '确定要清空所有日志吗？此操作不可恢复！', 
-      '警告', 
+      '确定要清空所有日志吗？此操作不可恢复！',
+      '警告',
       {
         type: 'warning',
         confirmButtonText: '确定清空',
         cancelButtonText: '取消'
       }
     )
-    
+
     const res = await systemApi.logs.clear()
     if (res.success) {
       ElMessage.success('日志清空成功')
@@ -251,8 +261,8 @@ const handleClearLogs = async () => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('日志清空失败:', error)
-      ElMessage.error('日志清空失败，请稍后重试')
+
+      notifyError(error, '日志清空失败，请稍后重试')
     }
   }
 }

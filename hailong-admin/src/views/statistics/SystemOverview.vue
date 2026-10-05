@@ -5,7 +5,8 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card-wrapper">
           <div class="stat-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="stat-icon" style="background: #edf3f8;
+  color: #245b85;">
               <el-icon><Document /></el-icon>
             </div>
             <div class="stat-content">
@@ -22,7 +23,8 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card-wrapper">
           <div class="stat-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <div class="stat-icon" style="background: #edf3f8;
+  color: #245b85;">
               <el-icon><DocumentCopy /></el-icon>
             </div>
             <div class="stat-content">
@@ -39,7 +41,8 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card-wrapper">
           <div class="stat-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <div class="stat-icon" style="background: #edf3f8;
+  color: #245b85;">
               <el-icon><View /></el-icon>
             </div>
             <div class="stat-content">
@@ -56,7 +59,8 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card-wrapper">
           <div class="stat-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+            <div class="stat-icon" style="background: #edf3f8;
+  color: #245b85;">
               <el-icon><User /></el-icon>
             </div>
             <div class="stat-content">
@@ -206,21 +210,30 @@
 </template>
 
 <script setup>
+import { useLatestRequest } from '@/composables/useLatestRequest'
+const loadSystemOverviewRequest = useLatestRequest()
+const loadRealtimeDataRequest = useLatestRequest()
+const loadTrendDataRequest = useLatestRequest()
+const loadAnnouncementTypeDistributionRequest = useLatestRequest()
+const loadInfoTypeDistributionRequest = useLatestRequest()
+
+import { notifyError } from '@/utils/errors'
+import { localDate } from '@/utils/form'
 import { ref, reactive, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { 
-  Document, 
-  DocumentCopy, 
-  View, 
-  User, 
+import {
+  Document,
+  DocumentCopy,
+  View,
+  User,
   Clock,
   CaretTop,
   CaretBottom,
   Download
 } from '@element-plus/icons-vue'
 import { statisticsApi } from '@/api'
-import * as echarts from 'echarts'
+import * as echarts from '@/utils/echarts'
 import { getLineChartOption, getDoughnutChartOption, getGaugeChartOption } from '@/utils/chartOptions'
 
 const router = useRouter()
@@ -263,13 +276,16 @@ let realtimeTimer = null
  * 加载系统概览数据
  */
 const loadSystemOverview = async () => {
+  const requestId = loadSystemOverviewRequest.begin()
   try {
     const res = await statisticsApi.system.getOverview()
+    if (!loadSystemOverviewRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       Object.assign(systemData, res.data)
     }
   } catch (error) {
-    console.error('加载系统概览失败:', error)
+    if (!loadSystemOverviewRequest.isCurrent(requestId)) return
+    notifyError(error, '加载系统概览失败:')
   }
 }
 
@@ -277,13 +293,16 @@ const loadSystemOverview = async () => {
  * 加载实时数据
  */
 const loadRealtimeData = async () => {
+  const requestId = loadRealtimeDataRequest.begin()
   try {
     const res = await statisticsApi.system.getRealtime()
+    if (!loadRealtimeDataRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       Object.assign(realtimeData, res.data)
     }
   } catch (error) {
-    console.error('加载实时数据失败:', error)
+    if (!loadRealtimeDataRequest.isCurrent(requestId)) return
+    notifyError(error, '加载实时数据失败:')
   }
 }
 
@@ -291,29 +310,32 @@ const loadRealtimeData = async () => {
  * 加载综合趋势数据
  */
 const loadTrendData = async () => {
+  const requestId = loadTrendDataRequest.begin()
   try {
     const [visitRes, announcementRes, infoRes] = await Promise.all([
       statisticsApi.visit.getTrend({ days: 30 }),
       statisticsApi.announcement.getTrend({ days: 30 }),
       statisticsApi.infoPublication.getTrend({ days: 30 })
     ])
-    
+    if (!loadTrendDataRequest.isCurrent(requestId)) return
+
     if (visitRes.success && announcementRes.success && infoRes.success) {
       renderTrendChart({
         dates: visitRes.data.dates,
         series: [
           { name: '访问量', data: visitRes.data.visits || [] },
-          { name: '公告发布', data: announcementRes.data.govProcurement?.map((v, i) => 
+          { name: '公告发布', data: announcementRes.data.govProcurement?.map((v, i) =>
             v + (announcementRes.data.construction?.[i] || 0)) || [] },
-          { name: '信息发布', data: infoRes.data.companyNews?.map((v, i) => 
-            v + (infoRes.data.policyRegulation?.[i] || 0) + 
-            (infoRes.data.policyInfo?.[i] || 0) + 
+          { name: '信息发布', data: infoRes.data.companyNews?.map((v, i) =>
+            v + (infoRes.data.policyRegulation?.[i] || 0) +
+            (infoRes.data.policyInfo?.[i] || 0) +
             (infoRes.data.notice?.[i] || 0)) || [] }
         ]
       })
     }
   } catch (error) {
-    console.error('加载趋势数据失败:', error)
+    if (!loadTrendDataRequest.isCurrent(requestId)) return
+    notifyError(error, '加载趋势数据失败:')
   }
 }
 
@@ -324,13 +346,13 @@ const renderTrendChart = (data) => {
   if (!trendChart) {
     trendChart = echarts.init(trendChartRef.value)
   }
-  
+
   const option = getLineChartOption(data, {
     smooth: true,
     showArea: true,
     colors: ['#4facfe', '#667eea', '#f093fb']
   })
-  
+
   trendChart.setOption(option)
 }
 
@@ -338,13 +360,16 @@ const renderTrendChart = (data) => {
  * 加载公告类型分布
  */
 const loadAnnouncementTypeDistribution = async () => {
+  const requestId = loadAnnouncementTypeDistributionRequest.begin()
   try {
     const res = await statisticsApi.announcement.getTypeDistribution()
+    if (!loadAnnouncementTypeDistributionRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       renderAnnouncementTypeChart(res.data)
     }
   } catch (error) {
-    console.error('加载公告类型分布失败:', error)
+    if (!loadAnnouncementTypeDistributionRequest.isCurrent(requestId)) return
+    notifyError(error, '加载公告类型分布失败:')
   }
 }
 
@@ -355,11 +380,11 @@ const renderAnnouncementTypeChart = (data) => {
   if (!announcementTypeChart) {
     announcementTypeChart = echarts.init(announcementTypeChartRef.value)
   }
-  
+
   const option = getDoughnutChartOption(data, {
     radius: ['40%', '70%']
   })
-  
+
   announcementTypeChart.setOption(option)
 }
 
@@ -367,13 +392,16 @@ const renderAnnouncementTypeChart = (data) => {
  * 加载信息类型分布
  */
 const loadInfoTypeDistribution = async () => {
+  const requestId = loadInfoTypeDistributionRequest.begin()
   try {
     const res = await statisticsApi.infoPublication.getTypeDistribution()
+    if (!loadInfoTypeDistributionRequest.isCurrent(requestId)) return
     if (res.success && res.data) {
       renderInfoTypeChart(res.data)
     }
   } catch (error) {
-    console.error('加载信息类型分布失败:', error)
+    if (!loadInfoTypeDistributionRequest.isCurrent(requestId)) return
+    notifyError(error, '加载信息类型分布失败:')
   }
 }
 
@@ -384,11 +412,11 @@ const renderInfoTypeChart = (data) => {
   if (!infoTypeChart) {
     infoTypeChart = echarts.init(infoTypeChartRef.value)
   }
-  
+
   const option = getDoughnutChartOption(data, {
     radius: ['40%', '70%']
   })
-  
+
   infoTypeChart.setOption(option)
 }
 
@@ -399,7 +427,7 @@ const renderHealthChart = () => {
   if (!healthChart) {
     healthChart = echarts.init(healthChartRef.value)
   }
-  
+
   // 计算系统健康度（示例：基于各项指标）
   const healthScore = Math.min(100, Math.round(
     (systemData.totalAnnouncements > 0 ? 25 : 0) +
@@ -407,13 +435,13 @@ const renderHealthChart = () => {
     (systemData.totalVisits > 100 ? 25 : systemData.totalVisits / 4) +
     (systemData.activeUsers > 0 ? 25 : 0)
   ))
-  
+
   const option = getGaugeChartOption(healthScore, {
     min: 0,
     max: 100,
     unit: '%'
   })
-  
+
   healthChart.setOption(option)
 }
 
@@ -460,23 +488,25 @@ const handleResize = () => {
   if (healthChart) healthChart.resize()
 }
 
+let healthRenderTimer
 onMounted(() => {
   loadSystemOverview()
   loadRealtimeData()
   loadTrendData()
   loadAnnouncementTypeDistribution()
   loadInfoTypeDistribution()
-  
+
   // 延迟渲染健康度图表，确保数据已加载
-  setTimeout(() => {
+  healthRenderTimer = setTimeout(() => {
     renderHealthChart()
   }, 500)
-  
+
   startRealtimeUpdate()
   window.addEventListener('resize', handleResize)
 })
 
 onBeforeUnmount(() => {
+  clearTimeout(healthRenderTimer)
   stopRealtimeUpdate()
 })
 

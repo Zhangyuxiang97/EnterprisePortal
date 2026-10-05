@@ -8,7 +8,26 @@
 
 **技术架构**: Vue 3 + Vite + Element Plus
 
-**开发状态**: ✅ 已完成并投入使用
+**开发状态**: 本地开发与预览；正式部署按根目录 Ubuntu 22 Docker 部署指南执行。
+
+## 后台维护与验证
+
+- 菜单按公告管理、信息发布、附件管理、门户设置、企业资料、统计分析、系统管理组织；轮播图与友情链接独立编辑页暂未开放入口。
+- `components/RichEditor.vue` 统一处理历史 HTML 载入、图片上传和隔离正文预览；历史正文只有实际编辑后才转为编辑器格式。
+- `composables/useEditorForm.js` 统一处理关闭、路由离开、刷新提醒及上传期间的保存限制；`utils/form.js` 提供本地时间、有效正文和地区树筛选。
+- 上传格式和体积限制读取 `/api/attachments/upload-options`，默认后端上限为 10 MB。附件“引用”可查看已保存内容的使用位置，有引用的文件不能直接删除。
+- 资质展示开关与证书有效期分别显示。日期、编号和荣誉级别没有明确依据时留空，长期证书在描述中注明。
+- 公告数量按记录计数，不代表去重后的项目数；金额是已记录的结果公告中标 / 成交金额，可能包含同项目的多条结果记录。发布时间趋势按启用记录的 `PublishTime` 统计，“今日入库”按创建时间统计。
+
+```bash
+npm ci
+npm test
+npm run build
+```
+
+浏览器回归使用本机已初始化的测试数据库和 Chrome，需先启动 API 和管理端。设置环境变量 `ADMIN_TEST_USERNAME`、`ADMIN_TEST_PASSWORD` 后运行 `npm run test:browser`；可用 `ADMIN_TEST_URL` / `ADMIN_TEST_API` 调整本机地址，默认分别为 `http://127.0.0.1:3002` 和 `http://127.0.0.1:5000/api`。脚本拒绝连接非本机域名，不输出凭据。
+
+该回归会验证现有初始化公告与扫描通知，按原值保存资质/荣誉，并创建临时政策、地区、普通用户及文本附件，最后清理本轮创建的记录。服务端附件使用软删除，因此上传的测试文件仍按既有存储保留规则处理。不要针对业务库运行；测试代码位于 `tests/admin.smoke.mjs`。
 
 ## 🛠 技术栈
 
@@ -124,7 +143,7 @@ pnpm install
 
 ```env
 # 开发环境API地址
-VITE_API_BASE_URL=http://localhost:5000
+VITE_API_BASE_URL=/api
 ```
 
 编辑 `.env.production` 文件：
@@ -736,6 +755,23 @@ docker run -d -p 3000:80 --name hailong-admin hailong-admin
 - 数据格式是否正确
 - 容器尺寸是否正确
 ```
+
+## 后台接口与编辑约定（2026-10-05）
+
+- 公告、资讯和企业资料的后台读取使用 `/api/announcements/manage`、`/api/info-publications/manage`、`/api/config/manage/...`，需要登录。原公开读取接口只返回启用内容；管理详情不增加门户浏览量。
+- 列表只返回摘要及表格字段，编辑时读取详情。保存公告、资讯和企业资料必须带读取时的 `version`；过期版本返回 HTTP 409，页面保留本地修改。
+- `useContentSubmit` 统一公告/资讯的保存过程；`useEditorForm`、`useEditorLeaveGuard` 保护未保存编辑和上传；`useLatestRequest` 防止迟到请求更新页面或已销毁的图表。
+- 普通请求与附件上传共用单次令牌刷新。会话彻底失效时保留当前表单，可在提示的新窗口重新登录后返回继续操作。退出登录前先确认未保存内容，再调用服务端注销。
+- 用户列表的 `isLastActiveAdmin` 用于禁用危险操作，后端同时通过事务和行锁保护最后一名启用管理员。
+- Element Plus 组件及字符串图标在 `src/plugins-ui.js` 按实际使用注册；新增组件需要补充注册，局部图标直接导入。统计图表通过 `src/utils/echarts.js` 注册需要的图表能力。
+
+### 回归验证
+
+- `npm test`：本地时间、富文本有效性、地区筛选、证书展示和查询时序。
+- `npm run test:browser`：历史公告和企业资料保存、扫描件预览、文件上传删除、权限、内容冲突、并发刷新、上传重试、登录失效恢复及服务端注销。
+- 浏览器测试只连接 localhost / 127.0.0.1，需要预先启动 API 和后台，并通过 `ADMIN_TEST_USERNAME`、`ADMIN_TEST_PASSWORD` 提供本机测试管理员。端口可用 `ADMIN_TEST_URL`、`ADMIN_TEST_API` 调整；默认使用本机 Chrome，设置 `ADMIN_TEST_CHANNEL=chromium` 可使用 Playwright 自带 Chromium。
+- 后端 `dotnet test BackEnd/Protral.sln` 从仓库根目录执行。MySQL 集成用例需显式设置 `LOCAL_MYSQL_TEST_CONNECTION`，仅接受本机连接，创建随机 `hailong_cleanup_test_*` 数据库并在结束时清理；不会使用该连接指定的业务库作为测试库。
+- CI 的 `initial-data` 作业会启动独立 MySQL，导入初始化 SQL，再通过 `scripts/run-ci-browser.mjs` 启动隔离的 API/后台服务并执行浏览器用例。测试凭据通过进程环境传递，不写入工作流输出。
 
 ## 📚 相关文档
 

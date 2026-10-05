@@ -8,8 +8,13 @@ namespace HailongConsulting.API.Models.Entities;
 /// 统一公告实体（政府采购 + 建设工程）
 /// </summary>
 [Table("announcements")]
-public class Announcement
+public class Announcement : IVersionedContent
 {
+    [ConcurrencyCheck]
+    [Column("version")]
+    [MaxLength(32)]
+    public string Version { get; set; } = Guid.NewGuid().ToString("N");
+
     /// <summary>
     /// 公告ID
     /// </summary>
@@ -68,6 +73,11 @@ public class Announcement
     [Column("budget_amount")]
     [Precision(15, 2)]
     public decimal? BudgetAmount { get; set; }
+
+    /// <summary>中标/成交金额（万元，不含候选人报价）</summary>
+    [Column("award_amount")]
+    [Precision(15, 2)]
+    public decimal? AwardAmount { get; set; }
 
     /// <summary>
     /// 截止时间

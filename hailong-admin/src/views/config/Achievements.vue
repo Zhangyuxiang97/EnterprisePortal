@@ -4,10 +4,10 @@
       <template #header>
         <div class="card-header">
           <span>重大业绩</span>
-          <el-button type="primary" icon="Plus" @click="handleAdd">新增业绩</el-button>
+          <el-button v-if="canManage" type="primary" icon="Plus" @click="handleAdd">新增业绩</el-button>
         </div>
       </template>
-      
+
       <el-table :data="tableData" v-loading="loading" border stripe>
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="projectName" label="项目名称" min-width="200" show-overflow-tooltip />
@@ -29,7 +29,7 @@
         </el-table-column>
         <el-table-column label="操作" width="240" fixed="right">
           <template #default="{ row, $index }">
-            <el-button type="primary" size="small" link @click="handleEdit(row)">编辑</el-button>
+            <el-button v-if="canManage" type="primary" size="small" link @click="handleEdit(row)">编辑</el-button>
             <el-button
               type="info"
               size="small"
@@ -44,7 +44,7 @@
               @click="handleSort(row, 'down')"
               :disabled="$index === tableData.length - 1"
             >下移</el-button>
-            <el-button type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
+            <el-button v-if="canManage" type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -53,6 +53,8 @@
     <!-- 新增/编辑对话框 -->
     <el-dialog
       v-model="dialogVisible"
+      class="editor-dialog"
+      :before-close="beforeEditorClose"
       :title="dialogTitle"
       width="800px"
       @close="handleDialogClose"
@@ -61,15 +63,15 @@
         <el-form-item label="项目名称" prop="projectName">
           <el-input v-model="formData.projectName" placeholder="请输入项目名称" maxlength="200" show-word-limit />
         </el-form-item>
-        
+
         <el-form-item label="项目类型" prop="projectType">
           <el-input v-model="formData.projectType" placeholder="请输入项目类型" maxlength="50" />
         </el-form-item>
-        
+
         <el-form-item label="客户名称" prop="clientName">
           <el-input v-model="formData.clientName" placeholder="请输入客户名称" maxlength="200" />
         </el-form-item>
-        
+
         <el-form-item label="项目金额(万元)" prop="projectAmount">
           <el-input-number
             v-model="formData.projectAmount"
@@ -80,7 +82,7 @@
             style="width: 100%"
           />
         </el-form-item>
-        
+
         <el-form-item label="完成日期" prop="completionDate">
           <el-date-picker
             v-model="formData.completionDate"
@@ -91,7 +93,7 @@
             style="width: 100%"
           />
         </el-form-item>
-        
+
         <el-form-item label="项目图片">
           <FileUpload
             v-model="formData.imageIds"
@@ -105,7 +107,7 @@
           />
           <div class="form-tip">建议尺寸：800x600，仅支持上传1张图片</div>
         </el-form-item>
-        
+
         <el-form-item label="项目描述">
           <el-input
             v-model="formData.description"
@@ -116,12 +118,12 @@
             show-word-limit
           />
         </el-form-item>
-        
+
         <el-form-item label="排序" prop="sortOrder">
           <el-input-number v-model="formData.sortOrder" :min="0" :max="9999" />
           <span class="form-tip" style="margin-left: 10px;">数字越小越靠前</span>
         </el-form-item>
-        
+
         <el-form-item label="状态">
           <el-switch
             v-model="formData.status"
@@ -132,16 +134,19 @@
           />
         </el-form-item>
       </el-form>
-      
+
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSubmit" :loading="submitting">确定</el-button>
+        <el-button @click="handleCancel">取消</el-button>
+        <el-button type="primary" @click="handleSubmit" :loading="submitting" :disabled="activeUploads > 0">确定</el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
+import { notifyError } from '@/utils/errors'
+import { createLatestRequest } from '@/utils/latestRequest'
+import { useEditorForm } from '@/composables/useEditorForm'
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { systemConfigApi } from '@/api'
@@ -166,6 +171,8 @@ const formData = reactive({
   sortOrder: 0,
   status: true
 })
+const { markSaved, handleCancel, beforeEditorClose, canManage, activeUploads } = useEditorForm(formData, dialogVisible, submitting)
+
 
 const rules = {
   projectName: [
@@ -183,20 +190,24 @@ const rules = {
   ]
 }
 
+const listRequests = createLatestRequest()
 const loadData = async () => {
+  const requestId = listRequests.begin()
   loading.value = true
   try {
     const res = await systemConfigApi.achievements.getList()
+    if (!listRequests.isCurrent(requestId)) return
     if (res.success) {
       tableData.value = res.data || []
     } else {
       ElMessage.error(res.message || '加载数据失败')
     }
   } catch (error) {
-    console.error('加载数据失败:', error)
-    ElMessage.error('加载数据失败，请稍后重试')
+    if (!listRequests.isCurrent(requestId)) return
+
+    notifyError(error, '加载数据失败，请稍后重试')
   } finally {
-    loading.value = false
+    if (listRequests.isCurrent(requestId)) loading.value = false
   }
 }
 
@@ -221,6 +232,7 @@ const handleEdit = (row) => {
   dialogTitle.value = '编辑业绩'
   Object.assign(formData, {
     id: row.id,
+        version: row.version,
     projectName: row.projectName,
     projectType: row.projectType,
     clientName: row.clientName,
@@ -236,26 +248,27 @@ const handleEdit = (row) => {
 
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   await formRef.value.validate(async (valid) => {
     if (!valid) return
-    
+
     submitting.value = true
     try {
       const res = formData.id
         ? await systemConfigApi.achievements.update(formData.id, formData)
         : await systemConfigApi.achievements.create(formData)
-      
+
       if (res.success) {
         ElMessage.success(formData.id ? '更新成功' : '创建成功')
-        dialogVisible.value = false
+        markSaved()
+      dialogVisible.value = false
         loadData()
       } else {
         ElMessage.error(res.message || '操作失败')
       }
     } catch (error) {
-      console.error('提交失败:', error)
-      ElMessage.error('操作失败，请稍后重试')
+
+      notifyError(error, '操作失败，请稍后重试')
     } finally {
       submitting.value = false
     }
@@ -272,8 +285,8 @@ const handleSort = async (row, direction) => {
       ElMessage.error(res.message || '排序失败')
     }
   } catch (error) {
-    console.error('排序失败:', error)
-    ElMessage.error('排序失败，请稍后重试')
+
+    notifyError(error, '排序失败，请稍后重试')
   }
 }
 
@@ -282,7 +295,7 @@ const handleDelete = async (row) => {
     await ElMessageBox.confirm('确定要删除该业绩吗？', '提示', {
       type: 'warning'
     })
-    
+
     const res = await systemConfigApi.achievements.delete(row.id)
     if (res.success) {
       ElMessage.success('删除成功')
@@ -292,8 +305,8 @@ const handleDelete = async (row) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('删除失败:', error)
-      ElMessage.error('删除失败，请稍后重试')
+
+      notifyError(error, '删除失败，请稍后重试')
     }
   }
 }

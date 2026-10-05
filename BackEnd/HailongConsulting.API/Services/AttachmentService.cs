@@ -1,3 +1,4 @@
+using HailongConsulting.API.Data;
 using AutoMapper;
 using HailongConsulting.API.Common;
 using HailongConsulting.API.Models.DTOs;
@@ -13,15 +14,18 @@ namespace HailongConsulting.API.Services;
 public class AttachmentService : IAttachmentService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly ILogger<AttachmentService> _logger;
 
     public AttachmentService(
         IUnitOfWork unitOfWork,
+        ApplicationDbContext context,
         IMapper mapper,
         ILogger<AttachmentService> logger)
     {
         _unitOfWork = unitOfWork;
+        _context = context;
         _mapper = mapper;
         _logger = logger;
     }
@@ -31,8 +35,9 @@ public class AttachmentService : IAttachmentService
         try
         {
             // 构建查询条件
-            var allAttachments = await _unitOfWork.Attachments.FindAsync(a => a.IsDeleted == 0);
-            var query = allAttachments.AsQueryable();
+            var query = _unitOfWork.Attachments.Query().Where(a => a.IsDeleted == 0);
+            page = Math.Max(1, page);
+            pageSize = Math.Clamp(pageSize, 1, 100);
 
             // 分类筛选
             if (!string.IsNullOrWhiteSpace(category))
@@ -52,12 +57,12 @@ public class AttachmentService : IAttachmentService
                 query = query.Where(a => a.FileName.Contains(keyword));
             }
 
-            var totalCount = query.Count();
-            var items = query
-                .OrderByDescending(a => a.CreatedAt)
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(a => a.CreatedAt).ThenByDescending(a => a.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .ToList();
+                .ToListAsync();
 
             var dtoItems = _mapper.Map<List<AttachmentDto>>(items);
 
@@ -116,6 +121,9 @@ public class AttachmentService : IAttachmentService
 
     public async Task<bool> DeleteAsync(int id)
     {
+        if (!await _unitOfWork.Attachments.AnyAsync(a => a.Id == id && a.IsDeleted == 0)) return false;
+        var references = await AttachmentReferences.FindAsync(_context, id);
+        if (references.Count > 0) throw new InvalidOperationException($"附件正在被 {references.Count} 条内容引用，请先在对应内容中移除引用");
         try
         {
             await _unitOfWork.Attachments.SoftDeleteAsync(id);
@@ -131,9 +139,15 @@ public class AttachmentService : IAttachmentService
 
     public async Task<bool> DeleteRangeAsync(IEnumerable<int> ids)
     {
+        var selected = ids.Distinct().ToArray();
+        if (selected.Length is < 1 or > 100) throw new System.ComponentModel.DataAnnotations.ValidationException("每次请选择1到100个附件");
+        if (await _unitOfWork.Attachments.Query().CountAsync(a => selected.Contains(a.Id) && a.IsDeleted == 0) != selected.Length) return false;
+        var references = await AttachmentReferences.FindManyAsync(_context, selected);
+        var used = references.FirstOrDefault(pair => pair.Value.Count > 0);
+        if (used.Value != null) throw new InvalidOperationException($"附件 {used.Key} 仍被内容引用，本次未删除任何附件，请先移除引用");
         try
         {
-            await _unitOfWork.Attachments.SoftDeleteRangeAsync(ids);
+            await _unitOfWork.Attachments.SoftDeleteRangeAsync(selected);
             await _unitOfWork.SaveChangesAsync();
             return true;
         }

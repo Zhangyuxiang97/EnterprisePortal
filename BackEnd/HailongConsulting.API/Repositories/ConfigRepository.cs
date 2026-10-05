@@ -1,3 +1,4 @@
+using HailongConsulting.API.Common;
 using HailongConsulting.API.Data;
 using HailongConsulting.API.Models.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -42,8 +43,9 @@ public class ConfigRepository : IConfigRepository
 
     public async Task<bool> UpdateBannerAsync(CarouselBanner banner)
     {
-        _context.Set<CarouselBanner>().Update(banner);
-        return await _context.SaveChangesAsync() > 0;
+
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<bool> DeleteBannerAsync(int id)
@@ -78,16 +80,19 @@ public class ConfigRepository : IConfigRepository
         }
         else
         {
+            ContentRevision.Check(existing, profile.Version);
             // 如果存在，更新现有的
             existing.Title = profile.Title;
             existing.Content = profile.Content;
             existing.Highlights = profile.Highlights;
             existing.ImageIds = profile.ImageIds;
+            existing.Status = profile.Status;
             existing.UpdatedAt = DateTime.Now;
-            _context.Set<CompanyProfile>().Update(existing);
+
         }
         
-        return await _context.SaveChangesAsync() > 0;
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     #endregion
@@ -118,8 +123,9 @@ public class ConfigRepository : IConfigRepository
 
     public async Task<bool> UpdateAchievementAsync(MajorAchievement achievement)
     {
-        _context.Set<MajorAchievement>().Update(achievement);
-        return await _context.SaveChangesAsync() > 0;
+
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<bool> DeleteAchievementAsync(int id)
@@ -159,8 +165,9 @@ public class ConfigRepository : IConfigRepository
 
     public async Task<bool> UpdateHonorAsync(CompanyHonor honor)
     {
-        _context.Set<CompanyHonor>().Update(honor);
-        return await _context.SaveChangesAsync() > 0;
+
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<bool> DeleteHonorAsync(int id)
@@ -200,8 +207,9 @@ public class ConfigRepository : IConfigRepository
 
     public async Task<bool> UpdateLinkAsync(FriendlyLink link)
     {
-        _context.Set<FriendlyLink>().Update(link);
-        return await _context.SaveChangesAsync() > 0;
+
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<bool> DeleteLinkAsync(int id)
@@ -295,8 +303,9 @@ public class ConfigRepository : IConfigRepository
 
     public async Task<bool> UpdateBusinessScopeAsync(BusinessScope scope)
     {
-        _context.Set<BusinessScope>().Update(scope);
-        return await _context.SaveChangesAsync() > 0;
+
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<bool> DeleteBusinessScopeAsync(int id)
@@ -336,8 +345,9 @@ public class ConfigRepository : IConfigRepository
 
     public async Task<bool> UpdateQualificationAsync(CompanyQualification qualification)
     {
-        _context.Set<CompanyQualification>().Update(qualification);
-        return await _context.SaveChangesAsync() > 0;
+
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<bool> DeleteQualificationAsync(int id)

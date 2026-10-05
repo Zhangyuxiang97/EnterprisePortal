@@ -29,6 +29,9 @@
 
   <ItemGroup>
     <EmbeddedResource Include="DatabaseMigrations\*.sql" />
+    <EmbeddedResource Include="SiteSettingsDefaults.json" />
+    <Content Include="SeedAssets\legacy\*.jpg" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="SeedAssets\legacy\*.docx" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

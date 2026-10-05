@@ -59,6 +59,7 @@
 </template>
 
 <script setup>
+import { notifyError } from '@/utils/errors'
 import { ref, watch, onMounted } from 'vue'
 import { systemApi } from '@/api'
 import { ElMessage } from 'element-plus'
@@ -129,8 +130,8 @@ const loadProvinces = async () => {
       provinces.value = res.data
     }
   } catch (error) {
-    console.error('加载省份列表失败:', error)
-    ElMessage.error('加载省份列表失败')
+
+    notifyError(error, '加载省份列表失败')
   }
 }
 
@@ -147,8 +148,8 @@ const loadCities = async (provinceCode) => {
       cities.value = res.data
     }
   } catch (error) {
-    console.error('加载城市列表失败:', error)
-    ElMessage.error('加载城市列表失败')
+
+    notifyError(error, '加载城市列表失败')
   }
 }
 
@@ -165,8 +166,8 @@ const loadDistricts = async (cityCode) => {
       districts.value = res.data
     }
   } catch (error) {
-    console.error('加载区县列表失败:', error)
-    ElMessage.error('加载区县列表失败')
+
+    notifyError(error, '加载区县列表失败')
   }
 }
 

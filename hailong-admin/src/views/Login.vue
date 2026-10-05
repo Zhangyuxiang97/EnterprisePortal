@@ -6,11 +6,11 @@
         <h1>海隆咨询后台管理系统</h1>
         <p>Hailong Consulting Management System</p>
       </div>
-      
-      <el-form 
-        ref="loginFormRef" 
-        :model="loginForm" 
-        :rules="loginRules" 
+
+      <el-form
+        ref="loginFormRef"
+        :model="loginForm"
+        :rules="loginRules"
         class="login-form"
       >
         <el-form-item prop="username">
@@ -22,7 +22,7 @@
             clearable
           />
         </el-form-item>
-        
+
         <el-form-item prop="password">
           <el-input
             v-model="loginForm.password"
@@ -34,12 +34,12 @@
             @keyup.enter="handleLogin"
           />
         </el-form-item>
-        
+
         <el-form-item>
-          <el-button 
-            type="primary" 
-            size="large" 
-            :loading="loading" 
+          <el-button
+            type="primary"
+            size="large"
+            :loading="loading"
             @click="handleLogin"
             class="login-button"
           >
@@ -52,6 +52,7 @@
 </template>
 
 <script setup>
+import { notifyError } from '@/utils/errors'
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -75,8 +76,7 @@ const loginRules = {
     { required: true, message: '请输入用户名', trigger: 'blur' }
   ],
   password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
+    { required: true, message: '请输入密码', trigger: 'blur' }
   ]
 }
 
@@ -88,15 +88,15 @@ const loading = ref(false)
  */
 const handleLogin = async () => {
   if (!loginFormRef.value) return
-  
+
   await loginFormRef.value.validate(async (valid) => {
     if (!valid) return
-    
+
     loading.value = true
-    
+
     try {
       const success = await userStore.login(loginForm)
-      
+
       if (success) {
         ElMessage.success('登录成功')
         router.push('/home')
@@ -104,8 +104,8 @@ const handleLogin = async () => {
         ElMessage.error('用户名或密码错误')
       }
     } catch (error) {
-      console.error('登录错误:', error)
-      ElMessage.error('登录失败，请稍后重试')
+
+      notifyError(error, '登录失败，请稍后重试')
     } finally {
       loading.value = false
     }

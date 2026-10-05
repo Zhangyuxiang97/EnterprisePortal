@@ -1,5 +1,10 @@
 <template>
   <div class="rich-editor">
+    <div class="editor-actions"><span>正文编辑</span><el-button text size="small" @click="previewVisible = true">预览正文</el-button></div>
+    <el-dialog v-model="previewVisible" title="正文预览" width="min(960px, 94vw)" append-to-body>
+      <iframe title="正文预览" :srcdoc="previewDocument" sandbox="" style="width: 100%; height: 65vh; border: 0;" />
+    </el-dialog>
+    <el-alert v-if="editorError" :title="editorError" type="error" :closable="false" />
     <Toolbar
       :editor="editorRef"
       :defaultConfig="toolbarConfig"
@@ -7,7 +12,7 @@
       class="toolbar"
     />
     <Editor
-      v-model="valueHtml"
+      :defaultHtml="''"
       :defaultConfig="editorConfig"
       :mode="mode"
       :style="{ height: height + 'px' }"
@@ -19,12 +24,13 @@
 </template>
 
 <script setup>
-import { ref, shallowRef, watch, onBeforeUnmount, computed } from 'vue'
+import { notifyError } from '@/utils/errors'
+import { ref, shallowRef, watch, onBeforeUnmount, computed, nextTick, inject } from 'vue'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import '@wangeditor/editor/dist/css/style.css'
 import { ElMessage } from 'element-plus'
-import { tokenUtils } from '@/utils/auth'
-import { API_CONFIG } from '@/config/api.config'
+import { uploadOptions, loadUploadOptions, validateUpload } from '@/utils/upload'
+import { uploadAttachment } from '@/api/attachment'
 
 const props = defineProps({
   modelValue: {
@@ -56,92 +62,57 @@ const emit = defineEmits(['update:modelValue', 'change'])
 const editorRef = shallowRef()
 
 // 内容 HTML
-const valueHtml = ref(props.modelValue)
+const editorError = ref('')
+const previewVisible = ref(false)
+const activeUploads = inject('editorActiveUploads', ref(0))
+const previewDocument = computed(() => `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src http: https: data:; media-src http: https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"><style>body{font:16px/1.85 system-ui,sans-serif;color:#273548;padding:24px;overflow-wrap:anywhere}img,video{max-width:100%;height:auto}table{border-collapse:collapse;max-width:100%}td,th{border:1px solid #ddd;padding:8px}a{color:#245b85}</style></head><body>${props.modelValue || '<p>暂无正文</p>'}</body></html>`)
+let lastHtml = ''
+let applying = false
+let revision = 0
 
 // 工具栏配置
 const toolbarConfig = {
   excludeKeys: props.disabled ? ['uploadImage', 'uploadVideo'] : []
 }
 
-// 上传请求头
-const uploadHeaders = computed(() => {
-  const token = tokenUtils.getToken()
-  return token ? { Authorization: `Bearer ${token}` } : {}
-})
+async function uploadEditorFile(file, category) {
+  activeUploads.value++
+  try {
+    await loadUploadOptions()
+    const error = validateUpload(file, uploadOptions[category])
+    if (error) throw new Error(error)
+    const data = new FormData()
+    data.append('file', file)
+    data.append('category', category)
+    const res = await uploadAttachment(data)
+    if (!res.success) throw new Error(res.message || '上传失败')
+    return res.data
+  } catch (error) { notifyError(error, error.message || '上传失败，请重试') }
+  finally { activeUploads.value-- }
+}
 
 // 编辑器配置
 const editorConfig = {
   placeholder: props.placeholder,
   readOnly: props.disabled,
   MENU_CONF: {
-    // 配置上传图片
     uploadImage: {
-      server: `${API_CONFIG.baseURL}/attachments/upload`,
-      fieldName: 'file',
-      maxFileSize: 5 * 1024 * 1024, // 5M
+      maxFileSize: Number.MAX_SAFE_INTEGER,
       allowedFileTypes: ['image/*'],
-      headers: uploadHeaders.value,
-      
-      // 上传前的钩子
-      onBeforeUpload(file) {
-        console.log('上传图片前:', file)
-        return file
-      },
-      
-      // 自定义插入图片
-      customInsert(res, insertFn) {
-        console.log('图片上传响应:', res)
-        if (res.success && res.data) {
-          const url = res.data.fileUrl || res.data.url
-          const alt = res.data.fileName || res.data.name || ''
-          insertFn(url, alt, url)
-          ElMessage.success('图片上传成功')
-        } else {
-          ElMessage.error(res.message || '图片上传失败')
-        }
-      },
-      
-      // 上传错误
-      onError(file, err, res) {
-        console.error('图片上传失败:', err, res)
-        ElMessage.error('图片上传失败，请重试')
+      async customUpload(file, insertFn) {
+        const attachment = await uploadEditorFile(file, 'image')
+        if (attachment) insertFn(attachment.fileUrl, attachment.fileName, '')
       }
     },
-    
-    // 配置上传视频
     uploadVideo: {
-      server: `${API_CONFIG.baseURL}/attachments/upload`,
-      fieldName: 'file',
-      maxFileSize: 100 * 1024 * 1024, // 100M
+      maxFileSize: Number.MAX_SAFE_INTEGER,
       allowedFileTypes: ['video/*'],
-      headers: uploadHeaders.value,
-      
-      // 上传前的钩子
-      onBeforeUpload(file) {
-        console.log('上传视频前:', file)
-        return file
-      },
-      
-      // 自定义插入视频
-      customInsert(res, insertFn) {
-        console.log('视频上传响应:', res)
-        if (res.success && res.data) {
-          const url = res.data.fileUrl || res.data.url
-          const poster = res.data.poster || ''
-          insertFn(url, poster)
-          ElMessage.success('视频上传成功')
-        } else {
-          ElMessage.error(res.message || '视频上传失败')
-        }
-      },
-      
-      // 上传错误
-      onError(file, err, res) {
-        console.error('视频上传失败:', err, res)
-        ElMessage.error('视频上传失败，请重试')
+      async customUpload(file, insertFn) {
+        const attachment = await uploadEditorFile(file, 'video')
+        if (attachment) insertFn(attachment.fileUrl, '')
       }
     },
-    
+
     // 配置插入链接
     insertLink: {
       checkLink: (text, url) => {
@@ -149,13 +120,13 @@ const editorConfig = {
         if (!url) {
           return '链接不能为空'
         }
-        if (!/^https?:\/\/.+/.test(url)) {
-          return '链接格式不正确，必须以 http:// 或 https:// 开头'
+        if (!/^https?:\/\/.+/.test(url) && !/^\/uploads\/[^\s]+$/.test(url)) {
+          return '请输入 http(s) 链接或站内 /uploads/ 附件路径'
         }
         return true
       }
     },
-    
+
     // 配置代码高亮
     codeSelectLang: {
       codeLangs: [
@@ -180,31 +151,37 @@ const editorConfig = {
 /**
  * 编辑器创建完成
  */
-const handleCreated = (editor) => {
-  editorRef.value = editor
-  
-  // 如果是禁用状态，设置为只读
-  if (props.disabled) {
-    editor.disable()
+// 先完成空编辑器的插件初始化，再导入历史 HTML。直接作为初始 html 会触发 Slate 路径失效。
+const applyHtml = async (html) => {
+  const current = ++revision
+  applying = true
+  await nextTick()
+  const editor = editorRef.value
+  if (!editor || current !== revision) return
+  try {
+    editor.setHtml(html || '')
+    lastHtml = editor.getHtml()
+    editorError.value = ''
+  } catch {
+    editorError.value = '正文载入失败，请关闭后重试；原始内容尚未改动。'
+  } finally {
+    await nextTick()
+    if (current === revision) applying = false
   }
 }
-
-/**
- * 内容变化
- */
+const handleCreated = (editor) => {
+  editorRef.value = editor
+  applyHtml(props.modelValue)
+}
 const handleChange = (editor) => {
   const html = editor.getHtml()
+  if (applying || html === lastHtml || editorError.value) return
+  lastHtml = html
   emit('update:modelValue', html)
   emit('change', html)
 }
-
-/**
- * 监听外部值变化
- */
-watch(() => props.modelValue, (newVal) => {
-  if (newVal !== valueHtml.value) {
-    valueHtml.value = newVal
-  }
+watch(() => props.modelValue, (html) => {
+  if (editorRef.value && html !== lastHtml) applyHtml(html)
 })
 
 /**
@@ -243,7 +220,7 @@ const getText = () => {
 const setHtml = (html) => {
   const editor = editorRef.value
   if (editor) {
-    editor.setHtml(html)
+    applyHtml(html)
   }
 }
 
@@ -271,6 +248,7 @@ const focus = () => {
  * 组件销毁时，销毁编辑器
  */
 onBeforeUnmount(() => {
+  ++revision
   const editor = editorRef.value
   if (editor) {
     editor.destroy()
@@ -288,6 +266,7 @@ defineExpose({
 </script>
 
 <style scoped>
+.editor-actions { display: flex; align-items: center; justify-content: space-between; padding: 4px 12px; background: #f7f9fb; color: #64748b; font-size: 12px; }
 .rich-editor {
   border: 1px solid #ccc;
   border-radius: 4px;

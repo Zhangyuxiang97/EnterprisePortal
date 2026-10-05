@@ -28,10 +28,10 @@
               :key="type.value"
               @click="formData.serviceType = type.value; calculate()"
               :class="[
-                'py-3 px-4 rounded-lg font-medium transition-all border-2',
+                'portal-choice py-3 px-4',
                 formData.serviceType === type.value
-                  ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white border-hailong-primary shadow-lg'
-                  : 'bg-white text-gray-700 border-gray-200 hover:border-hailong-primary'
+                  ? 'portal-choice--selected'
+                  : ''
               ]"
             >
               {{ type.label }}
@@ -70,7 +70,7 @@
 
         <button
           @click="calculate"
-          class="w-full py-4 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white rounded-lg font-bold text-lg hover:shadow-xl transition-all"
+          class="portal-button portal-button--primary w-full py-4 text-lg"
         >
           开始计算
         </button>

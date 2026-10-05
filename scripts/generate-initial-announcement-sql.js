@@ -8,7 +8,8 @@ const path = require('path');
 const { findAnnouncementRegionOverride } = require('./announcement-region-overrides');
 
 const ROOT = path.join(__dirname, '..');
-const DATA_FILE = path.join(__dirname, 'data', 'final-data.json');
+const ACCESS_DATA_FILE = path.join(__dirname, 'data', 'access-initial-announcements.json');
+const DATA_FILE = fs.existsSync(ACCESS_DATA_FILE) ? ACCESS_DATA_FILE : path.join(__dirname, 'data', 'final-data.json');
 const REGION_FILES = [
   'SQL/02_hailong_consulting_init_data.sql',
   'SQL/03_region_dictionary_batch1_henan.sql',
@@ -138,32 +139,49 @@ function renderSql(type, items, regions) {
   const label = type === 'bidding' ? '招标公告' : type === 'result' ? '中标公示' : '变更公告';
   let sql = `-- ${label}（首次部署时直接写入区域编码）\n`;
   sql += `-- 记录数：${items.length}\n\nSET NAMES utf8mb4;\nSET CHARACTER SET utf8mb4;\n\nUSE \`hailong_consulting\`;\n\n`;
-  sql += `INSERT INTO announcements (\n`;
-  sql += `  title, business_type, notice_type, procurement_type,\n`;
-  sql += `  bidder, winner, budget_amount, deadline,\n`;
-  sql += `  province, city, district, project_region,\n`;
-  sql += `  content, publisher, publish_time, view_count,\n`;
-  sql += `  is_top, status, is_deleted, created_at, updated_at\n`;
-  sql += `) VALUES\n`;
+  const insert = `INSERT INTO announcements (\n` +
+    `  title, business_type, notice_type, procurement_type,\n` +
+    `  bidder, winner, budget_amount, award_amount, deadline,\n` +
+    `  province, city, district, project_region,\n` +
+    `  content, publisher, publish_time, view_count,\n` +
+    `  is_top, status, is_deleted, created_at, updated_at\n` +
+    `) VALUES\n`;
 
   const values = items.map(item => {
     const region = resolveRegion(item, regions);
     const row = [
       escapeSql(item.title), escapeSql(item.business_type), escapeSql(item.notice_type), escapeSql(item.procurement_type),
-      escapeSql(item.bidder), escapeSql(item.winner), formatNumber(item.budget_amount), formatDate(item.deadline),
+      escapeSql(item.bidder), escapeSql(item.winner), formatNumber(item.budget_amount), formatNumber(item.award_amount), formatDate(item.deadline),
       escapeSql(region.provinceCode), escapeSql(region.cityCode), escapeSql(region.districtCode),
       escapeSql([region.provinceName, region.cityName, region.districtName].filter(Boolean).join(' ')),
       escapeSql(item.content), escapeSql(item.publisher), formatDate(item.publish_time), formatNumber(item.view_count),
-      '0', '1', '0', 'NOW()', 'NOW()'
+      item.is_top ? '1' : '0', '1', '0', 'NOW()', 'NOW()'
     ];
     return `(${row.join(', ')})`;
   });
-  sql += `${values.join(',\n')};\n`;
+  // 正文较大时单个全量 INSERT 可超过客户端 packet 限制；按字节分批。
+  let batch = [];
+  let bytes = Buffer.byteLength(insert);
+  for (const value of values) {
+    const size = Buffer.byteLength(value) + 2;
+    if (batch.length && bytes + size > 4 * 1024 * 1024) {
+      sql += insert + batch.join(',\n') + ';\n\n';
+      batch = [];
+      bytes = Buffer.byteLength(insert);
+    }
+    batch.push(value);
+    bytes += size;
+  }
+  if (batch.length) sql += insert + batch.join(',\n') + ';\n';
   return sql;
 }
 
 function main() {
   const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  const sourceReport = path.join(ROOT, 'SQL/initialization-source-report.json');
+  if (fs.existsSync(sourceReport) && data.length < JSON.parse(fs.readFileSync(sourceReport, 'utf8')).announcementCount) {
+    throw new Error('公告源数据不包含已合并的 Access 备份；请先执行 generate-access-initial-sql，避免丢失补充公告。');
+  }
   const regions = loadRegions();
   const grouped = { bidding: [], result: [], correction: [] };
   const unresolved = [];
@@ -174,7 +192,7 @@ function main() {
     grouped[type].push(item);
     const region = resolveRegion(item, regions);
     // 与原初始化清洗规则一致：无法确认的市/区县写 NULL，不阻断整批公告导入。
-    if (!region.provinceCode) {
+    if (item.province && !region.provinceCode) {
       unresolved.push({ title: item.title, region });
     }
   }
@@ -196,4 +214,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { main, loadRegions, resolveRegion };
+module.exports = { main, loadRegions, resolveRegion, renderSql, escapeSql };
