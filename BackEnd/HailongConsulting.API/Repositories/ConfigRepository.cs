@@ -1,5 +1,6 @@
 using HailongConsulting.API.Common;
 using HailongConsulting.API.Data;
+using HailongConsulting.API.Models.DTOs;
 using HailongConsulting.API.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,47 +18,32 @@ public class ConfigRepository : IConfigRepository
         _context = context;
     }
 
-    #region 轮播图
+    public Task<bool> MoveAchievementAsync(int id, MoveCompanyContentDto dto) => MoveAsync<MajorAchievement>(id, dto);
+    public Task<bool> MoveBusinessScopeAsync(int id, MoveCompanyContentDto dto) => MoveAsync<BusinessScope>(id, dto);
 
-    public async Task<IEnumerable<CarouselBanner>> GetAllBannersAsync()
+    private async Task<bool> MoveAsync<T>(int id, MoveCompanyContentDto dto) where T : class, IVersionedContent
     {
-        return await _context.Set<CarouselBanner>()
-            .Where(b => b.IsDeleted == 0)
-            .OrderBy(b => b.SortOrder)
-            .ThenByDescending(b => b.CreatedAt)
+        if (dto.Direction is not ("up" or "down"))
+            throw new System.ComponentModel.DataAnnotations.ValidationException("排序方向无效");
+        var items = await _context.Set<T>()
+            .Where(item => EF.Property<sbyte>(item, "IsDeleted") == 0)
+            .OrderBy(item => EF.Property<int>(item, "SortOrder"))
+            .ThenBy(item => EF.Property<int>(item, "Id"))
             .ToListAsync();
-    }
-
-    public async Task<CarouselBanner?> GetBannerByIdAsync(int id)
-    {
-        return await _context.Set<CarouselBanner>()
-            .FirstOrDefaultAsync(b => b.Id == id && b.IsDeleted == 0);
-    }
-
-    public async Task<CarouselBanner> AddBannerAsync(CarouselBanner banner)
-    {
-        await _context.Set<CarouselBanner>().AddAsync(banner);
-        await _context.SaveChangesAsync();
-        return banner;
-    }
-
-    public async Task<bool> UpdateBannerAsync(CarouselBanner banner)
-    {
-
+        var index = items.FindIndex(item => _context.Entry(item).Property<int>("Id").CurrentValue == id);
+        if (index < 0) return false;
+        ContentRevision.Check(items[index], dto.Version);
+        var next = index + (dto.Direction == "up" ? -1 : 1);
+        if (next < 0 || next >= items.Count || _context.Entry(items[next]).Property<int>("Id").CurrentValue != dto.NeighborId)
+            throw new ContentConflictException();
+        ContentRevision.Check(items[next], dto.NeighborVersion);
+        (items[index], items[next]) = (items[next], items[index]);
+        // 统一顺序也能处理重复或不连续的旧排序值；一次保存保证整体原子性。
+        for (var i = 0; i < items.Count; i++)
+            _context.Entry(items[i]).Property<int>("SortOrder").CurrentValue = i + 1;
         await _context.SaveChangesAsync();
         return true;
     }
-
-    public async Task<bool> DeleteBannerAsync(int id)
-    {
-        var banner = await GetBannerByIdAsync(id);
-        if (banner == null) return false;
-
-        banner.IsDeleted = 1;
-        return await UpdateBannerAsync(banner);
-    }
-
-    #endregion
 
     #region 企业简介
 
@@ -103,7 +89,7 @@ public class ConfigRepository : IConfigRepository
     {
         return await _context.Set<MajorAchievement>()
             .Where(a => a.IsDeleted == 0)
-            .OrderBy(a => a.SortOrder)
+            .OrderBy(a => a.SortOrder).ThenBy(a => a.Id)
             .ThenByDescending(a => a.CompletionDate)
             .ToListAsync();
     }
@@ -181,48 +167,6 @@ public class ConfigRepository : IConfigRepository
 
     #endregion
 
-    #region 友情链接
-
-    public async Task<IEnumerable<FriendlyLink>> GetAllLinksAsync()
-    {
-        return await _context.Set<FriendlyLink>()
-            .Where(l => l.IsDeleted == 0)
-            .OrderBy(l => l.SortOrder)
-            .ThenByDescending(l => l.CreatedAt)
-            .ToListAsync();
-    }
-
-    public async Task<FriendlyLink?> GetLinkByIdAsync(int id)
-    {
-        return await _context.Set<FriendlyLink>()
-            .FirstOrDefaultAsync(l => l.Id == id && l.IsDeleted == 0);
-    }
-
-    public async Task<FriendlyLink> AddLinkAsync(FriendlyLink link)
-    {
-        await _context.Set<FriendlyLink>().AddAsync(link);
-        await _context.SaveChangesAsync();
-        return link;
-    }
-
-    public async Task<bool> UpdateLinkAsync(FriendlyLink link)
-    {
-
-        await _context.SaveChangesAsync();
-        return true;
-    }
-
-    public async Task<bool> DeleteLinkAsync(int id)
-    {
-        var link = await GetLinkByIdAsync(id);
-        if (link == null) return false;
-
-        link.IsDeleted = 1;
-        return await UpdateLinkAsync(link);
-    }
-
-    #endregion
-
     #region 访问统计
 
     public async Task<int> GetTotalVisitsAsync()
@@ -277,13 +221,15 @@ public class ConfigRepository : IConfigRepository
         await _context.SaveChangesAsync();
     }
 
+    #endregion
+
     #region 业务范围
 
     public async Task<IEnumerable<BusinessScope>> GetAllBusinessScopesAsync()
     {
         return await _context.Set<BusinessScope>()
             .Where(s => s.IsDeleted == 0)
-            .OrderBy(s => s.SortOrder)
+            .OrderBy(s => s.SortOrder).ThenBy(s => s.Id)
             .ThenByDescending(s => s.CreatedAt)
             .ToListAsync();
     }
@@ -359,6 +305,5 @@ public class ConfigRepository : IConfigRepository
         return await UpdateQualificationAsync(qualification);
     }
 
-    #endregion
     #endregion
 }

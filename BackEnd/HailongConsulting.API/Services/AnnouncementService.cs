@@ -157,7 +157,7 @@ public class AnnouncementService : IAnnouncementService
             queryDto.PageSize,
             queryDto.ProcurementType,
             queryDto.StartDate,
-            queryDto.EndDate, includeDisabled, queryDto.SortBy, queryDto.SortOrder);
+            queryDto.EndDate, includeDisabled, queryDto.SortBy, queryDto.SortOrder, queryDto.ProvinceUnlocated);
 
         var dtos = _mapper.Map<List<AnnouncementListDto>>(items);
 
@@ -205,7 +205,7 @@ public class AnnouncementService : IAnnouncementService
         };
     }
 
-    public async Task<AnnouncementRegionOptionsDto> GetRegionOptionsAsync(AnnouncementQueryDto queryDto)
+    public async Task<AnnouncementRegionOptionsDto> GetRegionOptionsAsync(AnnouncementQueryDto queryDto, bool includeDisabled = false)
     {
         var regions = await _unitOfWork.RegionDictionaries.GetTreeAsync();
         var (selectedProvince, selectedCity, selectedDistrict) = ResolveSelectedRegionPath(regions, queryDto);
@@ -218,7 +218,7 @@ public class AnnouncementService : IAnnouncementService
             queryDto.ProcurementType,
             queryDto.Keyword,
             queryDto.StartDate,
-            queryDto.EndDate);
+            queryDto.EndDate, includeDisabled: includeDisabled);
 
         Dictionary<string, int> cityCounts = [];
         var cityTotalCount = 0;
@@ -233,7 +233,7 @@ public class AnnouncementService : IAnnouncementService
                 queryDto.Keyword,
                 queryDto.StartDate,
                 queryDto.EndDate,
-                selectedProvince.RegionCode);
+                selectedProvince.RegionCode, includeDisabled: includeDisabled);
         }
 
         Dictionary<string, int> districtCounts = [];
@@ -250,7 +250,7 @@ public class AnnouncementService : IAnnouncementService
                 queryDto.StartDate,
                 queryDto.EndDate,
                 selectedProvince.RegionCode,
-                selectedCity.RegionCode);
+                selectedCity.RegionCode, includeDisabled: includeDisabled);
         }
 
         var provinceOptions = BuildRegionOptions(
@@ -282,6 +282,7 @@ public class AnnouncementService : IAnnouncementService
             IReadOnlyCollection<RegionDictionary> regions,
             AnnouncementQueryDto queryDto)
     {
+        if (queryDto.ProvinceUnlocated) return (null, null, null);
         var requestedProvince = FindRegion(regions, queryDto.Province, 1, parentCode: null);
         var requestedCity = FindRegion(regions, queryDto.City, 2, parentCode: null);
         var requestedDistrict = FindRegion(regions, queryDto.District, 3, parentCode: null);

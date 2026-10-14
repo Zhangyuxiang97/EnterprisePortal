@@ -2,14 +2,13 @@
   <div class="home-section">
     <div class="container-wide">
       <div class="text-center mb-16">
-        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 font-tech tracking-tight">公告信息</h2>
-        <div class="w-12 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto rounded-full mt-3"></div>
+        <h2 class="portal-section-title text-3xl md:text-4xl font-extrabold mb-4 font-tech tracking-tight">公告信息</h2>
       </div>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- 政府采购 -->
         <div>
           <div class="flex items-center justify-between mb-6">
-            <h3 class="text-2xl font-bold text-hailong-dark">政府采购</h3>
+            <h3 class="portal-category-heading portal-tone-blue text-2xl font-bold">政府采购</h3>
             <router-link to="/announcements?tab=GOV_PROCUREMENT"
               class="text-hailong-primary hover:underline text-sm">查看全部 →</router-link>
           </div>
@@ -19,9 +18,10 @@
           <div v-else class="space-y-4">
             <div v-for="announcement in govProcurementList" :key="announcement.id"
               @click="$emit('announcement-click', announcement.hashId || announcement.id)" @keydown.enter="$emit('announcement-click', announcement.hashId || announcement.id)" role="link" tabindex="0"
-              class="h-[140px] px-6 py-4 bg-white rounded-xl hover:shadow-lg transition-all cursor-pointer border-l-4 border-hailong-primary">
+              :class="getAnnouncementTone(announcement.noticeType)"
+              class="announcement-card h-[140px] px-6 py-4 bg-white rounded-xl border border-slate-200 hover:shadow-sm transition-shadow cursor-pointer">
               <div class="flex justify-between items-start mb-1">
-                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{{ announcement.noticeTypeName }}</span>
+                <span class="announcement-tag announcement-tag--large">{{ announcement.noticeTypeName }}</span>
                 <span class="text-xs text-gray-500">{{ formatDate(announcement.publishTime) }}</span>
               </div>
               <h4
@@ -38,7 +38,7 @@
         <!-- 建设工程 -->
         <div>
           <div class="flex items-center justify-between mb-6">
-            <h3 class="text-2xl font-bold text-hailong-dark">建设工程</h3>
+            <h3 class="portal-category-heading portal-tone-teal text-2xl font-bold">建设工程</h3>
             <router-link to="/announcements?tab=CONSTRUCTION"
               class="text-hailong-primary hover:underline text-sm">查看全部 →</router-link>
           </div>
@@ -48,9 +48,10 @@
           <div v-else class="space-y-4">
             <div v-for="announcement in constructionList" :key="announcement.id"
               @click="$emit('announcement-click', announcement.hashId || announcement.id)" @keydown.enter="$emit('announcement-click', announcement.hashId || announcement.id)" role="link" tabindex="0"
-              class="h-[140px] px-6 py-4 bg-white rounded-xl hover:shadow-lg transition-all cursor-pointer border-l-4 border-hailong-secondary">
+              :class="getAnnouncementTone(announcement.noticeType)"
+              class="announcement-card h-[140px] px-6 py-4 bg-white rounded-xl border border-slate-200 hover:shadow-sm transition-shadow cursor-pointer">
               <div class="flex justify-between items-start mb-1">
-                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">{{ announcement.noticeTypeName }}</span>
+                <span class="announcement-tag announcement-tag--large">{{ announcement.noticeTypeName }}</span>
                 <span class="text-xs text-gray-500">{{ formatDate(announcement.publishTime) }}</span>
               </div>
               <h4
@@ -58,7 +59,7 @@
                 class="announcement-title text-lg font-bold text-gray-900"
               >{{ announcement.title }}</h4>
               <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-600">区域: <strong class="text-hailong-secondary">{{ announcement.projectRegion }}</strong></span>
+                <span class="text-gray-600">区域: <strong class="text-hailong-primary">{{ announcement.projectRegion }}</strong></span>
               </div>
             </div>
           </div>
@@ -72,6 +73,7 @@
 import AsyncState from "@/components/common/AsyncState.vue"
 import { ref, onMounted } from 'vue'
 import { getRecentAnnouncements } from '@/api/home'
+import { getAnnouncementTone } from '@/utils/announcementAppearance'
 
 defineEmits(['announcement-click'])
 

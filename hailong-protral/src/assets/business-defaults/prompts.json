@@ -1,0 +1,36 @@
+{
+  "generator": "imagegen built-in",
+  "description": "AI-generated default service cover illustrations. Uploaded business cover images take precedence.",
+  "images": [
+    {
+      "name": "政府采购代理",
+      "file": "government-procurement.webp",
+      "prompt": "Use case: photorealistic-natural. Asset type: default cover photograph for a Chinese engineering consulting company website service card. Create a single polished editorial photograph, wide horizontal 16:9 composition with the main subject in the central 70%, safe for cropping to a wide service-card cover. Consistent natural daylight, realistic materials, restrained blue-gray, warm wood and subtle green palette, calm professional mood. No text, readable writing, logos, watermark, typography, collage, illustration, infographic, glowing technology, neon or artificial purple lighting. Scene: a modern tidy procurement review meeting room. Main subject: a few neatly stacked blue tender-document folders and an open evaluation document on a warm oak conference table, with a silver pen and discreet office chairs softly out of focus in the background. Medium close view, realistic ordinary professional workspace, no people. Any paper markings are indistinct lines, not readable words. Crisp main subject, soft daylight from a side window."
+    },
+    {
+      "name": "建设工程招标",
+      "file": "construction-tendering.webp",
+      "prompt": "Use case: photorealistic-natural. Asset type: default cover photograph for a Chinese engineering consulting company website service card. Create a single polished editorial photograph, wide horizontal 16:9 composition with the main subject in the central 70%, safe for cropping to a wide service-card cover. Consistent natural daylight, realistic materials, restrained blue-gray, warm wood and subtle green palette, calm professional mood. No text, readable writing, logos, watermark, typography, collage, illustration, infographic, glowing technology, neon or artificial purple lighting. Scene: an urban construction project in China in clear soft morning daylight. Main subject: a modern mid-rise office building under construction, visible concrete structure and one realistic tower crane, the completed neighboring buildings provide context. Architectural editorial photograph from a natural slightly elevated viewpoint, the building and crane centered, balanced sky and structure. No signboards, no branding, no people in close-up."
+    },
+    {
+      "name": "工程造价咨询",
+      "file": "cost-consulting.webp",
+      "prompt": "Use case: photorealistic-natural. Asset type: default cover photograph for a Chinese engineering consulting company website service card. Create a single polished editorial photograph, wide horizontal 16:9 composition with the main subject in the central 70%, safe for cropping to a wide service-card cover. Consistent natural daylight, realistic materials, restrained blue-gray, warm wood and subtle green palette, calm professional mood. No text, readable writing, logos, watermark, typography, collage, illustration, infographic, glowing technology, neon or artificial purple lighting. Scene: the desk of a construction cost consultant. Main subject: architectural floor plans with unreadable technical marks, a professional calculator, a metal scale ruler, pencil and a small neatly stacked cost-estimate report. Angled overhead close-up composition with centered plans and calculator. Real paper textures, warm neutral desk, understated daylight, orderly and credible. No coin piles, currency, slogans or logos."
+    },
+    {
+      "name": "工程监理",
+      "file": "construction-supervision.webp",
+      "prompt": "Use case: photorealistic-natural. Asset type: default cover photograph for a Chinese engineering consulting company website service card. Create a single polished editorial photograph, wide horizontal 16:9 composition with the main subject in the central 70%, safe for cropping to a wide service-card cover. Consistent natural daylight, realistic materials, restrained blue-gray, warm wood and subtle green palette, calm professional mood. No text, readable writing, logos, watermark, typography, collage, illustration, infographic, glowing technology, neon or artificial purple lighting. Scene: an active building construction site in China. Main subject: one Chinese construction supervision engineer viewed from the back and side, wearing a clean white safety helmet and muted navy workwear with a subtle high visibility vest, checking a drawing folder while looking toward a realistic concrete frame and steel structure. Medium environmental photograph, human and project in central area, face not identifiable, natural anatomy and sensible site equipment. Soft daylight, no logos, no decorative icons."
+    },
+    {
+      "name": "项目管理",
+      "file": "project-management.webp",
+      "prompt": "Use case: photorealistic-natural. Asset type: default cover photograph for a Chinese engineering consulting company website service card. Create a single polished editorial photograph, wide horizontal 16:9 composition with the main subject in the central 70%, safe for cropping to a wide service-card cover. Consistent natural daylight, realistic materials, restrained blue-gray, warm wood and subtle green palette, calm professional mood. No text, readable writing, logos, watermark, typography, collage, illustration, infographic, glowing technology, neon or artificial purple lighting. Scene: a modern professional project coordination office in China. Main subject: three Chinese project consultants in understated business clothing collaborating around a conference table with a simple architectural scale model and paper plans. Natural candid working poses, medium environmental photograph rather than posed portrait. Bright side-window daylight, blue-gray and warm wood furnishings, ordinary realistic workspace, balanced centered group and model. Any screen or paper writing is blurred and unreadable."
+    },
+    {
+      "name": "招标文件编制",
+      "file": "tender-document-preparation.webp",
+      "prompt": "Use case: photorealistic-natural. Asset type: default cover photograph for a Chinese engineering consulting company website service card. Create a single polished editorial photograph, wide horizontal 16:9 composition with the main subject in the central 70%, safe for cropping to a wide service-card cover. Consistent natural daylight, realistic materials, restrained blue-gray, warm wood and subtle green palette, calm professional mood. No text, readable writing, logos, watermark, typography, collage, illustration, infographic, glowing technology, neon or artificial purple lighting. Scene: a bright document-preparation desk in a professional consulting office. Main subject: an open silver laptop, a thick ring binder of tender-document pages, a paper clip and a hand holding a pen checking the document. Close three-quarter view centered on the binder and laptop, realistic hand anatomy; laptop display shows only an indistinct document layout without readable letters. Soft natural daylight, white paper, warm wood, muted blue-gray details. No folders labeled with text, no seals or brand logos."
+    }
+  ]
+}

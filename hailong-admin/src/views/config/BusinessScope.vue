@@ -22,10 +22,10 @@
           </template>
         </el-table-column>
         <el-table-column label="操作" width="200" fixed="right" align="center">
-          <template #default="{ row }">
+          <template #default="{ row, $index }">
             <el-button v-if="canManage" type="primary" size="small" link @click="handleEdit(row)">编辑</el-button>
-            <el-button type="success" size="small" link @click="handleSort(row, 'up')" :disabled="row.sortOrder === 1">上移</el-button>
-            <el-button type="success" size="small" link @click="handleSort(row, 'down')">下移</el-button>
+            <el-button type="success" size="small" link @click="handleSort(row, 'up')" :disabled="sorting || $index === 0">上移</el-button>
+            <el-button type="success" size="small" link @click="handleSort(row, 'down')" :disabled="sorting || $index === tableData.length - 1">下移</el-button>
             <el-button v-if="canManage" type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
@@ -154,6 +154,7 @@ import RichEditor from '@/components/RichEditor.vue'
 // 表格数据
 const tableData = ref([])
 const loading = ref(false)
+const sorting = ref(false)
 
 // 对话框
 const dialogVisible = ref(false)
@@ -300,17 +301,25 @@ const handleDelete = async (row) => {
  * 排序
  */
 const handleSort = async (row, direction) => {
+  if (sorting.value) return
+  const index = tableData.value.findIndex(item => item.id === row.id)
+  const neighbor = tableData.value[index + (direction === 'up' ? -1 : 1)]
+  if (!neighbor) return
+  sorting.value = true
   try {
-    const res = await systemConfigApi.businessScope.updateSort(row.id, direction)
+    const res = await systemConfigApi.businessScope.updateSort(row.id, { direction, version: row.version, neighborId: neighbor.id, neighborVersion: neighbor.version })
     if (res.success) {
       ElMessage.success('排序成功')
-      loadData()
+      await loadData()
     } else {
       ElMessage.error(res.message || '排序失败')
     }
   } catch (error) {
 
     notifyError(error, '排序失败，请稍后重试')
+    if (error.response?.status === 409) await loadData()
+  } finally {
+    sorting.value = false
   }
 }
 

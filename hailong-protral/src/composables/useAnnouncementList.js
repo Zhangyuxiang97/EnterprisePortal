@@ -4,6 +4,7 @@ import { getAnnouncementList, getAnnouncementRegionOptions } from '@/api/announc
 import { createLatestRequest } from '../utils/latestRequest.js'
 import { queryText, queryPage, readSavedQuery, saveQuery, sameQuery } from '../utils/query.js'
 import { getDateRange } from '../utils/date.js'
+import { UNLOCATED_PROVINCE } from '../utils/regionFilter.js'
 
 const emptyFilters = () => ({ businessType: '', noticeType: '', procurementType: '', province: '', city: '', district: '', timeRange: '', startDate: '', endDate: '', keyword: '' })
 const emptyCounts = () => ({ provinceTotal: 0, cityTotal: 0, districtTotal: 0, provinceUnlocated: 0, cityUnlocated: 0, districtUnlocated: 0 })
@@ -36,6 +37,7 @@ export function useAnnouncementList() {
     const filters = emptyFilters()
     for (const key of Object.keys(filters)) filters[key] = queryText(query[key === 'businessType' ? 'tab' : key])
     if (filters.businessType !== 'GOV_PROCUREMENT') filters.procurementType = ''
+    if (filters.province === UNLOCATED_PROVINCE) { filters.city = ''; filters.district = '' }
     return filters
   }
   const loadPageData = async () => {
@@ -58,7 +60,7 @@ export function useAnnouncementList() {
       const data = regions.value.data
       provinces.value = data.provinces || []; cities.value = data.cities || []; districts.value = data.districts || []
       for (const key of Object.keys(regionCounts.value)) regionCounts.value[key] = data[`${key}Count`] || 0
-      const resolved = { province: data.selectedProvinceCode || '', city: data.selectedCityCode || '', district: data.selectedDistrictCode || '' }
+      const resolved = { province: filters.province === UNLOCATED_PROVINCE ? UNLOCATED_PROVINCE : data.selectedProvinceCode || '', city: data.selectedCityCode || '', district: data.selectedDistrictCode || '' }
       if (Object.keys(resolved).some(key => filters[key] !== resolved[key])) {
         const query = { ...route.query }
         for (const [key, value] of Object.entries(resolved)) { if (value) query[key] = value; else delete query[key] }

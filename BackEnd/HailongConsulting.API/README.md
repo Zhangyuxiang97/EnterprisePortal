@@ -4,7 +4,7 @@
 
 ## 启动
 
-先按 [数据库说明](../../SQL/README.md) 导入编号 00–10 的 SQL，再配置数据库连接和 JWT 密钥。API 自动迁移不能替代首次基础表与业务数据初始化。
+先按 [数据库说明](../../SQL/README.md) 导入编号 01–08 的 SQL，再配置数据库连接和 JWT 密钥。API 自动迁移不能替代首次基础表与业务数据初始化。
 
 从仓库根目录执行以下 PowerShell 示例，先替换占位值：
 
@@ -32,6 +32,7 @@ API 显式使用 5000 端口，与两个前端的默认代理一致。真实凭�
 
 ```text
 Controllers/          路由、授权及请求入口
+Controllers/Company/  企业简介、业务范围、资质、业绩、荣誉及访问记录
 Services/             业务、内容校验、附件引用、迁移与初始化
 Repositories/         数据访问和查询投影
 Data/                 EF Core 上下文
@@ -41,8 +42,9 @@ Common/               映射、分页、密码与错误辅助
 Middleware/           异常及操作日志
 DatabaseMigrations/   内嵌版本化 SQL 迁移
 SeedAssets/legacy/    已核验的旧站公开图片和 Word 附件
-SiteSettingsDefaults.json  API 和门户共用的展示默认值
 ```
+
+共用展示默认值位于仓库根 `config/portal-defaults.json`，通过项目文件内嵌到 API。Docker 从仓库根构建，专用 `Dockerfile.dockerignore` 只发送 API 源码和共用配置，发布包含 `SeedAssets`，上传文件及日志由运行卷提供。
 
 ## 初始账户与会话
 
@@ -56,7 +58,9 @@ SiteSettingsDefaults.json  API 和门户共用的展示默认值
 ## 查询与编辑约定
 
 - 公告、资讯和企业资料的公开接口只返回启用内容。管理读取使用 `/api/announcements/manage`、`/api/info-publications/manage` 和 `/api/config/manage/...`，按角色授权。
+- 公告查询支持 `provinceUnlocated=true` 筛选省份为空或无法匹配有效省级字典的记录，该条件与具体省市区互斥。公开 `/api/announcements/region-options` 仅统计启用公告；授权 `/api/announcements/manage/region-options` 包含停用公告，与管理列表口径一致。地区选项数量受业务、公告类型、采购子类、关键词及日期条件影响，省份数量不受选中的省份限制。
 - 后台查看详情不增加浏览量；列表只投影表格及摘要字段，正文在详情接口读取，地区批量查询。
+- 首页最新公告与公告列表均返回 `hashId`，门户详情使用该值生成链接。公开详情接口优先解析 HashId，并兼容历史正整数 ID 链接；两种链接使用同一公开查询和访问计数规则。
 - 公告、资讯及企业资料采用独立 `version`。更新请求携带读取时版本，冲突返回 409；浏览次数独立原子递增，不修改内容版本。
 - `budgetAmount` 与 `awardAmount` 分别表示明确预算和最终中标 / 成交金额，单位为万元。金额字段省略时保留原值，显式 `null` 清空，0 为有效值。
 - 请求验证必填、长度、枚举、分页及字段组合。HTML 经统一过滤器清洗；扫描图片正文可保存。
@@ -86,4 +90,4 @@ dotnet test BackEnd/Protral.sln -c Release
 
 [CI 工作流](../../.github/workflows/verify.yml) 使用独立 MySQL 验证 SQL、跨连接保护和迁移重入，并启动隔离服务执行后台浏览器回归。本机未运行的测试或远端执行状态应按实际输出判断。
 
-最后更新：2026-10-05。
+最后更新：2026-10-14。

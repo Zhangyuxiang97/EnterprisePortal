@@ -1,0 +1,18 @@
+# 构建上下文为仓库根，只发送 API 和共享默认配置。
+**
+!BackEnd/
+!BackEnd/HailongConsulting.API/
+!BackEnd/HailongConsulting.API/**
+!config/
+!config/portal-defaults.json
+**/bin
+**/obj
+**/logs
+**/wwwroot/uploads
+**/.env*
+**/appsettings.*.local.json
+**/*.user
+**/*.suo
+**/.vs
+**/node_modules
+**/TestResults

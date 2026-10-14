@@ -16,6 +16,9 @@ public class ConfigService : IConfigService
     private readonly IAttachmentService _attachmentService;
     private readonly IHtmlContentSanitizer _htmlContentSanitizer;
 
+    public Task<bool> MoveAchievementAsync(int id, MoveCompanyContentDto dto) => _repository.MoveAchievementAsync(id, dto);
+    public Task<bool> MoveBusinessScopeAsync(int id, MoveCompanyContentDto dto) => _repository.MoveBusinessScopeAsync(id, dto);
+
     public ConfigService(
         IConfigRepository repository,
         IMapper mapper,
@@ -27,51 +30,6 @@ public class ConfigService : IConfigService
         _attachmentService = attachmentService;
         _htmlContentSanitizer = htmlContentSanitizer;
     }
-
-    #region 轮播图
-
-    public async Task<IEnumerable<CarouselBannerDto>> GetAllBannersAsync()
-    {
-        var banners = await _repository.GetAllBannersAsync();
-        return _mapper.Map<IEnumerable<CarouselBannerDto>>(banners);
-    }
-
-    public async Task<CarouselBannerDto?> GetBannerByIdAsync(int id)
-    {
-        var banner = await _repository.GetBannerByIdAsync(id);
-        return banner == null ? null : _mapper.Map<CarouselBannerDto>(banner);
-    }
-
-    public async Task<CarouselBannerDto> CreateBannerAsync(CreateCarouselBannerDto dto)
-    {
-        var banner = _mapper.Map<CarouselBanner>(dto);
-        var created = await _repository.AddBannerAsync(banner);
-        return _mapper.Map<CarouselBannerDto>(created);
-    }
-
-    public async Task<bool> UpdateBannerAsync(int id, UpdateCarouselBannerDto dto)
-    {
-        var banner = await _repository.GetBannerByIdAsync(id);
-        if (banner == null) return false;
-        ContentRevision.Check(banner, dto.Version);
-
-        // 只更新非null的字段
-        if (dto.Title != null) banner.Title = dto.Title;
-        if (dto.Description != null) banner.Description = dto.Description;
-        if (dto.ImageId.HasValue) banner.ImageId = dto.ImageId.Value;
-        if (dto.LinkUrl != null) banner.LinkUrl = dto.LinkUrl;
-        if (dto.SortOrder.HasValue) banner.SortOrder = dto.SortOrder.Value;
-        if (dto.Status.HasValue) banner.Status = (sbyte)(dto.Status.Value ? 1 : 0);
-
-        return await _repository.UpdateBannerAsync(banner);
-    }
-
-    public async Task<bool> DeleteBannerAsync(int id)
-    {
-        return await _repository.DeleteBannerAsync(id);
-    }
-
-    #endregion
 
     #region 企业简介
 
@@ -251,51 +209,6 @@ public class ConfigService : IConfigService
 
     #endregion
 
-    #region 友情链接
-
-    public async Task<IEnumerable<FriendlyLinkDto>> GetAllLinksAsync()
-    {
-        var links = await _repository.GetAllLinksAsync();
-        return _mapper.Map<IEnumerable<FriendlyLinkDto>>(links);
-    }
-
-    public async Task<FriendlyLinkDto?> GetLinkByIdAsync(int id)
-    {
-        var link = await _repository.GetLinkByIdAsync(id);
-        return link == null ? null : _mapper.Map<FriendlyLinkDto>(link);
-    }
-
-    public async Task<FriendlyLinkDto> CreateLinkAsync(CreateFriendlyLinkDto dto)
-    {
-        var link = _mapper.Map<FriendlyLink>(dto);
-        var created = await _repository.AddLinkAsync(link);
-        return _mapper.Map<FriendlyLinkDto>(created);
-    }
-
-    public async Task<bool> UpdateLinkAsync(int id, UpdateFriendlyLinkDto dto)
-    {
-        var link = await _repository.GetLinkByIdAsync(id);
-        if (link == null) return false;
-        ContentRevision.Check(link, dto.Version);
-
-        // 只更新非null的字段
-        if (dto.Name != null) link.Name = dto.Name;
-        if (dto.Url != null) link.Url = dto.Url;
-        if (dto.LogoId.HasValue) link.LogoId = dto.LogoId;
-        if (dto.Description != null) link.Description = dto.Description;
-        if (dto.SortOrder.HasValue) link.SortOrder = dto.SortOrder.Value;
-        if (dto.Status.HasValue) link.Status = (sbyte)(dto.Status.Value ? 1 : 0);
-
-        return await _repository.UpdateLinkAsync(link);
-    }
-
-    public async Task<bool> DeleteLinkAsync(int id)
-    {
-        return await _repository.DeleteLinkAsync(id);
-    }
-
-    #endregion
-
     #region 访问统计
 
     public async Task<VisitStatisticDto> GetVisitStatisticsAsync()
@@ -333,6 +246,8 @@ public class ConfigService : IConfigService
 
         await _repository.RecordVisitAsync(statistic);
     }
+    #endregion
+
     #region 业务范围
 
     public async Task<IEnumerable<BusinessScopeDto>> GetAllBusinessScopesAsync()
@@ -491,8 +406,6 @@ public class ConfigService : IConfigService
     {
         return await _repository.DeleteQualificationAsync(id);
     }
-
-    #endregion
 
     #endregion
 }

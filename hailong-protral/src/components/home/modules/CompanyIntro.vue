@@ -3,7 +3,7 @@
     <div class="container-wide">
       <div class="text-center mb-8">
         <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 font-tech tracking-tight">企业简介</h2>
-        <div class="w-12 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto rounded-full mt-3"></div>
+        <div class="w-12 h-1 portal-soft-accent mx-auto rounded-full mt-3"></div>
       </div>
       <div v-if="profileLoading" class="text-center py-8 text-gray-500">加载中...</div>
       <AsyncState v-else-if="fetchError" :error="fetchError" @retry="loadCompanyProfile" />
@@ -24,7 +24,7 @@
           </div>
           <div v-if="profileHighlights.length > 0" class="grid grid-cols-2 gap-4">
             <div v-for="highlight in profileHighlights" :key="highlight"
-              class="text-center p-6 bg-gradient-to-br from-hailong-primary/5 to-hailong-secondary/5 rounded-xl hover:shadow-md hover:scale-105 transition-all duration-300 cursor-pointer group">
+              class="text-center p-6 portal-soft-gradient rounded-xl hover:shadow-md hover:scale-105 transition-all duration-300 cursor-pointer group">
               <div
                 class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-hailong-primary/20 transition-colors">
                 <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">

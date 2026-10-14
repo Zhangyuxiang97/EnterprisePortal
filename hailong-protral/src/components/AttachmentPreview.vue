@@ -1,23 +1,23 @@
 <template>
   <dialog ref="dialog" aria-label="附件预览" class="fixed inset-0 m-0 h-full max-h-none w-full max-w-none items-center justify-center bg-transparent p-4" @click="handleClose" @cancel.prevent="handleClose" @close="handleClose">
-    <div class="relative w-full max-w-6xl max-h-[90vh] bg-white rounded-xl shadow-2xl overflow-hidden" @click.stop>
+    <div class="relative flex min-w-0 w-full max-w-6xl max-h-[90dvh] flex-col bg-white rounded-xl shadow-2xl overflow-hidden" @click.stop>
       <!-- 头部 -->
-      <div class="flex flex-wrap gap-3 items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-hailong-primary/5 to-hailong-secondary/5">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 bg-hailong-primary/10 rounded-lg flex items-center justify-center">
+      <div class="flex shrink-0 gap-3 items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-hailong-primary/5 to-hailong-secondary/5">
+        <div class="flex min-w-0 flex-1 items-center gap-3">
+          <div class="w-10 h-10 shrink-0 bg-hailong-primary/10 rounded-lg flex items-center justify-center">
             <svg class="w-5 h-5 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
           </div>
-          <div>
-            <h3 class="text-lg font-bold text-gray-900">{{ attachment.fileName }}</h3>
+          <div class="min-w-0">
+            <h3 :title="attachment.fileName" class="line-clamp-2 break-all text-lg font-bold text-gray-900">{{ attachment.fileName }}</h3>
             <p class="text-sm text-gray-500">{{ formatFileSize(attachment.fileSize) }}</p>
           </div>
         </div>
         <button
           @click="handleClose" aria-label="关闭附件预览"
-          class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+          class="w-10 h-10 shrink-0 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
         >
           <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -26,7 +26,7 @@
       </div>
 
       <!-- 预览内容 -->
-      <div class="overflow-auto max-h-[calc(90vh-140px)] p-6">
+      <div class="min-h-0 overflow-auto p-4 sm:p-6">
         <!-- 图片预览 -->
         <div v-if="isImage" class="flex items-center justify-center">
           <img :src="attachment.fileUrl" :alt="attachment.fileName" class="max-w-full h-auto rounded-lg shadow-lg" />
@@ -39,7 +39,7 @@
 
         <!-- 文本文件预览 -->
         <div v-else-if="isText" class="bg-gray-50 rounded-lg p-6">
-          <pre class="text-sm text-gray-700 whitespace-pre-wrap font-mono">{{ textContent }}</pre>
+          <pre class="text-sm text-gray-700 whitespace-pre-wrap [overflow-wrap:anywhere] font-mono">{{ textContent }}</pre>
         </div>
 
         <!-- 不支持预览的文件类型 -->
@@ -66,7 +66,7 @@
       </div>
 
       <!-- 底部操作栏 -->
-      <div class="flex flex-wrap gap-3 items-center justify-between px-4 sm:px-6 py-4 border-t border-gray-200 bg-gray-50">
+      <div class="flex shrink-0 flex-wrap gap-3 items-center justify-between px-4 sm:px-6 py-4 border-t border-gray-200 bg-gray-50">
         <div class="text-sm text-gray-500">
           <span class="font-medium">文件类型:</span> {{ fileExtension.toUpperCase() }}
         </div>

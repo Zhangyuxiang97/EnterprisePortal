@@ -10,6 +10,9 @@ BackEnd/.vs/
 
 # Generated runtime credentials
 .runtime/
+.env
+.env.local
+.claude/
 config/deployment.env
 logs/bootstrap/
 

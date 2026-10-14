@@ -26,13 +26,13 @@ curl -fsS http://127.0.0.1:5001/health/ready
 
 - 后台保存出现冲突：说明版本已经变化，保留当前内容，重新加载最新配置后合并保存。
 - 门户完整刷新仍显示旧内容：检查 `/api/config/site-settings`；请求失败时会使用七天内有效缓存或构建默认值，最多尝试三次。
-- 后台首次保存前：使用唯一默认文件 `BackEnd/HailongConsulting.API/SiteSettingsDefaults.json`。
+- 后台首次保存前：使用唯一默认文件 `config/portal-defaults.json`。
 - 静态导航、首页模块和构建参数：修改后需要重新构建门户。
 
 ## 本地验证
 
 ```bash
-node scripts/check-project-config.mjs
+node scripts/checks/check-project-config.mjs
 node --test hailong-protral/tests/*.test.mjs
 bash -n deploy-ubuntu22-docker.sh
 bash scripts/tests/deployment-readiness.test.sh
@@ -40,3 +40,5 @@ dotnet test BackEnd/Protral.sln
 ```
 
 两个前端分别执行 `npm ci` 和 `npm run build`。部署验证测试使用替身，不访问 Docker、网络或真实凭据。
+
+门户浏览器验收在初始化本机数据库并启动 API 后，从 `hailong-protral` 执行 `npx playwright install chromium webkit` 和 `npm run test:browser`。覆盖桌面、平板和手机，报告、截图与失败追踪保存至根目录 `.runtime/portal-browser/`。尺寸、场景和参数见 [门户测试说明](../../hailong-protral/README.md#浏览器与手机端验收)。

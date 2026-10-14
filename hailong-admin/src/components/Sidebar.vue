@@ -60,8 +60,6 @@
         <el-menu-item index="/config/qualifications">企业资质</el-menu-item>
         <el-menu-item index="/config/achievements">重要业绩</el-menu-item>
         <el-menu-item index="/config/honors">企业荣誉</el-menu-item>
-        <!-- <el-menu-item index="/config/banners">轮播图管理</el-menu-item> -->
-        <!-- <el-menu-item index="/config/friendly-links">友情链接</el-menu-item> -->
       </el-sub-menu>
 
       <!-- 仅管理员可见 -->

@@ -2,14 +2,15 @@
 
 # 第一阶段：构建应用
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
+WORKDIR /src/BackEnd/HailongConsulting.API
 
 # 复制项目文件并还原依赖
-COPY ["HailongConsulting.API.csproj", "./"]
+COPY ["BackEnd/HailongConsulting.API/HailongConsulting.API.csproj", "./"]
 RUN dotnet restore "HailongConsulting.API.csproj"
 
 # 复制所有源代码
-COPY . .
+COPY BackEnd/HailongConsulting.API/ ./
+COPY config/portal-defaults.json /src/config/portal-defaults.json
 
 # 构建应用
 RUN dotnet build "HailongConsulting.API.csproj" -c Release -o /app/build

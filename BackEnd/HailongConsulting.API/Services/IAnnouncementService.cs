@@ -31,7 +31,7 @@ public interface IAnnouncementService : IAnnouncementStatisticsExtension
     /// <summary>
     /// 获取仅包含有公告数据的区域筛选项及数量
     /// </summary>
-    Task<AnnouncementRegionOptionsDto> GetRegionOptionsAsync(AnnouncementQueryDto queryDto);
+    Task<AnnouncementRegionOptionsDto> GetRegionOptionsAsync(AnnouncementQueryDto queryDto, bool includeDisabled = false);
     
     /// <summary>
     /// 删除公告

@@ -58,7 +58,7 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
         int pageSize,
         string? procurementType = null,
         DateTime? startDate = null,
-        DateTime? endDate = null, bool includeDisabled = false, string? sortBy = null, string? sortOrder = null)
+        DateTime? endDate = null, bool includeDisabled = false, string? sortBy = null, string? sortOrder = null, bool provinceUnlocated = false)
     {
         var query = BuildFilteredQuery(
             businessType,
@@ -72,6 +72,10 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
             district);
 
         if (!includeDisabled) query = query.Where(a => a.Status == 1);
+        // 与地区选项的未明确数量一致：空值和无法匹配省级字典的历史值都可检索。
+        if (provinceUnlocated)
+            query = query.Where(a => !_context.RegionDictionaries.Any(r =>
+                r.IsDeleted == 0 && r.RegionLevel == 1 && r.RegionCode == a.Province));
         var totalCount = await query.CountAsync();
 
         var ascending = string.Equals(sortOrder, "asc", StringComparison.OrdinalIgnoreCase);
@@ -105,7 +109,7 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
         DateTime? startDate,
         DateTime? endDate,
         string? province = null,
-        string? city = null)
+        string? city = null, bool includeDisabled = false)
     {
         var query = BuildFilteredQuery(
             businessType,
@@ -118,7 +122,7 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
             city,
             district: null);
 
-        query = query.Where(a => a.Status == 1);
+        if (!includeDisabled) query = query.Where(a => a.Status == 1);
         var groupedCounts = regionLevel switch
         {
             1 => await query

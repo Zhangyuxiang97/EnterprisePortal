@@ -1,6 +1,6 @@
 <template>
   <header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-hailong-dark/95 text-white backdrop-blur-md shadow-lg">
-    <nav ref="navigationElement" aria-label="主导航" class="container-wide" @keydown.esc="closeMenus">
+    <nav ref="navigationElement" aria-label="主导航" class="container-wide">
       <div class="flex h-20 items-center justify-between gap-4">
         <router-link to="/" class="flex min-w-0 items-center gap-2 sm:gap-3" aria-label="返回首页">
           <img :src="logoUrl" alt="" class="h-10 sm:h-12 w-auto shrink-0" />
@@ -28,10 +28,10 @@
           <div v-if="link.children">
             <button type="button" @click="mobileMenu = mobileMenu === link.name ? null : link.name" :aria-expanded="mobileMenu === link.name" :aria-controls="`mobile-submenu-${index}`" class="flex w-full items-center justify-between rounded-lg px-4 py-3" :class="{ active: isActiveParent(link) }">{{ link.name }} <span aria-hidden="true">⌄</span></button>
             <div v-show="mobileMenu === link.name" :id="`mobile-submenu-${index}`" class="ml-4 border-l border-white/20">
-              <router-link v-for="child in link.children" :key="child.path" :to="child.path" class="block rounded-lg px-4 py-3 text-sm" :class="{ active: isActive(child.path) }">{{ child.name }}</router-link>
+              <router-link v-for="child in link.children" :key="child.path" :to="child.path" class="block rounded-lg px-4 py-3 text-sm" :class="{ active: isActive(child.path) }" :aria-current="isActive(child.path) ? 'page' : undefined">{{ child.name }}</router-link>
             </div>
           </div>
-          <router-link v-else :to="link.path" class="block rounded-lg px-4 py-3" :class="{ active: isActive(link.path) }">{{ link.name }}</router-link>
+          <router-link v-else :to="link.path" class="block rounded-lg px-4 py-3" :class="{ active: isActive(link.path) }" :aria-current="isActive(link.path) ? 'page' : undefined">{{ link.name }}</router-link>
         </template>
       </div>
     </nav>
@@ -54,9 +54,16 @@ const isActiveParent = link => link.children.some(child => isActive(child.path))
 const closeMenus = () => { desktopMenu.value = null; mobileMenu.value = null; showMobileMenu.value = false }
 const closeOnFocusOut = event => { if (!event.currentTarget.contains(event.relatedTarget)) desktopMenu.value = null }
 const closeOutside = event => { if (!navigationElement.value?.contains(event.target)) closeMenus() }
+const closeOnEscape = event => { if (event.key === 'Escape') closeMenus() }
 watch(() => route.fullPath, closeMenus)
-onMounted(() => document.addEventListener('click', closeOutside))
-onUnmounted(() => document.removeEventListener('click', closeOutside))
+onMounted(() => {
+  document.addEventListener('click', closeOutside)
+  document.addEventListener('keydown', closeOnEscape)
+})
+onUnmounted(() => {
+  document.removeEventListener('click', closeOutside)
+  document.removeEventListener('keydown', closeOnEscape)
+})
 </script>
 <style scoped>
 .nav-link { @apply text-sm font-medium transition-colors hover:text-hailong-cyan; }

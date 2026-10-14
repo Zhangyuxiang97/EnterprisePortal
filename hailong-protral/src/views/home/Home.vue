@@ -93,7 +93,7 @@ const handleQualificationClick = id => router.push(`/qualification/${id}`)
   width: min(80%, 1200px);
   height: 1px;
   transform: translateX(-50%);
-  background: linear-gradient(90deg, transparent, #dce3ee 20%, #dce3ee 80%, transparent);
+  background: #dce3ee;
 }
 
 :deep(.home-closing) {

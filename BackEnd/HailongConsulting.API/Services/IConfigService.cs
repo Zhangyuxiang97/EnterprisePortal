@@ -7,13 +7,8 @@ namespace HailongConsulting.API.Services;
 /// </summary>
 public interface IConfigService
 {
-    // 轮播图
-    Task<IEnumerable<CarouselBannerDto>> GetAllBannersAsync();
-    Task<CarouselBannerDto?> GetBannerByIdAsync(int id);
-    Task<CarouselBannerDto> CreateBannerAsync(CreateCarouselBannerDto dto);
-    Task<bool> UpdateBannerAsync(int id, UpdateCarouselBannerDto dto);
-    Task<bool> DeleteBannerAsync(int id);
-
+    Task<bool> MoveAchievementAsync(int id, MoveCompanyContentDto dto);
+    Task<bool> MoveBusinessScopeAsync(int id, MoveCompanyContentDto dto);
     // 企业简介
     Task<CompanyProfileDto?> GetCompanyProfileAsync();
     Task<bool> UpdateCompanyProfileAsync(UpdateCompanyProfileDto dto);
@@ -30,6 +25,8 @@ public interface IConfigService
     Task<CompanyHonorDto?> GetHonorByIdAsync(int id);
     Task<CompanyHonorDto> CreateHonorAsync(CreateCompanyHonorDto dto);
     Task<bool> UpdateHonorAsync(int id, UpdateCompanyHonorDto dto);
+    Task<bool> DeleteHonorAsync(int id);
+
     // 业务范围
     Task<IEnumerable<BusinessScopeDto>> GetAllBusinessScopesAsync();
     Task<BusinessScopeDto?> GetBusinessScopeByIdAsync(int id);
@@ -43,15 +40,6 @@ public interface IConfigService
     Task<CompanyQualificationDto> CreateQualificationAsync(CreateCompanyQualificationDto dto);
     Task<bool> UpdateQualificationAsync(int id, UpdateCompanyQualificationDto dto);
     Task<bool> DeleteQualificationAsync(int id);
-
-    Task<bool> DeleteHonorAsync(int id);
-
-    // 友情链接
-    Task<IEnumerable<FriendlyLinkDto>> GetAllLinksAsync();
-    Task<FriendlyLinkDto?> GetLinkByIdAsync(int id);
-    Task<FriendlyLinkDto> CreateLinkAsync(CreateFriendlyLinkDto dto);
-    Task<bool> UpdateLinkAsync(int id, UpdateFriendlyLinkDto dto);
-    Task<bool> DeleteLinkAsync(int id);
 
     // 访问统计
     Task<VisitStatisticDto> GetVisitStatisticsAsync();

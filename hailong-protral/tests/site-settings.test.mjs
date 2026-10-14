@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { createSiteSettingsLoader } from '../src/utils/siteSettingsLoader.js'
 
-const defaults = JSON.parse(readFileSync(new URL('../../BackEnd/HailongConsulting.API/SiteSettingsDefaults.json', import.meta.url)))
+const defaults = JSON.parse(readFileSync(new URL('../../config/portal-defaults.json', import.meta.url)))
 const response = { success: true, data: defaults }
 const tick = () => new Promise(resolve => setImmediate(resolve))
 

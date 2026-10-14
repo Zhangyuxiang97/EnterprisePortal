@@ -17,16 +17,16 @@
 ```text
 Protral/
 ├─ BackEnd/
-│  ├─ HailongConsulting.API/       API、数据库迁移、展示默认值和初始化媒体
+│  ├─ HailongConsulting.API/       API、数据库迁移和初始化媒体
 │  ├─ HailongConsulting.API.Tests/ 后端单元与集成测试
 │  └─ Protral.sln
 ├─ hailong-protral/               门户、静态导航与首页模块配置
 ├─ hailong-admin/                 管理端
-├─ SQL/                          按 00–10 编号的首次初始化 SQL 和复核报告
-├─ config/                       非敏感部署参数示例
+├─ SQL/                          init/ 首次初始化 SQL，reports/ 来源及字段复核报告
+├─ config/                       共用展示默认值及非敏感部署参数示例
 ├─ docs/                         架构、配置、部署与维护文档
 ├─ nginx/                        前端镜像构建及反向代理配置
-├─ scripts/                      数据转换、部署检查与回归工具
+├─ scripts/                      初始化、迁移、检查与回归工具，见 scripts/README.md
 ├─ portal-design-demos/          独立静态设计演示，不参与正式门户部署
 ├─ .github/workflows/verify.yml   自动验证
 ├─ docker-compose.yml
@@ -69,7 +69,7 @@ git clone https://github.com/Zhangyuxiang97/EnterprisePortal.git Protral
 cd Protral
 ```
 
-按 [数据库初始化说明](SQL/README.md) 的顺序导入 `SQL/00_*.sql` 至 `SQL/10_*.sql`。仅执行表结构和基础资料文件会缺少公告、资讯、地区及企业媒体记录。API 启动迁移用于升级已有结构，不能替代首次完整初始化。
+按 [数据库初始化说明](SQL/README.md) 的顺序导入 `SQL/init/` 中的编号 SQL 文件。仅执行表结构和基础资料文件会缺少公告、资讯、地区及企业媒体记录。API 启动迁移用于升级已有结构，不能替代首次完整初始化。
 
 ### 2. 启动 API
 
@@ -126,7 +126,7 @@ docker compose --env-file config/deployment.env --env-file .runtime/secrets.env 
 | 内容 | 位置 / 维护入口 |
 | --- | --- |
 | 公司名称、标语、联系方式、地图、交通及 FAQ | 后台“门户设置”，存储于 `portal_site_settings` |
-| 同一组字段的初始化及回退默认值 | `BackEnd/HailongConsulting.API/SiteSettingsDefaults.json`，API 和门户共用 |
+| 同一组字段的初始化及回退默认值 | `config/portal-defaults.json`，API 和门户共用 |
 | 导航、页脚链接、首页模块启用与顺序 | `hailong-protral/config/site-config.json`，修改后重新构建门户 |
 | 企业简介正文、业务、资质、荣誉、业绩 | 后台“企业资料”，存储于对应业务表 |
 | 门户 Docker 宿主端口 | `config/deployment.env`，示例为 `config/deployment.env.example` |
@@ -156,7 +156,7 @@ Docker 的 `mysql-data` 保存数据库，`api-uploads` 保存上传文件，`ap
 从仓库根目录执行配置及后端检查：
 
 ```bash
-node scripts/check-project-config.mjs
+node scripts/checks/check-project-config.mjs
 dotnet test BackEnd/Protral.sln -c Release
 ```
 
@@ -165,10 +165,12 @@ dotnet test BackEnd/Protral.sln -c Release
 | 目录 | 安装、测试与构建 |
 | --- | --- |
 | `hailong-admin` | `npm ci`、`npm test`、`npm run build` |
-| `hailong-protral` | `npm ci`、`node --test tests/*.test.mjs`、`npm run build` |
+| `hailong-protral` | `npm ci`、`npm test`、`npm run build` |
 | `scripts` | `npm ci`、`node --test tests/*.test.js` |
 
 后台浏览器回归需要本机独立测试环境及测试管理员，命令为 `npm run test:browser`；配置和清理范围见 [后台 README](hailong-admin/README.md)。MySQL 集成测试需显式提供 `LOCAL_MYSQL_TEST_CONNECTION`，使用随机临时数据库验证并发保护和迁移。
+
+门户浏览器验收在初始化本机数据并启动 API 后，从 `hailong-protral` 执行 `npx playwright install chromium webkit` 和 `npm run test:browser`，覆盖桌面、平板和手机视口。测试报告位于 `.runtime/portal-browser/report/`，场景及参数见 [门户 README](hailong-protral/README.md#浏览器与手机端验收)。
 
 [GitHub Actions](.github/workflows/verify.yml) 在 push / pull request 时执行配置检查、测试和构建，并在独立 MySQL 中验证首次 SQL、迁移及浏览器操作。推送后执行状态以仓库 Actions 页面为准。
 
@@ -184,4 +186,4 @@ dotnet test BackEnd/Protral.sln -c Release
 - [维护与故障排查](docs/operations/maintenance.md)
 - [文档维护方案](implementation_plan.md)
 
-最后更新：2026-10-05。
+最后更新：2026-10-06。

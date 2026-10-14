@@ -9,18 +9,25 @@
       @change="handleProvinceChange"
       :style="{ width: provinceWidth }"
     >
-      <el-option label="全部省份" value="all" />
+      <el-option :label="regionOptions ? `全部省份 (${regionOptions.provinceTotalCount})` : '全部省份'" value="all" />
       <el-option
         v-for="province in provinces"
         :key="province.regionCode"
-        :label="province.regionName"
+        :label="provinceLabel(province)"
         :value="province.regionCode"
       />
+      <el-option v-if="regionOptions?.provinceUnlocatedCount > 0"
+        :label="`省份未明确 (${regionOptions.provinceUnlocatedCount})`" :value="UNLOCATED_PROVINCE" />
+      <template #label="{ label }">
+        {{ selectedProvince === UNLOCATED_PROVINCE
+          ? regionOptions?.provinceUnlocatedCount > 0 ? `省份未明确 (${regionOptions.provinceUnlocatedCount})` : '省份未明确'
+          : label }}
+      </template>
     </el-select>
 
     <!-- 城市选择 - 只有选择了省份才显示 -->
     <el-select
-      v-if="showCity && selectedProvince && selectedProvince !== 'all'"
+      v-if="showCity && selectedProvince && selectedProvince !== 'all' && selectedProvince !== UNLOCATED_PROVINCE"
       v-model="selectedCity"
       placeholder="请选择城市"
       filterable
@@ -60,11 +67,12 @@
 
 <script setup>
 import { notifyError } from '@/utils/errors'
-import { ref, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { systemApi } from '@/api'
-import { ElMessage } from 'element-plus'
+import { UNLOCATED_PROVINCE } from '@/utils/regionFilter'
 
 const props = defineProps({
+  regionOptions: { type: Object, default: null },
   // 是否显示城市选择
   showCity: {
     type: Boolean,
@@ -83,7 +91,7 @@ const props = defineProps({
   // 省份宽度
   provinceWidth: {
     type: String,
-    default: '120px'
+    default: '180px'
   },
   // 城市宽度
   cityWidth: {
@@ -121,6 +129,9 @@ const districts = ref([])
 const selectedProvince = ref('all')
 const selectedCity = ref('all')
 const selectedDistrict = ref('all')
+const provinceCounts = computed(() => new Map((props.regionOptions?.provinces || []).map(item => [item.regionCode, item.count])))
+const provinceLabel = province => props.regionOptions
+  ? `${province.regionName} (${provinceCounts.value.get(province.regionCode) || 0})` : province.regionName
 
 // 加载省份列表
 const loadProvinces = async () => {
@@ -137,7 +148,7 @@ const loadProvinces = async () => {
 
 // 加载城市列表
 const loadCities = async (provinceCode) => {
-  if (!provinceCode || provinceCode === 'all') {
+  if (!provinceCode || provinceCode === 'all' || provinceCode === UNLOCATED_PROVINCE) {
     cities.value = []
     return
   }
@@ -180,7 +191,7 @@ const handleProvinceChange = async (value) => {
   districts.value = []
 
   // 如果选择了具体省份，加载城市列表
-  if (value && value !== 'all' && props.showCity) {
+  if (value && value !== 'all' && value !== UNLOCATED_PROVINCE && props.showCity) {
     await loadCities(value)
   }
 

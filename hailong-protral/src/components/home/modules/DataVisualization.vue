@@ -4,7 +4,7 @@
     <div class="container-wide">
       <div class="text-center mb-16">
         <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 font-tech tracking-tight">交易数据可视化</h2>
-        <div class="w-12 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto rounded-full mt-3"></div>
+        <div class="w-12 h-1 portal-soft-accent mx-auto rounded-full mt-3"></div>
       </div>
       
       <div v-if="statisticsLoading" class="text-center py-20 bg-white rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
@@ -23,17 +23,17 @@
       </div>
       
       <div v-else>
-        <!-- 4大指标数据看板 (横向分布，包含高端图表指示图标) -->
+        <!-- 指标概览 -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <!-- 1. 项目总数 -->
           <div class="group bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300 flex items-center justify-between">
             <div class="min-w-0">
-              <div class="text-xs font-bold text-slate-400 tracking-wider mb-1.5 uppercase">项目总数</div>
+              <div class="text-xs font-bold text-slate-500 tracking-wider mb-1.5 uppercase">项目总数</div>
               <div class="text-2xl md:text-3xl font-extrabold text-slate-800 font-tech truncate">
                 {{ statistics.totalProjects || 0 }}
               </div>
             </div>
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-blue-50 text-hailong-primary group-hover:scale-105 transition-all">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-blue-50 text-blue-600 group-hover:scale-105 transition-all">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
               </svg>
@@ -43,12 +43,12 @@
           <!-- 2. 交易总额 -->
           <div class="group bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300 flex items-center justify-between">
             <div class="min-w-0">
-              <div class="text-xs font-bold text-slate-400 tracking-wider mb-1.5 uppercase">交易总额</div>
+              <div class="text-xs font-bold text-slate-500 tracking-wider mb-1.5 uppercase">交易总额</div>
               <div class="text-2xl md:text-3xl font-extrabold text-slate-800 font-tech truncate">
                 {{ formatTotalAmount(statistics.totalAmount) }}
               </div>
             </div>
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-purple-50 text-hailong-secondary group-hover:scale-105 transition-all">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-purple-50 text-violet-600 group-hover:scale-105 transition-all">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -58,12 +58,12 @@
           <!-- 3. 政府采购项目数 -->
           <div class="group bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300 flex items-center justify-between">
             <div class="min-w-0">
-              <div class="text-xs font-bold text-slate-400 tracking-wider mb-1.5 uppercase">政府采购项目</div>
+              <div class="text-xs font-bold text-slate-500 tracking-wider mb-1.5 uppercase">政府采购项目</div>
               <div class="text-2xl md:text-3xl font-extrabold text-slate-800 font-tech truncate">
                 {{ getProjectTypeCount('政府采购') }}
               </div>
             </div>
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-blue-50 text-hailong-primary group-hover:scale-105 transition-all">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-blue-50 text-blue-600 group-hover:scale-105 transition-all">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
@@ -73,12 +73,12 @@
           <!-- 4. 建设工程项目数 -->
           <div class="group bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300 flex items-center justify-between">
             <div class="min-w-0">
-              <div class="text-xs font-bold text-slate-400 tracking-wider mb-1.5 uppercase">建设工程项目</div>
+              <div class="text-xs font-bold text-slate-500 tracking-wider mb-1.5 uppercase">建设工程项目</div>
               <div class="text-2xl md:text-3xl font-extrabold text-slate-800 font-tech truncate">
                 {{ getProjectTypeCount('建设工程') }}
               </div>
             </div>
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-purple-50 text-hailong-secondary group-hover:scale-105 transition-all">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-purple-50 text-violet-600 group-hover:scale-105 transition-all">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
@@ -138,7 +138,7 @@
           <!-- 地区排行 -->
           <div class="bg-white rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-100">
             <h3 class="text-lg font-bold text-slate-800 mb-6 pb-3.5 border-b border-slate-100 flex items-center gap-2">
-              <span class="w-1.5 h-5 bg-hailong-secondary rounded-full"></span>
+              <span class="w-1.5 h-5 bg-[#52978a] rounded-full"></span>
               地区项目排行
             </h3>
             
@@ -165,7 +165,7 @@
                 <!-- 进度条 -->
                 <div class="relative h-1.5 bg-slate-100 rounded-full overflow-hidden">
                   <div
-                    class="absolute inset-y-0 left-0 bg-gradient-to-r from-hailong-primary to-hailong-secondary rounded-full transition-all duration-500 group-hover:opacity-85"
+                    class="absolute inset-y-0 left-0 portal-soft-accent rounded-full transition-all duration-500 group-hover:opacity-85"
                     :style="{ width: (region.projectCount / regionRanking[0].projectCount * 100) + '%' }">
                   </div>
                 </div>
@@ -297,11 +297,3 @@ onMounted(() => {
   loadStatistics()
 })
 </script>
-
-<style scoped>
-.bg-grid-pattern {
-  background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-</style>

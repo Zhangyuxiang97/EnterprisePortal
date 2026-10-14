@@ -120,9 +120,10 @@
                   <option v-for="province in provinces" :key="province.regionCode" :value="province.regionCode">
                     {{ province.regionName }} ({{ province.count }})
                   </option>
-                  <option v-if="regionCounts.provinceUnlocated > 0" disabled>
+                  <option v-if="regionCounts.provinceUnlocated > 0" :value="UNLOCATED_PROVINCE">
                     省份未明确 ({{ regionCounts.provinceUnlocated }})
                   </option>
+                  <option v-else-if="searchParams.province === UNLOCATED_PROVINCE" :value="UNLOCATED_PROVINCE" hidden>省份未明确</option>
                 </select>
                 <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -130,7 +131,7 @@
               </div>
 
               <!-- 城市选择 -->
-              <div class="relative" v-if="searchParams.province">
+              <div class="relative" v-if="searchParams.province && searchParams.province !== UNLOCATED_PROVINCE">
                 <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
@@ -238,6 +239,7 @@
       </div>
 </template>
 <script setup>
+import { UNLOCATED_PROVINCE } from '@/utils/regionFilter'
 import { toRefs } from 'vue'
 const props = defineProps({ controller: { type: Object, required: true } })
 const { searchParams, showCustomDatePicker, provinces, cities, districts, regionCounts, businessTypes, currentAnnouncementTypes, procurementTypes, timeRanges, handleSearch, clearKeyword, handleReset, handleBusinessTypeChange, handleNoticeTypeChange, handleProcurementTypeChange, onProvinceChange, onCityChange, onDistrictChange, selectTimeRange, onCustomDateChange } = toRefs(props.controller)

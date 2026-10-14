@@ -1,69 +1,39 @@
 # 海隆咨询数据库初始化说明
 
-## 文件说明
+## 目录与执行文件
 
-**重要提示：** 所有 SQL 文件已按执行顺序编号（00-10），MySQL Docker 容器在数据目录为空的首次启动时按文件名顺序执行。现有数据目录不会再次自动导入。
+`init/` 保存八份按 01–08 顺序执行的首次初始化 SQL；`reports/` 保存资料来源和字段复核证据。MySQL 数据目录为空时自动初始化，已有数据目录由 API 版本化迁移升级。
 
-### 0. 00_set_charset.sql
-**字符集设置文件**，统一使用 `utf8mb4`，应在导入其他文件前执行。
+| 执行文件 | 内容 |
+| --- | --- |
+| [01_schema.sql](init/01_schema.sql) | 字符集、数据库结构、索引和视图 |
+| [02_base_data.sql](init/02_base_data.sql) | 真实企业简介、业务范围及全部 7 条友情链接；不导入管理员或演示业绩 |
+| [03_regions.sql](init/03_regions.sql) | 2463 个唯一区域编码，保留省市区县、父编码和排序字段 |
+| [04_announcements_bidding.sql](init/04_announcements_bidding.sql) | 旧站招标栏目 1169 条公告 |
+| [05_announcements_result.sql](init/05_announcements_result.sql) | 旧站中标栏目 1131 条公告 |
+| [06_announcements_correction.sql](init/06_announcements_correction.sql) | 旧站变更栏目 226 条公告 |
+| [07_info_publications.sql](init/07_info_publications.sql) | 43 篇资讯：政策 26、新闻中心 17；包含 13 篇知识资讯 |
+| [08_company_media.sql](init/08_company_media.sql) | 4 项证照、6 组荣誉及 29 个公开媒体文件的附件关联 |
 
-### 1. 01_hailong_consulting_schema.sql
-**数据库结构文件**，包含：
-- 数据库创建语句
-- 所有表的创建语句（CREATE TABLE）
-- 索引和视图定义
+媒体脚本查询企业简介和资讯的实际 ID，因此在资讯导入后执行。初始管理员由 API 在用户表为空时生成。重要业绩缺少真实来源，保持空白，由后台补充。
 
-### 2. 02_hailong_consulting_init_data.sql
-**主初始化数据文件**，包含：
-- 不包含管理员或测试账号，初始管理员由 API 首次启动生成
-- 备份中的真实企业简介，以及业务范围和友情链接基础数据
-- 核对原图的证照与荣誉由 10 导入；重要业绩待后台补充真实资料
-- 公告和资讯分别由 06–09 导入
-- 友情链接数据
-- 区域字典由 03、04、05 三批初始化文件统一导入，本文件不重复导入
+每份数据 SQL 声明 `utf8mb4`，结构文件明确设置数据库和表的字符集与排序规则。三个公告文件按旧站栏目保留；实际公告类型还根据标题判断，数据库按类型统计的数量可能与栏目文件行数不同。
 
-### 3. 03_region_dictionary_batch1_henan.sql
-**区域字典初始化第一批**：河南省省市县字典，共 143 条唯一区域编码，包含巩义市、中原区、二七区及市区汇总项。
+## 初始化数据维护
 
-### 4. 04_region_dictionary_batch2_north_east_east.sql
-**区域字典初始化第二批**：华北、东北、华东区域数据（含安徽省），共 998 条唯一区域编码。
+仓库已包含生成结果，部署直接使用 `init/` 和 API `SeedAssets/legacy`，无需提供原始 MDB 或再次抓取旧站。原 MDB 和本机中间数据不提交。
 
-### 5. 05_region_dictionary_batch3_central_south_west.sql
-**区域字典初始化第三批**：华中、华南、西南、西北及港澳台区域数据，共 1322 条唯一区域编码。
-
-### 6. 06_announcements_bidding.sql
-**旧站招标信息栏目数据**，1169条
-
-### 7. 07_announcements_result.sql
-**旧站中标公示栏目数据**，1131条（包含 1 条备份中没有的既有公告）
-
-### 8. 08_announcements_correction.sql
-**旧站变更公告栏目数据**，226条
-
-### 9. 09_access_info_publications.sql
-
-备份中的 43 篇真实资讯按正文重新分类：政策 26 篇（国家政策 13、地方政策 8、行业法规 5），新闻中心 17 篇（公司新闻 1、行业动态 1、通知公告 2、知识资讯 13）；另补充 2 条未重复的友情链接。
-
-知识文章归入新闻中心的“知识资讯”分类，后台支持筛选和编辑；门户新闻列表和详情直接展示。
-
-### 10. 10_legacy_company_media.sql
-
-根据旧站公开原图恢复 4 项证照资料、6 组企业荣誉及其附件关联。过往造价资质、信用等级、管理体系认证标明历史资料，日期按原证书记载；重要业绩没有真实来源，保持空白。对应图片由 API 发布包中的 `SeedAssets/legacy` 补入 `/uploads/legacy/`，不依赖旧站在线服务。
-
-`10_legacy_company_media.sql` 同时登记正文中的已恢复媒体，覆盖 29 个文件。关联类型使用后台支持的 `company_qualification`、`company_honor`、`company_profile` 和 `info_publication`；实际跨内容引用可通过后台附件管理查询。政策文号由 `info_publications.document_number` 可空列保存，既有正文不自动推断文号。
-
-公告 SQL 已在生成阶段直接写入区域编码，首次导入后无需再执行区域转换脚本。
-
-从完整公告数据 `scripts/data/access-initial-announcements.json` 重新生成公告 SQL：
+从完整公告数据 `scripts/data/access-initial-announcements.json` 生成公告 SQL：
 
 ```bash
 cd scripts
 npm run generate-initial-sql
 ```
 
-> 数据来源：henanhailong.com 的既有抓取数据与海隆数据库.mdb。按旧站 ID 保留 2375 条已清洗公告，补入 151 条备份公告，合计 **2526 条**。最新公告日期为 2026-09-24。
-> 文件按旧站栏目拆分；实际 `notice_type` 还会依据标题识别结果/更正，因此数据库按公告类型统计的数量可能与文件行数不同。
-> 原 MDB、公开内容中间 JSON 和完整公告生成数据均不提交；部署使用仓库中的 SQL 和 API 的 `SeedAssets/legacy` 初始化资源。
+地区数据在 `init/03_regions.sql` 维护；公告生成、离线清洗及地区格式化共用 `scripts/initialization/region-dictionary.js` 读取。修改地区后执行 `npm run generate-regions` 校验编码唯一性并统一格式，保留原插入顺序。
+
+数据来自 henanhailong.com 抓取结果及海隆数据库.mdb：保留 2375 条已清洗公告，补入 151 条备份公告，共 **2526 条**，最新公告日期为 2026-09-24。
+
 
 ## 从 Access 备份重新生成
 
@@ -78,7 +48,7 @@ npm run generate-access-initial-sql -- --source ../.runtime/access-export --base
 
 `final-data.json` 是原 2375 条已清洗公告，不要将生成后的完整公告文件当作基线；该中间文件保留在本地 `scripts/data/`，不随仓库分发。没有原始输入时直接使用已生成 SQL 即可。
 
-生成器同时更新 02、06–10、`initialization-source-report.json` 和 `initialization-field-review.json`，并核验初始化资源 SHA-256；重复执行输出一致。只有旧 2375 条数据时，普通公告生成命令会拒绝覆盖当前完整初始化数据。
+生成器更新 `init/02_base_data.sql`、`init/04–08` 及 `reports/` 下的两份 JSON 报告，并核验初始化资源 SHA-256；重复执行输出一致。只有旧 2375 条数据时，普通公告生成命令会拒绝覆盖当前完整初始化数据。
 
 ## 分类与金额字段
 
@@ -116,7 +86,7 @@ npm run generate-access-initial-sql -- --source ../.runtime/access-export --base
 
 补充现有字典遗漏的巩义市；编码依据[巩义市政府 2025 年“一卡通”清单](https://public.gongyishi.gov.cn/)，归属关系参考[巩义市政府历史沿革](https://www.gongyishi.gov.cn/lsyg.jhtml)。中原区 410102 和二七区 410103 根据[郑州市生态环境局重点排污单位名录](https://sthjj.zhengzhou.gov.cn/u/cms/sthjj/202005/04032833jv2m.pdf)补齐。其他地区继续使用项目现有字典，不把没有明确区县证据的公告默认写成市区。
 
-[initialization-field-review.json](initialization-field-review.json) 包含每条公告的旧值、新值、是否变更、规则、证据片段、金额候选及待核查原因，并保留旧站 ID；顶部 `pendingAnnouncements` 为完整剩余清单。分类/地区在同名项目一致时补缺；不同包的对应关系经逐条确认后引用明确来源，不复制其他包的标的类型。金额不会跨公告复制。正常候选报价和明确跨区县范围留在 `notes`，不列为未解决冲突。
+[initialization-field-review.json](reports/initialization-field-review.json) 包含每条公告的旧值、新值、是否变更、规则、证据片段、金额候选及待核查原因，并保留旧站 ID；顶部 `pendingAnnouncements` 为完整剩余清单。分类/地区在同名项目一致时补缺；不同包的对应关系经逐条确认后引用明确来源，不复制其他包的标的类型。金额不会跨公告复制。正常候选报价和明确跨区县范围留在 `notes`，不列为未解决冲突。
 
 ### 缺少可靠证据的字段
 
@@ -131,81 +101,40 @@ npm run generate-access-initial-sql -- --source ../.runtime/access-export --base
 
 已确认完整两标段的旧 ID 618 合计 25299.23 万元；旧 ID 2869 合计 51.07 万元；旧 ID 2705 合计 45.35 万元。预算与中标金额分别存储。
 
-复核脚本为 `scripts/review-announcement-fields.js`，逐条确认结论位于 `scripts/confirmed-announcement-reviews.js`，由 Access 初始化生成器统一调用。后续重新生成会复用复核规则。
+复核脚本为 `scripts/initialization/review-announcement-fields.js`，逐条确认结论位于 `scripts/initialization/confirmed-announcement-reviews.js`，由 Access 初始化生成器统一调用。后续重新生成会复用复核规则。
 
 ## 图片与附件
 
-MDB 未包含旧站 `uploadfile` 文件。原有 61 个文件引用中，已从原站恢复企业资料及新闻、政策的 28 张图片和 1 个 Word 附件；其余 32 个公告媒体文件仍列入待补清单，见 [initialization-source-report.json](initialization-source-report.json)。
+MDB 未包含旧站 `uploadfile` 文件。原有 61 个文件引用中，已从原站恢复企业资料及新闻、政策的 28 张图片和 1 个 Word 附件；其余 32 个公告媒体文件仍列入待补清单，见 [initialization-source-report.json](reports/initialization-source-report.json)。
 
 - 不保留没有原始文件的本地图片引用，缺失文档保留链接文字并标注“附件待补充”。
 - 清除编辑器本机 `file:///` 图片、旧编辑器图标、脚本及事件属性。
 - 保留正文中的 6 处 PNG 内嵌图片；外部图片和文档保留原外链，未核验外站可用性。
 - 后端正文过滤器允许 `img.src` 中限定栅格图片的 base64 数据；其他 data URI、SVG、脚本及事件属性被过滤。
-- 已恢复文件保存在 `BackEnd/HailongConsulting.API/SeedAssets/legacy`，来源 URL、大小和 SHA-256 见 `scripts/legacy-media-manifest.json`，企业证书人工核对字段见 `scripts/legacy-company-data.json`。原站标记 `.doc` 的附件实为 OpenXML Word 文档，本站按 `.docx` 提供。
+- 已恢复文件保存在 `BackEnd/HailongConsulting.API/SeedAssets/legacy`，来源 URL、大小和 SHA-256 见 `scripts/initialization/legacy-media-manifest.json`，企业证书人工核对字段见 `scripts/initialization/legacy-company-data.json`。原站标记 `.doc` 的附件实为 OpenXML Word 文档，本站按 `.docx` 提供。
 - API 每次启动仅把缺失的初始化资源补入上传卷，不覆盖已存在文件。Docker 与本地部署均使用 `/uploads/legacy/`；发布与备份时保留初始化资源及整个上传目录。招聘页面尚未导入。
 - 当前门户默认地址按用户确认设置为“雅宝·东方国际广场1号楼8层”。
 
 ## 执行顺序
 
-**Docker 部署：** 文件已按执行顺序编号（00-10），SQL 目录整体挂载到 MySQL 初始化目录，空数据目录首次启动时会自动按顺序执行，无需额外导入。
+Docker Compose 将 `SQL/init/` 挂载到 MySQL 的 `/docker-entrypoint-initdb.d`。空数据目录首次启动时按文件名执行，来源报告不进入初始化目录。
 
-**手动执行顺序：**
+手动初始化时，在仓库根目录执行下面的 Bash 命令。凭据使用本机权限受限的 MySQL 客户端配置文件，文件位置通过 `MYSQL_CLIENT_CONFIG` 提供：
 
 ```bash
-# 0. 设置字符集
-mysql -u root -p < 00_set_charset.sql
-
-# 1. 首先执行数据库结构文件
-mysql -u root -p < 01_hailong_consulting_schema.sql
-
-# 2. 执行主初始化数据文件
-mysql -u root -p hailong_consulting < 02_hailong_consulting_init_data.sql
-
-# 3. 执行河南、安徽区域初始化
-mysql -u root -p hailong_consulting < 03_region_dictionary_batch1_henan.sql
-
-# 4. 执行第二批区域初始化
-mysql -u root -p hailong_consulting < 04_region_dictionary_batch2_north_east_east.sql
-
-# 5. 执行第三批区域初始化
-mysql -u root -p hailong_consulting < 05_region_dictionary_batch3_central_south_west.sql
-
-# 6. 导入招标公告
-mysql -u root -p hailong_consulting < 06_announcements_bidding.sql
-
-# 7. 导入中标公示
-mysql -u root -p hailong_consulting < 07_announcements_result.sql
-
-# 8. 导入变更公告
-mysql -u root -p hailong_consulting < 08_announcements_correction.sql
-
-# 9. 导入真实资讯和补充友情链接
-mysql -u root -p hailong_consulting < 09_access_info_publications.sql
-
-# 10. 导入经原图核对的企业证照、荣誉与附件关联
-mysql -u root -p hailong_consulting < 10_legacy_company_media.sql
-
+: "${MYSQL_CLIENT_CONFIG:?请提供本机 MySQL 客户端配置文件路径}"
+for sql in SQL/init/[0-9][0-9]_*.sql; do
+  mysql --defaults-extra-file="$MYSQL_CLIENT_CONFIG" --default-character-set=utf8mb4 < "$sql" || exit 1
+done
+mysql --defaults-extra-file="$MYSQL_CLIENT_CONFIG" --default-character-set=utf8mb4 < scripts/tests/verify-initial-data.sql
 ```
 
-或者在MySQL客户端中执行：
+初始化断言检查公告、分类、金额、地区层级、资讯、友情链接、真实企业资料和媒体关联，任一断言不符即返回 SQL 错误。
 
-```sql
-SOURCE /path/to/00_set_charset.sql;
-SOURCE /path/to/01_hailong_consulting_schema.sql;
-SOURCE /path/to/02_hailong_consulting_init_data.sql;
-SOURCE /path/to/03_region_dictionary_batch1_henan.sql;
-SOURCE /path/to/04_region_dictionary_batch2_north_east_east.sql;
-SOURCE /path/to/05_region_dictionary_batch3_central_south_west.sql;
-SOURCE /path/to/06_announcements_bidding.sql;
-SOURCE /path/to/07_announcements_result.sql;
-SOURCE /path/to/08_announcements_correction.sql;
-SOURCE /path/to/09_access_info_publications.sql;
-SOURCE /path/to/10_legacy_company_media.sql;
-```
 
 ## 数据覆盖范围
 
-三批地区 SQL 共包含 2463 条唯一区域编码，数量按仓库初始化文件统计：
+地区 SQL 包含 2463 条唯一区域编码，数量按仓库初始化文件统计：
 
 | 字典层级 | 条数 |
 | --- | ---: |
@@ -213,7 +142,7 @@ SOURCE /path/to/10_legacy_company_media.sql;
 | 市级 | 361 |
 | 区县级及市区汇总项 | 2068 |
 
-字典包含市区汇总项，具体区县覆盖以 SQL 中实际编码为准。维护时按现有父子关系写入，批次之间不得重复编码。
+字典包含市区汇总项，具体区县覆盖以 SQL 中实际编码为准。维护时按现有父子关系写入，地区编码不得重复。
 
 ### 公告与资讯
 - 旧站招标信息栏目：1169条
@@ -253,9 +182,9 @@ GROUP BY notice_type;
 1. **执行前确认**：确保已经创建了数据库表结构
 2. **字符编码**：确保数据库和表使用UTF-8编码
 3. **数据冲突**：如果已有数据，可能会出现主键冲突，建议在空数据库中执行
-4. **区县数据**：三批区域文件均按统一编码写入，河南、安徽为完整市县级数据
+4. **区县数据**：地区文件按统一编码写入，河南、安徽为完整市县级数据
 5. **数据更新**：行政区划可能会有调整，使用时请注意数据的时效性
-6. **历史数据**：06、07、08 三个公告脚本包含从旧网站抓取的历史公告，数据来源为 henanhailong.com；公告 SQL 已直接写入区域编码，无需额外后处理脚本
+6. **历史数据**：04、05、06 三个公告脚本包含从旧网站抓取的历史公告，数据来源为 henanhailong.com；公告 SQL 已直接写入区域编码，无需额外后处理脚本
 
 ## 数据格式说明
 
@@ -286,4 +215,4 @@ GROUP BY notice_type;
 
 ---
 
-**最后更新时间**：2026-10-05
+**最后更新时间**：2026-10-06

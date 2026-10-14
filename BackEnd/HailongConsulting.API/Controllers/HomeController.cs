@@ -12,11 +12,13 @@ namespace HailongConsulting.API.Controllers;
 public class HomeController : ControllerBase
 {
     private readonly IHomeService _homeService;
+    private readonly IHashIdService _hashIdService;
     private readonly ILogger<HomeController> _logger;
 
-    public HomeController(IHomeService homeService, ILogger<HomeController> logger)
+    public HomeController(IHomeService homeService, IHashIdService hashIdService, ILogger<HomeController> logger)
     {
         _homeService = homeService;
+        _hashIdService = hashIdService;
         _logger = logger;
     }
 
@@ -68,6 +70,8 @@ public class HomeController : ControllerBase
         try
         {
             var announcements = await _homeService.GetRecentAnnouncementsAsync();
+            foreach (var announcement in announcements)
+                announcement.HashId = _hashIdService.Encode(announcement.Id);
             return Ok(ApiResponse<object>.SuccessResult(announcements));
         }
         catch (Exception ex) when (!ApiErrors.IsExpected(ex))

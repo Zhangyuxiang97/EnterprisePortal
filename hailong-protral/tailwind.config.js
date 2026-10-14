@@ -8,10 +8,10 @@ export default {
     extend: {
       colors: {
         hailong: {
-          primary: '#2878FF',
-          secondary: '#A259FF',
+          primary: '#245B85',
+          secondary: '#64748B',
           dark: '#0F1419',
-          cyan: '#00D4FF'
+          cyan: '#4E8290'
         }
       },
       fontFamily: {

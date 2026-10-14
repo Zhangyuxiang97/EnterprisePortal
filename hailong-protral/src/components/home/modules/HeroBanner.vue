@@ -1,5 +1,5 @@
 <template>
-  <div class="relative h-screen flex items-center justify-center pt-20 bg-gradient-to-br from-hailong-dark via-slate-900 to-indigo-950 overflow-hidden">
+  <div class="relative min-h-[100svh] flex items-center justify-center pt-28 pb-20 bg-[#142333] overflow-hidden">
     <!-- 几何网格与悬浮光晕 -->
     <div class="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
     <div class="absolute inset-0">

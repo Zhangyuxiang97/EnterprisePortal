@@ -1,4 +1,5 @@
 using HailongConsulting.API.Models.Entities;
+using HailongConsulting.API.Models.DTOs;
 
 namespace HailongConsulting.API.Repositories;
 
@@ -7,13 +8,8 @@ namespace HailongConsulting.API.Repositories;
 /// </summary>
 public interface IConfigRepository
 {
-    // 轮播图
-    Task<IEnumerable<CarouselBanner>> GetAllBannersAsync();
-    Task<CarouselBanner?> GetBannerByIdAsync(int id);
-    Task<CarouselBanner> AddBannerAsync(CarouselBanner banner);
-    Task<bool> UpdateBannerAsync(CarouselBanner banner);
-    Task<bool> DeleteBannerAsync(int id);
-
+    Task<bool> MoveAchievementAsync(int id, MoveCompanyContentDto dto);
+    Task<bool> MoveBusinessScopeAsync(int id, MoveCompanyContentDto dto);
     // 企业简介
     Task<CompanyProfile?> GetCompanyProfileAsync();
     Task<bool> UpdateCompanyProfileAsync(CompanyProfile profile);
@@ -32,11 +28,6 @@ public interface IConfigRepository
     Task<bool> UpdateHonorAsync(CompanyHonor honor);
     Task<bool> DeleteHonorAsync(int id);
 
-    // 友情链接
-    Task<IEnumerable<FriendlyLink>> GetAllLinksAsync();
-    Task<FriendlyLink?> GetLinkByIdAsync(int id);
-    Task<FriendlyLink> AddLinkAsync(FriendlyLink link);
-    Task<bool> UpdateLinkAsync(FriendlyLink link);
     // 业务范围
     Task<IEnumerable<BusinessScope>> GetAllBusinessScopesAsync();
     Task<BusinessScope?> GetBusinessScopeByIdAsync(int id);
@@ -50,8 +41,6 @@ public interface IConfigRepository
     Task<CompanyQualification> AddQualificationAsync(CompanyQualification qualification);
     Task<bool> UpdateQualificationAsync(CompanyQualification qualification);
     Task<bool> DeleteQualificationAsync(int id);
-
-    Task<bool> DeleteLinkAsync(int id);
 
     // 访问统计
     Task<int> GetTotalVisitsAsync();

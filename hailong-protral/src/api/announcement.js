@@ -1,4 +1,5 @@
 import request from './request'
+import { toAnnouncementRegionQuery } from '@/utils/regionFilter'
 
 /**
  * 获取公告列表
@@ -17,6 +18,7 @@ import request from './request'
  * @returns {Promise}
  */
 export function getAnnouncementList(params, options = {}) {
+  params = toAnnouncementRegionQuery(params)
   return request({
     ...options,
     url: '/announcements',
@@ -26,6 +28,7 @@ export function getAnnouncementList(params, options = {}) {
       noticeType: params.noticeType,
       procurementType: params.procurementType,
       province: params.province,
+      provinceUnlocated: params.provinceUnlocated,
       city: params.city,
       district: params.district,
       keyword: params.keyword,
@@ -43,6 +46,7 @@ export function getAnnouncementList(params, options = {}) {
  * @returns {Promise}
  */
 export function getAnnouncementRegionOptions(params = {}, options = {}) {
+  params = toAnnouncementRegionQuery(params)
   return request({
     ...options,
     url: '/announcements/region-options',
@@ -52,6 +56,7 @@ export function getAnnouncementRegionOptions(params = {}, options = {}) {
       noticeType: params.noticeType,
       procurementType: params.procurementType,
       province: params.province,
+      provinceUnlocated: params.provinceUnlocated,
       city: params.city,
       district: params.district,
       keyword: params.keyword,
@@ -80,6 +85,7 @@ export function getAnnouncementByHash(hashId, options = {}) {
  * @returns {Promise}
  */
 export function getGovProcurementList(params, options = {}) {
+  params = toAnnouncementRegionQuery(params)
   return request({
     ...options,
     url: '/announcements/gov-procurement',
@@ -88,6 +94,7 @@ export function getGovProcurementList(params, options = {}) {
       noticeType: params.noticeType,
       procurementType: params.procurementType,
       province: params.province,
+      provinceUnlocated: params.provinceUnlocated,
       city: params.city,
       district: params.district,
       keyword: params.keyword,
@@ -105,6 +112,7 @@ export function getGovProcurementList(params, options = {}) {
  * @returns {Promise}
  */
 export function getConstructionList(params, options = {}) {
+  params = toAnnouncementRegionQuery(params)
   return request({
     ...options,
     url: '/announcements/construction',
@@ -112,6 +120,7 @@ export function getConstructionList(params, options = {}) {
     params: {
       noticeType: params.noticeType,
       province: params.province,
+      provinceUnlocated: params.provinceUnlocated,
       city: params.city,
       district: params.district,
       keyword: params.keyword,

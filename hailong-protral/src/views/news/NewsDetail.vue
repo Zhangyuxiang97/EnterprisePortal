@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 pt-20">
+  <div class="portal-detail min-h-screen bg-gray-50 pt-20">
     
     <!-- 内容区域 -->
     <div class="pt-8 pb-12 bg-white">

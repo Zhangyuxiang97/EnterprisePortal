@@ -1,7 +1,7 @@
 <template>
   <footer class="bg-hailong-dark text-white py-12">
     <div class="container-wide">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8 mb-8">
         <div>
           <h3 class="text-xl font-bold mb-4 text-hailong-cyan font-tech">{{ companyInfo.fullName }}</h3>
           <p class="text-sm text-gray-400">{{ companyInfo.slogan }}</p>
@@ -15,7 +15,7 @@
               </router-link>
             </li>
           </ul>
-          <ul v-else class="space-y-2 text-sm text-gray-400">
+          <ul v-else class="space-y-2 text-sm text-gray-400 [overflow-wrap:anywhere]">
             <li v-for="item in footerContactItems" :key="item.label">
               {{ item.label }}: {{ item.value }}
             </li>

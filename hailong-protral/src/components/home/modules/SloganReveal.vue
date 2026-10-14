@@ -68,8 +68,8 @@ async function prepareAnimation(finishImmediately = false) {
   const count = metrics.length
   const pairCount = Math.max(0, Math.ceil(count / 2) - 1)
   const singleLine = metrics.reduce((sum, item) => sum + item.width, 0) <= bounds.width + 0.5
-  const expandDuration = Math.min(reducedMotion.value ? 1300 : 1100, (reducedMotion.value ? 380 : 320) * Math.max(1, pairCount))
-  const fadeDuration = reducedMotion.value ? 140 : 100
+  const expandDuration = Math.min(1100, 320 * Math.max(1, pairCount))
+  const fadeDuration = 100
   const duration = expandDuration + fadeDuration
   const initialWidth = count ? metrics[0].width + (count > 1 ? metrics.at(-1).width : 0) : 0
   const pairWidths = Array.from({ length: pairCount }, () => 0)
@@ -130,9 +130,10 @@ async function prepareAnimation(finishImmediately = false) {
     return elapsed < expandDuration ? 'expanding' : 'revealing'
   }
 
-  draw(finishImmediately || count <= 2 ? duration : 0)
+  const showComplete = finishImmediately || reducedMotion.value || count <= 2
+  draw(showComplete ? duration : 0)
   measured.value = true
-  if (finishImmediately || count <= 2) {
+  if (showComplete) {
     state.value = phase.value = 'complete'
     return
   }

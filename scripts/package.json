@@ -1,14 +1,17 @@
 {
   "name": "hailong-scraper",
   "version": "1.0.0",
-  "description": "河南海隆旧网站数据抓取工具",
+  "description": "海隆门户数据初始化、迁移及验证工具",
   "scripts": {
-    "scrape": "node scrape-hailong.js",
-    "transform": "node transform-data.js",
-    "preview": "start preview.html",
-    "generate-initial-sql": "node generate-initial-announcement-sql.js",
-    "generate-access-initial-sql": "node generate-access-initial-data.js",
-    "generate-region-batches": "node generate-region-initialization-batches.js"
+    "scrape": "node migration/scrape-hailong.js",
+    "transform": "node migration/transform-data.js",
+    "preview": "start migration/preview.html",
+    "generate-initial-sql": "node initialization/generate-initial-announcement-sql.js",
+    "generate-access-initial-sql": "node initialization/generate-access-initial-data.js",
+    "check": "node checks/check-project-config.mjs",
+    "test": "node --test tests/*.test.js",
+    "generate-regions": "node initialization/generate-regions.js",
+    "generate-region-batches": "node initialization/generate-regions.js"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",

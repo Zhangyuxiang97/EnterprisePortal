@@ -13,7 +13,7 @@ services:
       TZ: Asia/Shanghai
     volumes:
       - mysql-data:/var/lib/mysql
-      - ./SQL:/docker-entrypoint-initdb.d:ro
+      - ./SQL/init:/docker-entrypoint-initdb.d:ro
     networks:
       - hailong-network
     healthcheck:
@@ -28,52 +28,10 @@ services:
         max-size: 10m
         max-file: "3"
 
-  # 初始化公告数据容器
-  init-announcements:
-    image: mysql:8.0
-    container_name: hailong-init-announcements
-    depends_on:
-      mysql:
-        condition: service_healthy
-    env_file:
-      - .runtime/secrets.env
-    volumes:
-      - ./SQL:/sql:ro
-    entrypoint: >
-      sh -c '
-        echo "等待 MySQL 就绪..."
-        until mysqladmin ping -h mysql -u root -p$$MYSQL_ROOT_PASSWORD --silent; do
-          sleep 2
-        done
-        echo "检查公告数据..."
-        COUNT=$$(mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD -e "SELECT COUNT(*) FROM hailong_consulting.announcements" -s -N 2>/dev/null || echo 0)
-        echo "当前公告数量: $$COUNT"
-        if [ "$$COUNT" -lt 100 ]; then
-          echo "导入招标公告..."
-          mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/06_announcements_bidding.sql
-          echo "导入中标公告..."
-          mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/07_announcements_result.sql
-          echo "导入变更公告..."
-          mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD hailong_consulting < /sql/08_announcements_correction.sql
-          COUNT=$$(mysql -h mysql -u hailong_app -p$$MYSQL_PASSWORD -e "SELECT COUNT(*) FROM hailong_consulting.announcements" -s -N 2>/dev/null)
-          echo "导入完成，公告数量: $$COUNT"
-        else
-          echo "公告数据已存在，跳过导入"
-        fi
-        echo "初始化完成"
-      '
-    networks:
-      - hailong-network
-    logging:
-      driver: local
-      options:
-        max-size: 10m
-        max-file: "3"
-
   api:
     build:
-      context: ./BackEnd/HailongConsulting.API
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: BackEnd/HailongConsulting.API/Dockerfile
     container_name: hailong-api
     restart: unless-stopped
     env_file:

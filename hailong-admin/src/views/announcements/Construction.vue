@@ -28,6 +28,7 @@
         <el-form-item label="项目区域">
           <RegionSelector
             ref="searchRegionSelectorRef"
+            :region-options="regionOptions"
             @change="handleRegionChange"
           />
         </el-form-item>
@@ -273,6 +274,7 @@ const pagination = reactive({
 // 表格数据
 const tableData = ref([])
 const loading = ref(false)
+const regionOptions = ref(null)
 
 // 对话框
 const dialogVisible = ref(false)
@@ -357,8 +359,19 @@ const loadData = async () => {
       pageSize: pagination.pageSize
     }
 
-    const res = await announcementApi.getAnnouncementList(params)
+    const [listResult, regionResult] = await Promise.allSettled([
+      announcementApi.getAnnouncementList(params),
+      announcementApi.getAnnouncementRegionOptions(params)
+    ])
     if (!listRequests.isCurrent(requestId)) return
+    if (regionResult.status === 'fulfilled' && regionResult.value.success && regionResult.value.data) {
+      regionOptions.value = regionResult.value.data
+    } else {
+      regionOptions.value = null
+      notifyError(regionResult.status === 'rejected' ? regionResult.reason : new Error('统计读取失败'), '省份数量加载失败')
+    }
+    if (listResult.status === 'rejected') throw listResult.reason
+    const res = listResult.value
 
     if (res.success && res.data) {
       tableData.value = res.data.items || []

@@ -2,6 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 公告入口按公告类型着色，首页、列表与详情共用。 */
+.announcement-tone-bidding { --announcement-accent: #4e82a8; --announcement-bg: #edf4fc; --announcement-text: #245b85; }
+.announcement-tone-result { --announcement-accent: #559875; --announcement-bg: #edf7f1; --announcement-text: #28704d; }
+.announcement-tone-correction { --announcement-accent: #c58c4e; --announcement-bg: #fff5e8; --announcement-text: #965b20; }
+.announcement-tone-default { --announcement-accent: #94a3b8; --announcement-bg: #f1f5f9; --announcement-text: #475569; }
+.announcement-card { border-left: 3px solid var(--announcement-accent); }
+.announcement-card:hover { border-color: #cbd5e1; border-left-color: var(--announcement-accent); }
+.announcement-tag { display: inline-flex; align-items: center; background-color: var(--announcement-bg); color: var(--announcement-text); border-radius: 6px; padding: 4px 12px; font-size: 13px; line-height: 20px; font-weight: 600; white-space: nowrap; }
+.announcement-tag--large { font-size: 14px; }
+
+/* 纯色配色：品牌蓝、业务青绿、金额与荣誉暖金。 */
+.portal-tone-blue { --tone: #245b85; --tone-soft: #eef5fb; --tone-border: #cbddeb; }
+.portal-tone-teal { --tone: #256f65; --tone-soft: #edf7f3; --tone-border: #c4dfd5; }
+.portal-tone-gold { --tone: #875f26; --tone-soft: #fbf5e9; --tone-border: #e8d8b9; }
+.portal-tint { background-color: var(--tone-soft); border-color: var(--tone-border); }
+.portal-icon, .portal-label { background-color: var(--tone-soft); color: var(--tone); }
+.portal-icon > svg { color: inherit; }
+.portal-accent { color: var(--tone); }
+.portal-category-heading { color: var(--tone); display: flex; align-items: center; gap: 10px; }
+.portal-category-heading::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: var(--tone); flex-shrink: 0; }
+.portal-soft-gradient { background-image: linear-gradient(135deg, #f0f6fc, #f0f8f5); }
+.portal-soft-accent { background-image: linear-gradient(90deg, #356c91, #52978a); }
+.portal-contact-card { border-top: 3px solid var(--tone); }
+.portal-section-title { color: #1c405d; }
+.portal-section-title::after { content: ''; display: block; width: 36px; height: 3px; margin: 18px auto 0; border-radius: 2px; background-color: #ae8241; }
+.portal-form-header { background-color: #245b85; border-color: #245b85; color: #fff; }
+.portal-form-header h3 { color: inherit; }
+.portal-form-header button { color: #fff; }
+.portal-form-header button:hover { color: #fff; background-color: rgb(255 255 255 / .12); }
+
 /* 门户操作入口：纯色、细边框和轻量状态反馈。尺寸由具体场景控制。 */
 .portal-button,
 .portal-choice {
@@ -112,6 +142,15 @@ html {
   max-width: 1600px;
   margin: 0 auto;
   padding: 0 20px;
+}
+
+/* 标题和元信息中的连续英文、编号也能在详情卡片内换行。 */
+.portal-detail { overflow-wrap: anywhere; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .animate-float, .animate-ping, .animate-fade-in, .animate-slide-up { animation: none !important; }
+  .animate-on-scroll { transform: none; transition: none; }
 }
 
 /* 背景渐变 */

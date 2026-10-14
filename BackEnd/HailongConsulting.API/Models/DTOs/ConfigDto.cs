@@ -3,52 +3,6 @@ using System.Text.Json.Serialization;
 namespace HailongConsulting.API.Models.DTOs;
 
 /// <summary>
-/// 轮播图DTO
-/// </summary>
-public class CarouselBannerDto
-{
-    public string Version { get; set; } = string.Empty;
-    public int Id { get; set; }
-    public string? Title { get; set; }
-    public string? Description { get; set; }
-    public int ImageId { get; set; }
-    public string? LinkUrl { get; set; }
-    public int SortOrder { get; set; }
-    public bool Status { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
-}
-
-/// <summary>
-/// 创建轮播图DTO
-/// </summary>
-public class CreateCarouselBannerDto
-{
-    public string? Title { get; set; }
-    public string? Description { get; set; }
-    public int ImageId { get; set; }
-    public string? LinkUrl { get; set; }
-    public int SortOrder { get; set; } = 0;
-    public bool Status { get; set; } = true;
-}
-
-/// <summary>
-/// 更新轮播图DTO
-/// </summary>
-public class UpdateCarouselBannerDto
-{
-    [Required(ErrorMessage = "缺少内容版本，请重新打开编辑页面")]
-    [MaxLength(32)]
-    public string Version { get; set; } = string.Empty;
-    public string? Title { get; set; }
-    public string? Description { get; set; }
-    public int? ImageId { get; set; }
-    public string? LinkUrl { get; set; }
-    public int? SortOrder { get; set; }
-    public bool? Status { get; set; }
-}
-
-/// <summary>
 /// 企业简介DTO
 /// </summary>
 public class CompanyProfileDto
@@ -150,52 +104,6 @@ public class UpdateMajorAchievementDto
     public DateOnly? CompletionDate { get; set; }
     public string? Description { get; set; }
     public List<int>? ImageIds { get; set; }
-    public int? SortOrder { get; set; }
-    public bool? Status { get; set; }
-}
-
-/// <summary>
-/// 友情链接DTO
-/// </summary>
-public class FriendlyLinkDto
-{
-    public string Version { get; set; } = string.Empty;
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Url { get; set; } = string.Empty;
-    public int? LogoId { get; set; }
-    public string? Description { get; set; }
-    public int SortOrder { get; set; }
-    public bool Status { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
-}
-
-/// <summary>
-/// 创建友情链接DTO
-/// </summary>
-public class CreateFriendlyLinkDto
-{
-    public string Name { get; set; } = string.Empty;
-    public string Url { get; set; } = string.Empty;
-    public int? LogoId { get; set; }
-    public string? Description { get; set; }
-    public int SortOrder { get; set; } = 0;
-    public bool Status { get; set; } = true;
-}
-
-/// <summary>
-/// 更新友情链接DTO
-/// </summary>
-public class UpdateFriendlyLinkDto
-{
-    [Required(ErrorMessage = "缺少内容版本，请重新打开编辑页面")]
-    [MaxLength(32)]
-    public string Version { get; set; } = string.Empty;
-    public string? Name { get; set; }
-    public string? Url { get; set; }
-    public int? LogoId { get; set; }
-    public string? Description { get; set; }
     public int? SortOrder { get; set; }
     public bool? Status { get; set; }
 }

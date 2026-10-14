@@ -28,10 +28,10 @@
             <el-input v-model="form.contact.address[field.key]" :maxlength="field.max" />
           </el-form-item>
           <el-form-item label="工作日时间" prop="contact.workingHours.weekdays">
-            <el-input v-model="form.contact.workingHours.weekdays" maxlength="100" placeholder="例如：周一至周五 9:00–17:20" />
+            <el-input v-model="form.contact.workingHours.weekdays" maxlength="100" placeholder="例如：周一至周五：09:00–17:20" />
           </el-form-item>
           <el-form-item label="周末/节假日" prop="contact.workingHours.weekend">
-            <el-input v-model="form.contact.workingHours.weekend" maxlength="100" placeholder="例如：休息" />
+            <el-input v-model="form.contact.workingHours.weekend" maxlength="100" placeholder="例如：周末及法定节假日休息" />
           </el-form-item>
           <p class="settings-tip">首页、联系我们、专家库和页脚统一使用这里的联系方式。</p>
         </el-tab-pane>

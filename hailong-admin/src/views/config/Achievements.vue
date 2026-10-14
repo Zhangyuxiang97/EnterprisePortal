@@ -35,14 +35,14 @@
               size="small"
               link
               @click="handleSort(row, 'up')"
-              :disabled="$index === 0"
+              :disabled="sorting || $index === 0"
             >上移</el-button>
             <el-button
               type="info"
               size="small"
               link
               @click="handleSort(row, 'down')"
-              :disabled="$index === tableData.length - 1"
+              :disabled="sorting || $index === tableData.length - 1"
             >下移</el-button>
             <el-button v-if="canManage" type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
           </template>
@@ -154,6 +154,7 @@ import FileUpload from '@/components/FileUpload.vue'
 
 const tableData = ref([])
 const loading = ref(false)
+const sorting = ref(false)
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
 const submitting = ref(false)
@@ -276,17 +277,25 @@ const handleSubmit = async () => {
 }
 
 const handleSort = async (row, direction) => {
+  if (sorting.value) return
+  const index = tableData.value.findIndex(item => item.id === row.id)
+  const neighbor = tableData.value[index + (direction === 'up' ? -1 : 1)]
+  if (!neighbor) return
+  sorting.value = true
   try {
-    const res = await systemConfigApi.achievements.updateSort(row.id, direction)
+    const res = await systemConfigApi.achievements.updateSort(row.id, { direction, version: row.version, neighborId: neighbor.id, neighborVersion: neighbor.version })
     if (res.success) {
       ElMessage.success('排序成功')
-      loadData()
+      await loadData()
     } else {
       ElMessage.error(res.message || '排序失败')
     }
   } catch (error) {
 
     notifyError(error, '排序失败，请稍后重试')
+    if (error.response?.status === 409) await loadData()
+  } finally {
+    sorting.value = false
   }
 }
 

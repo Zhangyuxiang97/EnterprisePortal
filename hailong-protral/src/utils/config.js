@@ -1,7 +1,7 @@
 import { reactive } from 'vue'
 import request from '@/api/request'
 import staticConfig from '../../config/site-config.json'
-import defaults from '../../../BackEnd/HailongConsulting.API/SiteSettingsDefaults.json'
+import defaults from '../../../config/portal-defaults.json'
 import { createSiteSettingsLoader } from './siteSettingsLoader'
 
 // 导航和首页组件布局保持静态；站点展示内容在启动时从 API 更新。

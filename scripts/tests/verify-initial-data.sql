@@ -1,8 +1,12 @@
--- 在 00–10 全部导入后执行，任一核心初始化断言失败即返回 SQL 错误。
+-- 在 SQL/init/01–08 全部导入后执行，任一核心初始化断言失败即返回 SQL 错误。
 USE hailong_consulting;
 DELIMITER //
 CREATE PROCEDURE verify_initial_data()
 BEGIN
+  IF (SELECT COUNT(*) FROM region_dictionary) <> 2463 OR
+     (SELECT COUNT(DISTINCT region_code) FROM region_dictionary) <> 2463 THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '地区字典数量或编码唯一性不符';
+  END IF;
   IF (SELECT COUNT(*) FROM announcements) <> 2526 THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '公告数量不符';
   END IF;

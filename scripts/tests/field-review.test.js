@@ -1,7 +1,7 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
-const {loadRegions}=require('../generate-initial-announcement-sql');
-const {review,reviewAll,reviewInfo,extractDocument,sumAmounts}=require('../review-announcement-fields');
+const {loadRegions}=require('../initialization/generate-initial-announcement-sql');
+const {review,reviewAll,reviewInfo,extractDocument,sumAmounts}=require('../initialization/review-announcement-fields');
 const regions=loadRegions();
 const check=(title,text,tables=[])=>review({id:0,title,text,tables,category:26},regions);
 

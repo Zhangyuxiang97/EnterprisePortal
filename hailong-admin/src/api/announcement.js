@@ -1,4 +1,5 @@
 import request from './request'
+import { toAnnouncementRegionQuery } from '@/utils/regionFilter'
 
 /**
  * 公告管理 API
@@ -25,7 +26,7 @@ export const getAnnouncementList = (params) => {
   return request({
     url: '/announcements/manage',
     method: 'get',
-    params
+    params: toAnnouncementRegionQuery(params)
   })
 }
 
@@ -39,6 +40,12 @@ export const getAnnouncementDetail = (id) => {
     method: 'get'
   })
 }
+
+export const getAnnouncementRegionOptions = (params) => request({
+  url: '/announcements/manage/region-options',
+  method: 'get',
+  params: toAnnouncementRegionQuery(params)
+})
 
 /**
  * 创建公告
@@ -158,6 +165,7 @@ export const getAnnouncementStatistics = (params) => {
 
 export default {
   getAnnouncementList,
+  getAnnouncementRegionOptions,
   getAnnouncementDetail,
   createAnnouncement,
   updateAnnouncement,

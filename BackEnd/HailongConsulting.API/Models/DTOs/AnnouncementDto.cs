@@ -249,11 +249,18 @@ public class UpdateAnnouncementDto
 /// </summary>
 public class AnnouncementQueryDto : IValidatableObject
 {
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) => HailongConsulting.API.Common.PaginationValidation.Validate(PageNumber, PageSize, StartDate, EndDate);
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        foreach (var result in HailongConsulting.API.Common.PaginationValidation.Validate(PageNumber, PageSize, StartDate, EndDate))
+            yield return result;
+        if (ProvinceUnlocated && (!string.IsNullOrWhiteSpace(Province) || !string.IsNullOrWhiteSpace(City) || !string.IsNullOrWhiteSpace(District)))
+            yield return new ValidationResult("省份未明确不能与具体省市区条件同时使用", [nameof(ProvinceUnlocated)]);
+    }
     public string? BusinessType { get; set; }
     public string? NoticeType { get; set; }
     public string? ProcurementType { get; set; }
     public string? Province { get; set; }
+    public bool ProvinceUnlocated { get; set; }
     public string? City { get; set; }
     public string? District { get; set; }
     public string? Keyword { get; set; }

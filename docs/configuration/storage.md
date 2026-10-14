@@ -3,7 +3,7 @@
 | 内容 | 位置 | 生效方式 |
 | --- | --- | --- |
 | 公司标语、联系方式、交通和 FAQ | 数据库 `portal_site_settings` | 后台保存，门户刷新读取 |
-| 同一组展示字段的默认值 | `BackEnd/HailongConsulting.API/SiteSettingsDefaults.json` | API 内嵌，门户构建直接引用，只有一个源文件 |
+| 同一组展示字段的默认值 | `config/portal-defaults.json` | API 内嵌，门户构建直接引用，只有一个源文件 |
 | 导航、页脚链接和首页模块 | `hailong-protral/config/site-config.json` | 门户重新构建 |
 | 门户宿主端口 | `config/deployment.env` | 重新执行部署；示例文件可提交 |
 | 数据库与 JWT 凭据 | `.runtime/secrets.env` | 运行时读取，不提交 Git |

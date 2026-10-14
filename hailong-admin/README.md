@@ -32,7 +32,7 @@ API 在用户表为空时生成用户名 `admin` 和 12 位随机密码。按 AP
 | 统计分析 | 访问、公告与信息发布统计 |
 | 系统管理 | 用户、日志、区域字典和修改密码 |
 
-菜单按角色显示。轮播图与友情链接的独立编辑页暂未开放菜单入口；门户静态导航和首页模块配置需修改源文件并重新构建，详见 [配置存储位置](../docs/configuration/storage.md)。
+菜单按角色显示。门户静态导航和首页模块配置需修改源文件并重新构建，详见 [配置存储位置](../docs/configuration/storage.md)。
 
 公告数量按记录计数，不代表去重后的项目数。金额统计汇总已记录的结果公告中标 / 成交金额，同一项目可能有多条结果记录；发布时间趋势按启用记录的 `PublishTime` 统计，“今日入库”按创建时间统计。
 
@@ -52,6 +52,8 @@ src/
 
 - 后台读取使用 `/api/announcements/manage`、`/api/info-publications/manage`、`/api/config/manage/...`，需要授权；管理详情不计门户浏览量。
 - 列表只返回表格或摘要字段，编辑时读取详情。保存公告、资讯及企业资料携带读取时的 `version`；过期返回 409，保留本地修改。
+- 政府采购和建设工程的省份选项显示当前公告类型、关键词和日期条件下的数量，按管理列表口径包含停用公告、排除已删除公告。“省份未明确”可选择筛选，补充省份保存后重新统计；统计接口为授权的 `/api/announcements/manage/region-options`。
+- 未明确省份数量为 0 时隐藏下拉选项；已选条件查询为空时保留筛选，选中值不显示零数量，方便重置或调整其他条件。
 - `useContentSubmit` 统一公告 / 资讯保存；`useEditorForm`、`useEditorLeaveGuard` 保护未保存内容及上传；`useLatestRequest` 防止迟到响应覆盖页面。
 - 普通请求与上传共用单次刷新及重试。会话失效时保留编辑内容，可在新窗口登录后返回。退出先确认未保存内容，再调用服务端注销接口。
 - `RichEditor.vue` 处理历史 HTML、图片上传和隔离正文预览；历史正文在实际编辑后才转成编辑器格式。
@@ -83,7 +85,9 @@ npm run dev -- --host 127.0.0.1 --port 3002 --strictPort
 npm run test:browser
 ```
 
-该命令执行 `tests/admin.smoke.mjs` 与 `tests/backend-cleanup.smoke.mjs`，覆盖历史公告 / 企业资料保存、扫描件预览、上传删除、权限、版本冲突、刷新、登录恢复及注销。
+该命令执行 `tests/admin.smoke.mjs`、`tests/backend-cleanup.smoke.mjs` 和 `tests/province-filter.smoke.mjs`，覆盖历史公告 / 企业资料保存、扫描件预览、上传删除、权限、版本冲突、刷新、登录恢复、注销和省份筛选数量。
+
+`province-filter.smoke.mjs` 使用浏览器临时响应独立检查两类公告页面的省份数量、未明确筛选、搜索重置和补充保存后的刷新，不读写数据库；服务端的真实筛选与统计由关系数据库测试验证。单独运行可执行 `node tests/province-filter.smoke.mjs`，截图保存于 `.runtime/province-admin-browser/`。
 
 脚本只连接本机地址，会修改测试库中的现有记录、创建和清理临时内容。附件采用软删除，上传文件按存储保留规则处理；应使用独立测试库。CI 通过 [验证工作流](../.github/workflows/verify.yml) 启动隔离服务执行回归。
 
@@ -96,4 +100,4 @@ Docker 后台默认入口为 `http://服务器IP:8080`，使用根目录的统�
 - [后端 API](../BackEnd/HailongConsulting.API/README.md)
 - [全部文档](../docs/README.md)
 
-最后更新：2026-10-05。
+最后更新：2026-10-14。

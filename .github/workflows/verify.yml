@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - run: node scripts/check-project-config.mjs
+      - run: node scripts/checks/check-project-config.mjs
       - run: bash -n deploy-ubuntu22-docker.sh
       - run: bash scripts/tests/deployment-readiness.test.sh
       - run: npm ci && node --test tests/*.test.js
@@ -34,6 +34,8 @@ jobs:
           mkdir -p .runtime
           printf 'MYSQL_ROOT_PASSWORD=ci-only-unused\nMYSQL_PASSWORD=ci-only-unused\nConnectionStrings__DefaultConnection=unused\nJwt__Key=ci-only-unused\n' > .runtime/secrets.env
           docker compose --env-file .runtime/secrets.env config --quiet
+      - name: 验证 API 共享配置与前端镜像构建
+        run: docker compose --env-file .runtime/secrets.env build api nginx
   initial-data:
     runs-on: ubuntu-latest
     services:
@@ -58,7 +60,7 @@ jobs:
           dotnet-version: '8.0.x'
       - name: 按首次部署顺序导入空库
         run: |
-          for sql in SQL/[0-9][0-9]_*.sql; do
+          for sql in SQL/init/[0-9][0-9]_*.sql; do
             docker exec -i -e MYSQL_PWD=ci-only-unused ${{ job.services.mysql.id }} mysql --default-character-set=utf8mb4 < "$sql"
           done
       - name: 核验公告、资讯、企业简介及链接
@@ -68,9 +70,20 @@ jobs:
         env:
           LOCAL_MYSQL_TEST_CONNECTION: Server=127.0.0.1;Port=3306;User=root;Password=ci-only-unused
         run: dotnet test BackEnd/HailongConsulting.API.Tests/HailongConsulting.API.Tests.csproj --filter FullyQualifiedName~MySqlCleanupTests
-      - run: npm ci && npx playwright install --with-deps chromium
+      - run: npm ci
         working-directory: hailong-admin
-      - name: 本机隔离服务的登录、编辑、上传、会话与冲突回归
+      - run: npm ci && npx playwright install --with-deps chromium webkit
+        working-directory: hailong-protral
+      - name: 后台回归与门户桌面、手机端浏览器验收
         env:
           CI_DATABASE_CONNECTION: Server=127.0.0.1;Port=3306;Database=hailong_consulting;User=root;Password=ci-only-unused;CharSet=utf8mb4
-        run: node scripts/run-ci-browser.mjs
+        run: node scripts/tests/run-ci-browser.mjs
+      - name: 保存门户浏览器报告、截图和失败追踪
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-browser-report
+          path: .runtime/portal-browser/
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7

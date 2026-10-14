@@ -3,9 +3,6 @@
 
     <!-- 页面头部 Hero Banner -->
     <div class="relative pt-32 pb-20 text-center text-white overflow-hidden bg-gradient-to-br from-hailong-dark via-slate-900 to-indigo-950">
-      <!-- 几何网格与光晕背景 -->
-      <div class="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
-      <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-hailong-primary/10 rounded-full blur-[120px] pointer-events-none animate-float"></div>
       
       <div class="relative z-10 max-w-4xl mx-auto px-6">
         <h1 class="text-4xl md:text-5xl font-extrabold mb-4 font-tech tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-200 bg-clip-text text-transparent">
@@ -23,10 +20,10 @@
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             <!-- 联系电话 -->
             <div
-              class="group bg-white rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300">
+              class="portal-contact-card portal-tone-blue group bg-white rounded-xl p-6 border border-slate-200 hover:border-slate-300 transition-colors duration-200">
               <div
-                class="w-16 h-16 bg-gradient-to-br from-hailong-primary/10 to-hailong-secondary/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <svg class="w-8 h-8 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="portal-icon w-12 h-12 rounded-xl flex items-center justify-center mb-5">
+                <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
                   </path>
@@ -43,10 +40,10 @@
 
             <!-- 邮箱地址 -->
             <div
-              class="group bg-white rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300">
+              class="portal-contact-card portal-tone-teal group bg-white rounded-xl p-6 border border-slate-200 hover:border-slate-300 transition-colors duration-200">
               <div
-                class="w-16 h-16 bg-gradient-to-br from-hailong-primary/10 to-hailong-secondary/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <svg class="w-8 h-8 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="portal-icon w-12 h-12 rounded-xl flex items-center justify-center mb-5">
+                <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
                   </path>
@@ -56,17 +53,17 @@
               </h3>
               <p class="text-gray-600 mb-4">欢迎来信咨询</p>
               <a :href="`mailto:${contactInfo.email}`"
-                class="text-lg font-bold text-hailong-primary hover:text-hailong-secondary transition-colors break-all">
+                class="text-base font-medium text-hailong-primary hover:text-hailong-secondary transition-colors [overflow-wrap:anywhere]">
                 {{ contactInfo.email }}
               </a>
             </div>
 
             <!-- 公司地址 -->
             <div
-              class="group bg-white rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300">
+              class="portal-contact-card portal-tone-blue group bg-white rounded-xl p-6 border border-slate-200 hover:border-slate-300 transition-colors duration-200">
               <div
-                class="w-16 h-16 bg-gradient-to-br from-hailong-primary/10 to-hailong-secondary/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <svg class="w-8 h-8 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="portal-icon w-12 h-12 rounded-xl flex items-center justify-center mb-5">
+                <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -83,10 +80,10 @@
 
             <!-- 工作时间 -->
             <div
-              class="group bg-white rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100 transition-all duration-300">
+              class="portal-contact-card portal-tone-gold group bg-white rounded-xl p-6 border border-slate-200 hover:border-slate-300 transition-colors duration-200">
               <div
-                class="w-16 h-16 bg-gradient-to-br from-hailong-primary/10 to-hailong-secondary/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <svg class="w-8 h-8 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="portal-icon w-12 h-12 rounded-xl flex items-center justify-center mb-5">
+                <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
@@ -95,10 +92,9 @@
               </h3>
               <div class="space-y-3">
                 <div class="flex items-center justify-between">
-                  <span class="text-lg font-bold text-hailong-primary">{{ contactInfo.workingHours.weekdays }}</span>
+                  <span class="portal-accent text-lg font-bold">{{ contactInfo.workingHours.weekdays }}</span>
                 </div>
                 <div class="flex items-center justify-between">
-                  <span class="text-sm text-gray-600">周末</span>
                   <span class="text-sm text-gray-500">{{ contactInfo.workingHours.weekend }}</span>
                 </div>
               </div>
@@ -108,9 +104,9 @@
           <!-- 交通指引与地图位置 -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- 交通指引 -->
-            <div class="bg-white rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-100">
+            <div class="bg-white rounded-2xl p-8 border border-slate-200">
               <div class="flex items-center mb-6">
-                <div class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mr-4">
+                <div class="portal-icon portal-tone-teal w-12 h-12 rounded-xl flex items-center justify-center mr-4">
                   <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
@@ -121,10 +117,10 @@
               </div>
               <div class="grid grid-cols-1 gap-4">
                 <!-- 地铁 -->
-                <div v-if="transportation.metro.enabled" class="p-5 bg-slate-50 border border-slate-100/50 rounded-2xl transition-all hover:shadow-[0_10px_25px_rgba(0,0,0,0.01)]">
+                <div v-if="transportation.metro.enabled" class="portal-tint portal-tone-blue p-5 border rounded-2xl">
                   <div class="flex items-center mb-3">
-                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-2">
-                      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="portal-icon w-8 h-8 rounded-lg flex items-center justify-center mr-2">
+                      <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                       </svg>
@@ -138,10 +134,10 @@
                   </ul>
                 </div>
                 <!-- 公交 -->
-                <div v-if="transportation.bus.enabled" class="p-5 bg-slate-50 border border-slate-100/50 rounded-2xl transition-all hover:shadow-[0_10px_25px_rgba(0,0,0,0.01)]">
+                <div v-if="transportation.bus.enabled" class="portal-tint portal-tone-teal p-5 border rounded-2xl">
                   <div class="flex items-center mb-3">
-                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-2">
-                      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="portal-icon w-8 h-8 rounded-lg flex items-center justify-center mr-2">
+                      <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
                       </svg>
@@ -155,10 +151,10 @@
                   </ul>
                 </div>
                 <!-- 自驾 -->
-                <div v-if="transportation.driving.enabled" class="p-5 bg-slate-50 border border-slate-100/50 rounded-2xl transition-all hover:shadow-[0_10px_25px_rgba(0,0,0,0.01)]">
+                <div v-if="transportation.driving.enabled" class="portal-tint portal-tone-blue p-5 border rounded-2xl">
                   <div class="flex items-center mb-3">
-                    <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center mr-2">
-                      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="portal-icon w-8 h-8 rounded-lg flex items-center justify-center mr-2">
+                      <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
                         </path>
@@ -172,10 +168,10 @@
                   </ul>
                 </div>
                 <!-- 周边地标 -->
-                <div v-if="transportation.landmarks.length > 0" class="p-5 bg-slate-50 border border-slate-100/50 rounded-2xl transition-all hover:shadow-[0_10px_25px_rgba(0,0,0,0.01)]">
+                <div v-if="transportation.landmarks.length > 0" class="portal-tint portal-tone-gold p-5 border rounded-2xl">
                   <div class="flex items-center mb-3">
-                    <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mr-2">
-                      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="portal-icon w-8 h-8 rounded-lg flex items-center justify-center mr-2">
+                      <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
                         </path>
@@ -193,9 +189,9 @@
             </div>
 
             <!-- 地图位置 -->
-            <div class="bg-white rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-100">
+            <div class="bg-white rounded-2xl p-8 border border-slate-200">
               <div class="flex items-center mb-6">
-                <div class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mr-4">
+                <div class="portal-icon portal-tone-blue w-12 h-12 rounded-xl flex items-center justify-center mr-4">
                   <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -223,15 +219,15 @@
     <!-- 常见问题 -->
     <div class="mt-16">
       <div class="text-center mb-12">
-        <h2 class="text-4xl font-bold text-hailong-dark mb-4 font-tech">常见问题</h2>
-        <div class="w-24 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto"></div>
+        <h2 class="portal-section-title text-4xl font-bold mb-4 font-tech">常见问题</h2>
+
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div v-for="(faq, index) in faqs" :key="index"
-          class="bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-[0_12px_30px_rgba(40,120,255,0.03)] border border-slate-100 border-l-4 border-l-hailong-primary transition-all">
+          class="bg-white rounded-xl p-6 border border-slate-200 hover:border-slate-300 transition-colors">
           <h4 class="text-lg font-bold text-gray-900 mb-3 flex items-start">
             <span
-              class="inline-block w-6 h-6 bg-hailong-primary text-white rounded-full text-sm flex items-center justify-center mr-2 flex-shrink-0 mt-0.5">Q</span>
+              class="portal-label portal-tone-blue inline-block w-6 h-6 rounded-md text-sm flex items-center justify-center mr-2 flex-shrink-0 mt-0.5">Q</span>
             {{ faq.question }}
           </h4>
           <p class="text-gray-600 ml-8">{{ faq.answer }}</p>
@@ -314,9 +310,9 @@ const initMap = () => {
           padding: 12px;
           min-width: 220px;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: #f8fafc; border: 1px solid #e2e8f0;
           border-radius: 8px;
-          box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+          box-shadow: 0 4px 12px rgba(15,23,42,0.08);
         ">
           <div style="
             background: white;
@@ -329,21 +325,21 @@ const initMap = () => {
               font-weight: bold;
               color: #1a202c;
               padding-bottom: 8px;
-              border-bottom: 2px solid #667eea;
+              border-bottom: 1px solid #e2e8f0;
             ">
-              🏢 ${escapeHtml(getCompanyInfo().fullName)}
+              ${escapeHtml(getCompanyInfo().fullName)}
             </h3>
             <div style="margin: 8px 0; display: flex; align-items: center;">
-              <span style="color: #667eea; font-size: 14px; margin-right: 6px;">📞</span>
+              <span style="color: #245b85; font-size: 14px; margin-right: 6px;">电话</span>
               <a href="tel:${escapeHtml(contactInfo.value.phone)}" style="
                 font-size: 14px;
-                color: #667eea;
+                color: #245b85;
                 text-decoration: none;
                 font-weight: 600;
               ">${escapeHtml(contactInfo.value.phone)}</a>
             </div>
             <div style="margin: 8px 0; display: flex; align-items: start;">
-              <span style="color: #667eea; font-size: 14px; margin-right: 6px; margin-top: 2px;">📍</span>
+              <span style="color: #245b85; font-size: 14px; margin-right: 6px; margin-top: 2px;">地址</span>
               <div style="font-size: 12px; color: #4a5568; line-height: 1.4;">
                 ${escapeHtml(contactInfo.value.address.fullAddress)}
               </div>
@@ -384,9 +380,4 @@ const initMap = () => {
   }
 }
 
-.bg-grid-pattern {
-  background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
 </style>

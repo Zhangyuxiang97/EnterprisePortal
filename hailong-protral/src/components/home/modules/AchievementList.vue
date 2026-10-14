@@ -2,8 +2,7 @@
   <div v-if="loading || error || achievementsList.length" class="home-section">
     <div class="container-wide">
       <div class="text-center mb-16">
-        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 font-tech tracking-tight">重要业绩展示</h2>
-        <div class="w-12 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto rounded-full mt-3"></div>
+        <h2 class="portal-section-title text-3xl md:text-4xl font-extrabold mb-4 font-tech tracking-tight">重要业绩展示</h2>
       </div>
       <AsyncState v-if="loading || error" :loading="loading" :error="error" @retry="loadAchievements" />
       <div v-else class="relative overflow-hidden">
@@ -24,10 +23,10 @@
             <div class="p-6">
               <div v-if="achievement.projectType" class="flex items-center justify-between mb-3">
                 <span :class="[
-                  'px-3 py-1 rounded-full text-xs font-semibold',
-                  achievement.projectType === '工程' ? 'bg-blue-50 text-blue-700' :
-                    achievement.projectType === '服务' ? 'bg-violet-50 text-violet-700' :
-                      'bg-cyan-50 text-cyan-700'
+                  'portal-label px-3 py-1 rounded-full text-xs font-semibold',
+                  achievement.projectType === '工程' ? 'portal-tone-teal' :
+                    achievement.projectType === '服务' ? 'portal-tone-blue' :
+                      'portal-tone-gold'
                 ]">
                   {{ achievement.projectType }}
                 </span>

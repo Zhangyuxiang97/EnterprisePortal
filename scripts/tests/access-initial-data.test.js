@@ -1,7 +1,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { cleanHtml, plain, hasContent, summaryFor } = require('../generate-access-initial-data');
-const { renderSql, escapeSql } = require('../generate-initial-announcement-sql');
+const { cleanHtml, plain, hasContent, summaryFor } = require('../initialization/generate-access-initial-data');
+const { renderSql, escapeSql } = require('../initialization/generate-initial-announcement-sql');
 
 test('保留正文、表格与 PNG 内嵌图片，清除旧站失效引用和执行内容', () => {
   const missing=[];

@@ -1,4 +1,5 @@
 import request from './request'
+import { getBusinessImage } from '@/utils/businessImages'
 
 /**
  * ==================== 企业简介 ====================
@@ -24,12 +25,14 @@ export function getCompanyProfile(options = {}) {
  * 获取所有业务范围
  * @returns {Promise}
  */
-export function getBusinessScope(options = {}) {
-  return request({
+export async function getBusinessScope(options = {}) {
+  const response = await request({
     ...options,
     url: '/config/business-scope',
     method: 'get'
   })
+  if (!response.success || !Array.isArray(response.data)) return response
+  return { ...response, data: response.data.map(business => ({ ...business, imageUrl: getBusinessImage(business) })) }
 }
 
 /**
@@ -37,12 +40,14 @@ export function getBusinessScope(options = {}) {
  * @param {number} id - 业务范围ID
  * @returns {Promise}
  */
-export function getBusinessScopeById(id, options = {}) {
-  return request({
+export async function getBusinessScopeById(id, options = {}) {
+  const response = await request({
     ...options,
     url: `/config/business-scope/${id}`,
     method: 'get'
   })
+  if (!response.success || !response.data) return response
+  return { ...response, data: { ...response.data, imageUrl: getBusinessImage(response.data) } }
 }
 
 /**

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50" :class="{ 'pt-20': !embedded }">
+  <div class="portal-detail min-h-screen bg-gray-50" :class="{ 'pt-20': !embedded }">
     
     <!-- 内容区域 -->
     <div class="pt-8 pb-12 bg-white">
@@ -251,18 +251,7 @@ const getBusinessTypeLabel = (type) => {
 }
 
 // 获取类型样式
-const getTypeStyle = (type) => {
-  switch (type) {
-    case 'bidding':
-      return 'bg-hailong-primary/10 text-hailong-primary border border-hailong-primary/20'
-    case 'result':
-      return 'bg-hailong-secondary/10 text-hailong-secondary border border-hailong-secondary/20'
-    case 'correction':
-      return 'bg-hailong-cyan/10 text-hailong-cyan border border-hailong-cyan/20'
-    default:
-      return 'bg-gray-100 text-gray-800 border border-gray-200'
-  }
-}
+const getTypeStyle = type => `announcement-tag ${getAnnouncementTone(type)}`
 
 // 获取区域文本
 const getRegionText = (announcement) => {
@@ -274,6 +263,7 @@ const getRegionText = (announcement) => {
 }
 
 import { formatDate } from '@/utils/date'
+import { getAnnouncementTone } from '@/utils/announcementAppearance'
 
 
 // 预览附件

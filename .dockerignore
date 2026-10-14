@@ -2,9 +2,15 @@
 .vs
 .claude
 .runtime
+.env
+.env.*
+config/deployment.env
+**/appsettings.*.local.json
 **/node_modules
 **/dist
 **/bin
 **/obj
+**/logs
+**/wwwroot/uploads
 logs
 scripts

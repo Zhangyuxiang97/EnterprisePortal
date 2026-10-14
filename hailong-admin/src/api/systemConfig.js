@@ -7,7 +7,7 @@ export const siteSettings = {
 
 /**
  * 系统配置 API
- * 包含：企业简介、业务范围、企业资质、重要业绩、企业荣誉、轮播图、友情链接
+ * 包含：企业简介、业务范围、企业资质、重要业绩、企业荣誉
  */
 
 // ==================== 企业简介 ====================
@@ -47,6 +47,11 @@ export const businessScope = {
   delete: (id) => request({
     url: `/config/business-scope/${id}`,
     method: 'delete'
+  }),
+  updateSort: (id, data) => request({
+    url: `/config/business-scope/${id}/sort`,
+    method: 'put',
+    data
   })
 }
 
@@ -102,10 +107,10 @@ export const achievements = {
     url: `/config/achievements/${id}`,
     method: 'delete'
   }),
-  updateSort: (id, direction) => request({
+  updateSort: (id, data) => request({
     url: `/config/achievements/${id}/sort`,
     method: 'put',
-    data: { direction }
+    data
   })
 }
 
@@ -136,77 +141,11 @@ export const honors = {
   })
 }
 
-// ==================== 轮播图 ====================
-export const banners = {
-  getList: (params) => request({
-    url: '/config/manage/banners',
-    method: 'get',
-    params
-  }),
-  getDetail: (id) => request({
-    url: `/config/manage/banners/${id}`,
-    method: 'get'
-  }),
-  create: (data) => request({
-    url: '/config/banners',
-    method: 'post',
-    data
-  }),
-  update: (id, data) => request({
-    url: `/config/banners/${id}`,
-    method: 'put',
-    data
-  }),
-  delete: (id) => request({
-    url: `/config/banners/${id}`,
-    method: 'delete'
-  }),
-  updateSort: (id, direction) => request({
-    url: `/config/banners/${id}/sort`,
-    method: 'put',
-    data: { direction }
-  })
-}
-
-// ==================== 友情链接 ====================
-export const friendlyLinks = {
-  getList: (params) => request({
-    url: '/config/manage/links',
-    method: 'get',
-    params
-  }),
-  getDetail: (id) => request({
-    url: `/config/manage/links/${id}`,
-    method: 'get'
-  }),
-  create: (data) => request({
-    url: '/config/links',
-    method: 'post',
-    data
-  }),
-  update: (id, data) => request({
-    url: `/config/links/${id}`,
-    method: 'put',
-    data
-  }),
-  delete: (id) => request({
-    url: `/config/links/${id}`,
-    method: 'delete'
-  }),
-  updateSort: (id, direction) => request({
-    url: `/config/links/${id}/sort`,
-    method: 'put',
-    data: { direction }
-  })
-}
-
 export default {
   siteSettings,
   companyProfile,
   businessScope,
   qualifications,
   achievements,
-  honors,
-  banners,
-  friendlyLinks
+  honors
 }

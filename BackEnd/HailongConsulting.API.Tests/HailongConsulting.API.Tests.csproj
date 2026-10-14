@@ -17,5 +17,5 @@
     <ProjectReference Include="..\HailongConsulting.API\HailongConsulting.API.csproj" />
   </ItemGroup>
   <ItemGroup><Using Include="Xunit" /></ItemGroup>
-  <ItemGroup><None Include="..\..\SQL\01_hailong_consulting_schema.sql" Link="TestSchema.sql" CopyToOutputDirectory="PreserveNewest" /></ItemGroup>
+  <ItemGroup><None Include="..\..\SQL\init\01_schema.sql" Link="TestSchema.sql" CopyToOutputDirectory="PreserveNewest" /></ItemGroup>
 </Project>

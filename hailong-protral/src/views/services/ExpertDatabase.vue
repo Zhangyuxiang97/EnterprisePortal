@@ -3,12 +3,10 @@
     <!-- 导航栏 -->
 
     <!-- 页面头部 Hero Banner -->
-    <div class="relative pt-32 pb-20 text-center text-white overflow-hidden bg-gradient-to-br from-hailong-dark via-slate-900 to-indigo-950">
-      <div class="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
-      <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-hailong-primary/10 rounded-full blur-[120px] pointer-events-none animate-float"></div>
+    <div class="relative pt-32 pb-20 text-center text-white overflow-hidden bg-[#245b85]">
       
       <div class="relative z-10 max-w-4xl mx-auto px-6">
-        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 font-tech tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-200 bg-clip-text text-transparent">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 font-tech tracking-tight text-white">
           专家库
         </h1>
         <p class="text-base md:text-lg text-slate-300 font-medium max-w-2xl mx-auto">
@@ -27,7 +25,7 @@
             <div class="mb-8">
               <!-- 移动端：显示二维码和填写按钮 -->
               <div class="flex flex-col items-center md:hidden mb-8 space-y-4">
-                <div class="bg-gradient-to-br from-hailong-primary/10 to-hailong-secondary/10 p-6 rounded-xl border-2 border-hailong-cyan/30">
+                <div class="portal-tint portal-tone-blue p-6 rounded-xl border">
                   <div class="bg-white rounded-lg p-3">
                     <img :src="qrCodeImage" alt="专家库二维码" class="w-48 h-48 object-contain" />
                     <p class="text-xs text-gray-600 mt-2 text-center font-medium">扫码填写信息</p>
@@ -50,10 +48,10 @@
 
               <!-- 电脑端：公告内容（包含二维码） -->
               <div class="hidden md:block">
-                <div class="bg-gradient-to-r from-hailong-primary/5 to-hailong-secondary/5 p-6 md:p-8 rounded-xl border-l-4 border-hailong-primary">
-                  <div class="flex gap-6">
+                <div class="portal-tint portal-tone-blue p-6 md:p-8 rounded-xl border">
+                  <div class="flex flex-col gap-6 xl:flex-row">
                     <!-- 文字内容 -->
-                    <div class="flex-1">
+                    <div class="min-w-0 flex-1">
                       <p class="text-gray-700 leading-relaxed mb-4">
                         {{ companyInfo.fullName }}现已启动代理专家库信息录入工作，特此诚邀您参与。
                       </p>
@@ -65,7 +63,7 @@
                       </p>
                       
                       <!-- 电脑端：填写按钮组 -->
-                      <div class="flex gap-4 mt-6">
+                      <div class="flex flex-wrap gap-3 mt-6">
                         <button
                           @click="showFormAndScroll"
                           class="portal-button portal-button--primary inline-flex items-center px-8 py-3"
@@ -92,7 +90,7 @@
 
                     <!-- 二维码区域（可切换显示，在公告框内右侧） -->
                     <div v-if="showQRCode" class="flex-shrink-0 flex items-center">
-                      <div class="bg-white rounded-lg p-3 shadow-md">
+                      <div class="bg-white rounded-lg p-3 border border-slate-200">
                         <img :src="qrCodeImage" alt="专家库二维码" class="w-48 h-48 object-contain" />
                         <p class="text-xs text-gray-600 mt-2 text-center font-medium">扫码填写</p>
                       </div>
@@ -107,7 +105,7 @@
             <div class="border-t border-gray-200 my-8"></div>
 
             <!-- 联系方式区域 -->
-            <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <div class="portal-tint portal-tone-teal p-6 rounded-xl border">
               <h3 class="text-xl font-bold text-hailong-dark mb-4 flex items-center">
                 <svg class="w-6 h-6 mr-2 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
@@ -115,15 +113,15 @@
                 联系方式
               </h3>
               <div class="space-y-3">
-                <div class="flex items-center text-gray-800">
-                  <span class="font-medium text-gray-900 mr-2">联系电话：</span>
-                  <a :href="`tel:${companyInfo.contact.phone}`" class="text-hailong-primary hover:text-hailong-secondary transition-colors font-semibold text-lg">
+                <div class="flex items-start text-gray-800">
+                  <span class="shrink-0 font-medium text-gray-900 mr-2">联系电话：</span>
+                  <a :href="`tel:${companyInfo.contact.phone}`" class="min-w-0 [overflow-wrap:anywhere] text-hailong-primary hover:text-hailong-secondary transition-colors font-semibold text-lg">
                     {{ companyInfo.contact.phone }}
                   </a>
                 </div>
-                <div class="flex items-center text-gray-800">
-                  <span class="font-medium text-gray-900 mr-2">联系邮箱：</span>
-                  <a :href="`mailto:${companyInfo.contact.email}`" class="text-hailong-primary hover:text-hailong-secondary transition-colors">
+                <div class="flex items-start text-gray-800">
+                  <span class="shrink-0 font-medium text-gray-900 mr-2">联系邮箱：</span>
+                  <a :href="`mailto:${companyInfo.contact.email}`" class="min-w-0 [overflow-wrap:anywhere] text-hailong-primary hover:text-hailong-secondary transition-colors">
                     {{ companyInfo.contact.email }}
                   </a>
                 </div>
@@ -135,14 +133,14 @@
             </div>
 
             <!-- 温馨提示 -->
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-8">
+            <div class="portal-tint portal-tone-gold border rounded-lg p-4 mt-8">
               <div class="flex items-start">
-                <svg class="w-5 h-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <svg class="portal-accent w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
                 </svg>
-                <div class="text-sm text-blue-800">
+                <div class="text-sm text-slate-700">
                   <p class="font-medium mb-1">温馨提示：</p>
-                  <ul class="list-disc list-inside space-y-1 text-blue-700">
+                  <ul class="list-disc list-inside space-y-1 text-slate-600">
                     <li class="md:hidden">可点击"在线填写"按钮直接填写，或使用微信扫描二维码填写</li>
                     <li class="hidden md:list-item">推荐使用"电脑端填写"按钮在弹窗中直接填写</li>
                     <li class="hidden md:list-item">如不方便使用电脑，可点击"手机端填写"按钮显示二维码，使用手机扫码填写</li>
@@ -165,8 +163,8 @@
       @click.self="hideForm">
       <div class="bg-white rounded-none md:rounded-2xl shadow-2xl w-full h-full md:h-[85vh] md:max-w-4xl flex flex-col animate-scale-in">
         <!-- 标题栏 -->
-        <div class="bg-gradient-to-r from-hailong-primary to-hailong-secondary p-3 md:p-4 flex items-center justify-between shadow-lg rounded-t-none md:rounded-t-2xl">
-          <h3 class="text-lg md:text-xl font-bold text-white flex items-center">
+        <div class="portal-form-header shrink-0 border-b px-5 py-4 flex items-center justify-between gap-4 rounded-t-none md:rounded-t-2xl">
+          <h3 class="text-lg md:text-xl font-semibold text-slate-900 flex items-center">
             <svg class="w-5 h-5 md:w-6 md:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
             </svg>
@@ -174,8 +172,8 @@
           </h3>
           <button
             @click="hideForm"
-            class="text-white hover:text-gray-200 transition-colors p-1.5 md:p-2 hover:bg-white/10 rounded-lg"
-            title="关闭表单">
+            class="h-11 w-11 shrink-0 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors rounded-lg"
+            aria-label="关闭专家表单" title="关闭表单">
             <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -184,7 +182,7 @@
         <!-- iframe 内容区域 -->
         <div class="flex-1 overflow-hidden rounded-b-none md:rounded-b-2xl">
           <iframe
-            src="https://www.wjx.cn/vm/tkPK2g4.aspx"
+            title="专家信息填写表单" src="https://www.wjx.cn/vm/tkPK2g4.aspx"
             class="w-full h-full border-0"
             frameborder="0"
             scrolling="yes"
@@ -289,9 +287,4 @@ onUnmounted(() => {
   margin-bottom: 0;
 }
 
-.bg-grid-pattern {
-  background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
 </style>

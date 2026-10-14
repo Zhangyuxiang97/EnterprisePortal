@@ -29,7 +29,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="DatabaseMigrations\*.sql" />
-    <EmbeddedResource Include="SiteSettingsDefaults.json" />
+    <EmbeddedResource Include="../../config/portal-defaults.json" LogicalName="HailongConsulting.API.SiteSettingsDefaults.json" />
     <Content Include="SeedAssets\legacy\*.jpg" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="SeedAssets\legacy\*.docx" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>

@@ -2,8 +2,7 @@
   <div class="home-section">
     <div class="container-wide">
       <div class="text-center mb-16">
-        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 font-tech tracking-tight">业务范围</h2>
-        <div class="w-12 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto rounded-full mt-3"></div>
+        <h2 class="portal-section-title text-3xl md:text-4xl font-extrabold mb-4 font-tech tracking-tight">业务范围</h2>
       </div>
       <div v-if="loading" class="text-center py-8 text-gray-500">加载中...</div>
       <AsyncState v-else-if="fetchError" :error="fetchError" @retry="loadBusinessScope" />
@@ -13,7 +12,7 @@
           @click="$emit('business-click', business.id)" @keydown.enter="$emit('business-click', business.id)" role="link" tabindex="0"
           class="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary cursor-pointer">
           <div class="h-48 overflow-hidden bg-gray-200">
-            <img v-if="business.imageUrl" :src="business.imageUrl" :alt="business.name"
+            <img v-if="business.imageUrl" :src="business.imageUrl" :alt="business.name" loading="lazy" decoding="async"
               class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
             <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
               <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -28,7 +27,7 @@
             <div v-if="business.features && business.features.length > 0">
               <ul class="space-y-2">
                 <li v-for="(feature, index) in business.features.slice(0, 4)" :key="index" class="text-sm text-gray-500 flex items-center">
-                  <span class="w-1.5 h-1.5 bg-hailong-secondary rounded-full mr-2"></span>{{ feature }}
+                  <span class="w-1.5 h-1.5 bg-[#256f65] rounded-full mr-2"></span>{{ feature }}
                 </li>
               </ul>
             </div>

@@ -81,6 +81,11 @@ public class RecentAnnouncementDto
     public int Id { get; set; }
 
     /// <summary>
+    /// 门户详情链接使用的公告 HashId
+    /// </summary>
+    public string HashId { get; set; } = string.Empty;
+
+    /// <summary>
     /// 公告标题
     /// </summary>
     public string Title { get; set; } = string.Empty;

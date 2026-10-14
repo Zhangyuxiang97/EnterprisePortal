@@ -16,7 +16,7 @@ flowchart LR
     Nginx --> Uploads
 ```
 
-Docker Compose 定义 MySQL、API、Nginx 和公告初始化服务。门户默认发布到宿主端口 8082，后台到 8080，API 代理到 5001；MySQL 与 API 容器通过内部网络连接。Nginx 构建镜像时构建两个前端。
+Docker Compose 定义 MySQL、API 和 Nginx。门户默认发布到宿主端口 8082，后台到 8080，API 代理到 5001；MySQL 与 API 容器通过内部网络连接。Nginx 构建镜像时构建两个前端。
 
 配置来源为 [docker-compose.yml](../docker-compose.yml)、[Nginx 配置](../nginx/conf.d/default.conf) 和 [部署脚本](../deploy-ubuntu22-docker.sh)。
 

@@ -20,17 +20,6 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.VisitDate, opt => opt.MapFrom(src => src.VisitDate.ToString("yyyy-MM-dd")));
 
         // 系统配置映射
-        // 轮播图
-        CreateMap<CarouselBanner, CarouselBannerDto>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status == 1));
-        
-        CreateMap<CreateCarouselBannerDto, CarouselBanner>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (sbyte)(src.Status ? 1 : 0)));
-        
-        CreateMap<UpdateCarouselBannerDto, CarouselBanner>()
-            .ForMember(dest => dest.Status, opt => { opt.PreCondition(src => src.Status.HasValue); opt.MapFrom(src => (sbyte)(src.Status.GetValueOrDefault() ? 1 : 0)); })
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-
         // 企业简介
         CreateMap<CompanyProfile, CompanyProfileDto>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status == 1))
@@ -65,17 +54,6 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (sbyte)(src.Status ? 1 : 0)));
         
         CreateMap<UpdateCompanyHonorDto, CompanyHonor>()
-            .ForMember(dest => dest.Status, opt => { opt.PreCondition(src => src.Status.HasValue); opt.MapFrom(src => (sbyte)(src.Status.GetValueOrDefault() ? 1 : 0)); })
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-
-        // 友情链接
-        CreateMap<FriendlyLink, FriendlyLinkDto>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status == 1));
-        
-        CreateMap<CreateFriendlyLinkDto, FriendlyLink>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (sbyte)(src.Status ? 1 : 0)));
-        
-        CreateMap<UpdateFriendlyLinkDto, FriendlyLink>()
             .ForMember(dest => dest.Status, opt => { opt.PreCondition(src => src.Status.HasValue); opt.MapFrom(src => (sbyte)(src.Status.GetValueOrDefault() ? 1 : 0)); })
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 

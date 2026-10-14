@@ -10,7 +10,7 @@ WORKDIR /src/hailong-protral
 COPY hailong-protral/package*.json ./
 RUN npm ci
 COPY hailong-protral/ ./
-COPY BackEnd/HailongConsulting.API/SiteSettingsDefaults.json /src/BackEnd/HailongConsulting.API/SiteSettingsDefaults.json
+COPY config/portal-defaults.json /src/config/portal-defaults.json
 RUN npm run build
 
 FROM nginx:alpine

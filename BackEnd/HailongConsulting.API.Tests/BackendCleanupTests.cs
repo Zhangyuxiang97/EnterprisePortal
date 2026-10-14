@@ -182,4 +182,108 @@ public class BackendCleanupTests
         context.Response.Body.Position = 0; var body = await new StreamReader(context.Response.Body).ReadToEndAsync();
         Assert.Equal(500, context.Response.StatusCode); Assert.Contains("test-trace", body); Assert.DoesNotContain("internal-password-and-sql", body);
     }
+
+    private static async Task SeedProvinceCases(ApplicationDbContext db)
+    {
+        db.RegionDictionaries.AddRange(
+            new RegionDictionary { RegionCode = "410000", RegionName = "河南省", RegionLevel = 1 },
+            new RegionDictionary { RegionCode = "440000", RegionName = "广东省", RegionLevel = 1 },
+            new RegionDictionary { RegionCode = "410100", RegionName = "郑州市", RegionLevel = 2, ParentCode = "410000" },
+            new RegionDictionary { RegionCode = "990000", RegionName = "已删除地区", RegionLevel = 1, IsDeleted = 1 });
+        foreach (var (title, province, status, deleted) in new (string, string?, sbyte, sbyte)[] {
+            ("河南公开", "410000", 1, 0), ("河南停用", "410000", 0, 0), ("广东公开", "440000", 1, 0),
+            ("省份为空", null, 1, 0), ("省份空串", "", 1, 0), ("省份空格", "  ", 1, 0),
+            ("历史名称", "未识别省份", 1, 0), ("错误层级", "410100", 1, 0), ("失效编码", "990000", 1, 0),
+            ("未知停用", null, 0, 0), ("未知已删", null, 1, 1)
+        }) {
+            var article = Article(title, status); article.Province = province; article.IsDeleted = deleted;
+            db.Announcements.Add(article);
+        }
+        await db.SaveChangesAsync();
+    }
+
+    [Theory]
+    [InlineData(false, 6, 8)]
+    [InlineData(true, 7, 10)]
+    public async Task UnlocatedProvinceListMatchesCountsAndVisibility(bool management, int unlocated, int total)
+    {
+        await using var database = new Database(); await database.Initialize(); await using var db = database.Open();
+        await SeedProvinceCases(db);
+        var service = Announcements(db); var query = new AnnouncementQueryDto { ProvinceUnlocated = true };
+        var options = await service.GetRegionOptionsAsync(query, management);
+        var list = await service.GetPagedAsync(query, management);
+        Assert.Equal(total, options.ProvinceTotalCount);
+        Assert.Equal(unlocated, options.ProvinceUnlocatedCount);
+        Assert.Equal(unlocated, list.TotalCount);
+        Assert.Equal(total, options.Provinces.Sum(x => x.Count) + options.ProvinceUnlocatedCount);
+        Assert.DoesNotContain(list.Items, x => x.Title is "未知已删" or "河南公开" or "广东公开");
+        Assert.Equal(management, list.Items.Any(x => x.Title == "未知停用"));
+        Assert.Empty(options.Cities); Assert.Empty(options.Districts); Assert.Null(options.SelectedProvinceCode);
+        query.ProvinceUnlocated = false; query.Province = "410000";
+        Assert.Equal(management ? 2 : 1, (await service.GetPagedAsync(query, management)).TotalCount);
+        Assert.Equal(total, (await service.GetRegionOptionsAsync(query, management)).ProvinceTotalCount);
+    }
+
+    [Fact]
+    public async Task ProvinceCountsRespectBusinessNoticeKeywordAndDateFilters()
+    {
+        await using var database = new Database(); await database.Initialize(); await using var db = database.Open();
+        await SeedProvinceCases(db);
+        foreach (var (province, business, notice, date, title) in new[] {
+            ((string?)null, "GOV_PROCUREMENT", "result", new DateTime(2026,10,14), "目标未知"),
+            ("410000", "GOV_PROCUREMENT", "result", new DateTime(2026,10,14), "目标河南"),
+            ((string?)null, "CONSTRUCTION", "result", new DateTime(2026,10,14), "目标建设"),
+            ((string?)null, "GOV_PROCUREMENT", "bidding", new DateTime(2026,10,14), "目标招标"),
+            ((string?)null, "GOV_PROCUREMENT", "result", new DateTime(2026,10,13), "目标旧日期")
+        }) {
+            var article = Article(title); article.Province = province; article.BusinessType = business;
+            article.NoticeType = notice; article.PublishTime = date; db.Announcements.Add(article);
+        }
+        await db.SaveChangesAsync(); var service = Announcements(db);
+        var query = new AnnouncementQueryDto { ProvinceUnlocated = true, BusinessType = "GOV_PROCUREMENT",
+            NoticeType = "result", ProcurementType = "service", Keyword = "目标", StartDate = new DateTime(2026,10,14), EndDate = new DateTime(2026,10,14) };
+        var options = await service.GetRegionOptionsAsync(query, true);
+        Assert.Equal(2, options.ProvinceTotalCount); Assert.Equal(1, options.ProvinceUnlocatedCount);
+        Assert.Equal(1, options.Provinces.Single().Count);
+        Assert.Equal("目标未知", (await service.GetPagedAsync(query, true)).Items.Single().Title);
+    }
+
+    [Fact]
+    public async Task CompletingProvinceMovesRecordOutOfUnlocatedAndIncreasesProvinceCount()
+    {
+        await using var database = new Database(); await database.Initialize(); await using var db = database.Open();
+        await SeedProvinceCases(db); var service = Announcements(db);
+        var row = await db.Announcements.SingleAsync(x => x.Title == "省份为空");
+        var before = await service.GetRegionOptionsAsync(new(), true);
+        await service.UpdateAsync(row.Id, new UpdateAnnouncementDto { Version = row.Version, Province = "410000", ProjectRegion = "河南省" });
+        db.ChangeTracker.Clear(); var after = await service.GetRegionOptionsAsync(new(), true);
+        Assert.Equal(before.ProvinceUnlocatedCount - 1, after.ProvinceUnlocatedCount);
+        Assert.Equal(before.Provinces.Single(x => x.RegionCode == "410000").Count + 1, after.Provinces.Single(x => x.RegionCode == "410000").Count);
+        Assert.DoesNotContain((await service.GetPagedAsync(new() { ProvinceUnlocated = true }, true)).Items, x => x.Id == row.Id);
+        Assert.Contains((await service.GetPagedAsync(new() { Province = "410000" }, true)).Items, x => x.Id == row.Id);
+    }
+
+    [Theory]
+    [InlineData("province")]
+    [InlineData("city")]
+    [InlineData("district")]
+    public void UnlocatedProvinceRejectsConflictingRegionConditions(string field)
+    {
+        var query = new AnnouncementQueryDto { ProvinceUnlocated = true };
+        Assert.True(Validator.TryValidateObject(query, new ValidationContext(query), [], true));
+        if (field == "province") query.Province = "410000";
+        if (field == "city") query.City = "410100";
+        if (field == "district") query.District = "410102";
+        Assert.False(Validator.TryValidateObject(query, new ValidationContext(query), [], true));
+    }
+
+    [Fact]
+    public void ManagementRegionCountsRequireSameRolesAsManagementList()
+    {
+        var list = typeof(AnnouncementController).GetMethod(nameof(AnnouncementController.GetManagementList))!;
+        var counts = typeof(AnnouncementController).GetMethod(nameof(AnnouncementController.GetManagementRegionOptions))!;
+        var listAuth = list.GetCustomAttributes(typeof(Microsoft.AspNetCore.Authorization.AuthorizeAttribute), false).Cast<Microsoft.AspNetCore.Authorization.AuthorizeAttribute>().Single();
+        var countsAuth = counts.GetCustomAttributes(typeof(Microsoft.AspNetCore.Authorization.AuthorizeAttribute), false).Cast<Microsoft.AspNetCore.Authorization.AuthorizeAttribute>().Single();
+        Assert.Equal("admin,user", countsAuth.Roles); Assert.Equal(listAuth.Roles, countsAuth.Roles);
+    }
 }

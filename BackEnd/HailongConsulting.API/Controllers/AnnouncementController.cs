@@ -43,6 +43,11 @@ public class AnnouncementController : ControllerBase
         return data == null ? NotFound(ApiResponse<AnnouncementDto>.FailResult("内容不存在")) : Ok(ApiResponse<AnnouncementDto>.SuccessResult(data));
     }
 
+    [HttpGet("manage/region-options")]
+    [Authorize(Roles = "admin,user")]
+    public async Task<ActionResult<ApiResponse<AnnouncementRegionOptionsDto>>> GetManagementRegionOptions([FromQuery] AnnouncementQueryDto query)
+        => Ok(ApiResponse<AnnouncementRegionOptionsDto>.SuccessResult(await _announcementService.GetRegionOptionsAsync(query, includeDisabled: true)));
+
     /// <summary>
     /// 创建公告
     /// </summary>
@@ -97,7 +102,7 @@ public class AnnouncementController : ControllerBase
     }
 
     /// <summary>
-    /// 根据HashId获取公告详情
+    /// 根据HashId获取公告详情，兼容历史数字ID链接
     /// </summary>
     /// <param name="hashId">公告HashId</param>
     [HttpGet("by-hash/{hashId}")]
@@ -106,6 +111,10 @@ public class AnnouncementController : ControllerBase
         try
         {
             var id = _hashIdService.Decode(hashId);
+            // 先解码，避免将恰好由数字组成的有效 HashId 当作数据库 ID。
+            if (id == null && int.TryParse(hashId, System.Globalization.NumberStyles.None,
+                System.Globalization.CultureInfo.InvariantCulture, out var legacyId) && legacyId > 0)
+                id = legacyId;
             if (id == null)
             {
                 return NotFound(ApiResponse<AnnouncementDto>.FailResult("无效的公告链接"));

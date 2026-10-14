@@ -1,53 +1,13 @@
 <template>
 <div
           @click="$emit('open', announcement.hashId || announcement.id)" @keydown.enter="$emit('open', announcement.hashId || announcement.id)" role="link" tabindex="0"
-          :class="[
-            'group bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_35px_rgba(40,120,255,0.06)] hover:-translate-y-0.5 border border-slate-100/80 transition-all duration-300 cursor-pointer border-l-4 hover:border-l-[6px] flex flex-col gap-4',
-            announcement.businessType === 'GOV_PROCUREMENT' ? 'border-l-hailong-primary' :
-            announcement.businessType === 'CONSTRUCTION' ? 'border-l-hailong-secondary' : 'border-l-hailong-primary'
-          ]"
+          :class="getAnnouncementTone(announcement.noticeType)"
+          class="announcement-card group bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-sm border border-slate-100 transition-shadow duration-200 cursor-pointer flex flex-col gap-4"
         >
-          <!-- 业务类型和采购类型标签 -->
-          <div class="flex items-center gap-2">
-            <span
-              :class="[
-                'px-2.5 py-0.5 rounded-md text-[10px] font-bold whitespace-nowrap shadow-sm',
-                announcement.businessType === 'GOV_PROCUREMENT'
-                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
-                  : announcement.businessType === 'CONSTRUCTION'
-                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
-                  : 'bg-slate-500 text-white'
-              ]"
-            >
-              {{ announcement.businessType === 'GOV_PROCUREMENT' ? '政府采购' :
-                 announcement.businessType === 'CONSTRUCTION' ? '建设工程' : '其他' }}
-            </span>
-
-            <!-- 采购类型 - 仅政府采购显示 -->
-            <span
-              v-if="announcement.businessType === 'GOV_PROCUREMENT' && announcement.procurementType"
-              class="px-2.5 py-0.5 rounded-md text-[10px] font-bold whitespace-nowrap bg-blue-50/50 text-blue-600 border border-blue-100/50 shadow-sm"
-            >
-              {{ announcement.procurementType === 'goods' ? '货物' :
-                 announcement.procurementType === 'service' ? '服务' :
-                 announcement.procurementType === 'project' ? '工程' : announcement.procurementType }}
-            </span>
-
-            <!-- 公告类型 - 优化样式 -->
-            <span
-              :class="[
-                'ml-auto px-2.5 py-0.5 rounded-md text-[10px] font-bold whitespace-nowrap flex items-center gap-1 shadow-sm border',
-                announcement.noticeType === 'bidding'
-                  ? 'bg-blue-50 text-blue-600 border-blue-100/50'
-                  : announcement.noticeType === 'result'
-                  ? 'bg-emerald-50 text-emerald-600 border-emerald-100/50'
-                  : announcement.noticeType === 'correction'
-                  ? 'bg-orange-50 text-orange-600 border-orange-100/50'
-                  : 'bg-slate-50 text-slate-600 border-slate-200'
-              ]"
-            >
-              {{ announcement.noticeTypeName }}
-            </span>
+          <!-- 公告类型为主标签，业务与采购分类为辅助信息。 -->
+          <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+            <span class="announcement-tag">{{ announcement.noticeTypeName }}</span>
+            <span class="ml-auto whitespace-nowrap text-[13px] leading-5 text-[#64748b]">{{ getAnnouncementClassification(announcement) }}</span>
           </div>
 
           <!-- 标题 -->
@@ -65,13 +25,6 @@
               </div>
               <span class="text-xs text-slate-400 font-bold shrink-0">中标人：</span>
               <span class="text-sm text-emerald-800 font-extrabold truncate">{{ announcement.winner }}</span>
-            </div>
-            <div class="shrink-0 flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-100/50 px-2 py-0.5 rounded-full border border-emerald-200/30">
-              <span class="relative flex h-1.5 w-1.5 shrink-0">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-              </span>
-              中标喜报
             </div>
           </div>
 
@@ -120,6 +73,7 @@
 </template>
 <script setup>
 import { formatDate } from '@/utils/date'
+import { getAnnouncementTone, getAnnouncementClassification } from '@/utils/announcementAppearance'
 defineProps({ announcement: { type: Object, required: true } })
 defineEmits(['open'])
 </script>
