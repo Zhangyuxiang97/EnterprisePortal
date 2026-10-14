@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { nextTick } from 'vue'
+import { recordVisit } from '@/api/config'
 
 const routes = [
   {
@@ -103,6 +105,21 @@ const router = createRouter({
       return { top: 0 }
     }
   }
+})
+
+router.afterEach(async (to, from, failure) => {
+  if (failure || (from.name && to.path === from.path)) return
+
+  await nextTick()
+
+  // 统一记录门户页面访问；详情接口只负责内容自身的浏览数。
+  void recordVisit({
+    pageUrl: to.path.slice(0, 500),
+    pageTitle: document.title.slice(0, 255),
+    referer: (from.name ? from.fullPath : document.referrer).slice(0, 500)
+  }).catch(() => {
+    // 统计失败不影响页面导航。
+  })
 })
 
 export default router

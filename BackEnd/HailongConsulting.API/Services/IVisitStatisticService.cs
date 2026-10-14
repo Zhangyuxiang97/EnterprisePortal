@@ -19,21 +19,19 @@ public interface IVisitStatisticService : IVisitStatisticsExtension
     Task RecordVisitAsync(string pageUrl, string? pageTitle = null, string? visitorIp = null, string? userAgent = null, string? referer = null);
 
     /// <summary>
-    /// 增加公告浏览次数（同时更新业务表和统计表）
+    /// 增加公告业务浏览次数
     /// </summary>
     /// <param name="announcementId">公告ID</param>
-    /// <param name="request">HTTP请求对象</param>
-    Task IncrementAnnouncementViewAsync(int announcementId, HttpRequest request);
+    Task IncrementAnnouncementViewAsync(int announcementId);
 
     /// <summary>
-    /// 增加信息发布浏览次数（同时更新业务表和统计表）
+    /// 增加信息发布业务浏览次数
     /// </summary>
     /// <param name="publicationId">信息发布ID</param>
-    /// <param name="request">HTTP请求对象</param>
-    Task IncrementPublicationViewAsync(int publicationId, HttpRequest request);
+    Task IncrementPublicationViewAsync(int publicationId);
 
     /// <summary>
-    /// 获取指定日期范围的访问统计
+    /// 分页获取指定日期范围的访问记录
     /// </summary>
     Task<IEnumerable<VisitStatistic>> GetVisitStatisticsAsync(DateOnly startDate, DateOnly endDate);
     Task<PagedResult<VisitStatistic>> GetVisitStatisticsPageAsync(DateOnly startDate, DateOnly endDate, string? pagePath, int page, int pageSize);

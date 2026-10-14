@@ -16,39 +16,19 @@ public class VisitStatisticRepository : Repository<VisitStatistic>, IVisitStatis
 
     public async Task RecordVisitAsync(string pageUrl, string? pageTitle, string? visitorIp, string? userAgent, string? referer)
     {
-        var today = DateOnly.FromDateTime(DateTime.Now);
-        
-        // 查找今天是否已有该页面的访问记录
-        var existingRecord = await _dbSet
-            .FirstOrDefaultAsync(v => v.PageUrl == pageUrl && v.VisitDate == today && v.IsDeleted == 0);
-
-        if (existingRecord != null)
+        var now = DateTime.Now;
+        await _dbSet.AddAsync(new VisitStatistic
         {
-            // 更新现有记录
-            existingRecord.VisitCount++;
-            existingRecord.PageTitle = pageTitle ?? existingRecord.PageTitle;
-            existingRecord.VisitorIp = visitorIp ?? existingRecord.VisitorIp;
-            existingRecord.UserAgent = userAgent ?? existingRecord.UserAgent;
-            existingRecord.Referer = referer ?? existingRecord.Referer;
-            existingRecord.UpdatedAt = DateTime.Now;
-        }
-        else
-        {
-            // 创建新记录
-            var newRecord = new VisitStatistic
-            {
-                VisitDate = today,
-                PageUrl = pageUrl,
-                PageTitle = pageTitle,
-                VisitorIp = visitorIp,
-                UserAgent = userAgent,
-                Referer = referer,
-                VisitCount = 1,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
-            };
-            await _dbSet.AddAsync(newRecord);
-        }
+            VisitDate = DateOnly.FromDateTime(now),
+            PageUrl = pageUrl,
+            PageTitle = pageTitle,
+            VisitorIp = visitorIp,
+            UserAgent = userAgent,
+            Referer = referer,
+            VisitCount = 1,
+            CreatedAt = now,
+            UpdatedAt = now
+        });
     }
 
     public async Task<PagedResult<VisitStatistic>> GetPageAsync(DateOnly startDate, DateOnly endDate, string? pagePath, int page, int pageSize)

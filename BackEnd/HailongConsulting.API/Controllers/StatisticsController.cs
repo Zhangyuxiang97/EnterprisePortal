@@ -178,6 +178,7 @@ public class StatisticsController : ControllerBase
     /// </summary>
     [HttpPost("visits/record")]
     [AllowAnonymous]
+    [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("visit")]
     public async Task<ActionResult<ApiResponse<bool>>> RecordVisit([FromBody] RecordVisitDto dto)
     {
         try

@@ -250,6 +250,11 @@ public class AttachmentController : ControllerBase
     {
         try
         {
+            if (page < 1 || pageSize < 1 || pageSize > 100)
+            {
+                return BadRequest(ApiResponse<PagedResult<AttachmentDto>>.FailResult("页码必须大于 0，每页数量必须在 1 到 100 之间"));
+            }
+
             var result = await _attachmentService.GetPagedAsync(page, pageSize, category, relatedType, keyword);
             return Ok(ApiResponse<PagedResult<AttachmentDto>>.SuccessResult(result, "获取附件列表成功"));
         }

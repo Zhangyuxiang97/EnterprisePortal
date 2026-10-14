@@ -41,7 +41,7 @@ const detailPaths = { business: 'business-scope', qualifications: 'qualification
 const resolveImageUrl = value => {
   if (!value) return ''
   if (/^(https?:)?\/\//i.test(value)) return value
-  const base = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
+  const base = import.meta.env.VITE_API_BASE_URL || '/api'
   const origin = /^https?:\/\//i.test(base) ? new URL(base).origin : ''
   return `${origin}/${value.replace(/^\/+/, '')}`
 }

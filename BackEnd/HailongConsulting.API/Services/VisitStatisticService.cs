@@ -50,24 +50,11 @@ public class VisitStatisticService : IVisitStatisticService
         }
     }
 
-    public async Task IncrementAnnouncementViewAsync(int announcementId, HttpRequest request)
+    public async Task IncrementAnnouncementViewAsync(int announcementId)
     {
         try
         {
-            // 1. 增加业务表的浏览次数
             await _announcementRepository.IncrementViewCountAsync(announcementId);
-
-            // 2. 记录详细的访问统计
-            var pageUrl = $"/api/announcements/{announcementId}";
-            var announcement = await _announcementRepository.GetByIdAsync(announcementId);
-            var pageTitle = announcement?.Title;
-            var visitorIp = GetClientIpAddress(request);
-            var userAgent = request.Headers["User-Agent"].ToString();
-            var referer = request.Headers["Referer"].ToString();
-
-            await _visitStatisticRepository.RecordVisitAsync(pageUrl, pageTitle, visitorIp, userAgent, referer);
-
-            // 3. 保存所有更改
             await _unitOfWork.SaveChangesAsync();
         }
         catch (Exception ex)
@@ -77,24 +64,11 @@ public class VisitStatisticService : IVisitStatisticService
         }
     }
 
-    public async Task IncrementPublicationViewAsync(int publicationId, HttpRequest request)
+    public async Task IncrementPublicationViewAsync(int publicationId)
     {
         try
         {
-            // 1. 增加业务表的浏览次数
             await _infoPublicationRepository.IncrementViewCountAsync(publicationId);
-
-            // 2. 记录详细的访问统计
-            var pageUrl = $"/api/info-publications/{publicationId}";
-            var publication = await _infoPublicationRepository.GetByIdAsync(publicationId);
-            var pageTitle = publication?.Title;
-            var visitorIp = GetClientIpAddress(request);
-            var userAgent = request.Headers["User-Agent"].ToString();
-            var referer = request.Headers["Referer"].ToString();
-
-            await _visitStatisticRepository.RecordVisitAsync(pageUrl, pageTitle, visitorIp, userAgent, referer);
-
-            // 3. 保存所有更改
             await _unitOfWork.SaveChangesAsync();
         }
         catch (Exception ex)
@@ -131,30 +105,6 @@ public class VisitStatisticService : IVisitStatisticService
             _logger.LogError(ex, "获取热门页面统计失败，TopCount: {TopCount}, Days: {Days}", topCount, days);
             throw;
         }
-    }
-
-    /// <summary>
-    /// 获取客户端IP地址
-    /// </summary>
-    private string? GetClientIpAddress(HttpRequest request)
-    {
-        // 尝试从X-Forwarded-For头获取（适用于代理/负载均衡器）
-        var forwardedFor = request.Headers["X-Forwarded-For"].FirstOrDefault();
-        if (!string.IsNullOrEmpty(forwardedFor))
-        {
-            var ips = forwardedFor.Split(',');
-            return ips[0].Trim();
-        }
-
-        // 尝试从X-Real-IP头获取
-        var realIp = request.Headers["X-Real-IP"].FirstOrDefault();
-        if (!string.IsNullOrEmpty(realIp))
-        {
-            return realIp;
-        }
-
-        // 直接从连接获取
-        return request.HttpContext.Connection.RemoteIpAddress?.ToString();
     }
 
     #region IVisitStatisticsExtension 实现
@@ -304,7 +254,7 @@ public class VisitStatisticService : IVisitStatisticService
         {
             var total = await _context.VisitStatistics
                 .Where(v => v.IsDeleted == 0)
-                .CountAsync();
+                .SumAsync(v => v.VisitCount);
             
             if (total == 0)
             {
@@ -317,8 +267,8 @@ public class VisitStatisticService : IVisitStatisticService
                 .Select(g => new VisitSourceDto
                 {
                     Source = g.Key,
-                    Count = g.Count(),
-                    Percentage = (double)g.Count() / total * 100
+                    Count = g.Sum(v => v.VisitCount),
+                    Percentage = (double)g.Sum(v => v.VisitCount) / total * 100
                 })
                 .OrderByDescending(s => s.Count)
                 .Take(10)

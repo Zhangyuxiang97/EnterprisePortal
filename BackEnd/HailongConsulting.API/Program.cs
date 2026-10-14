@@ -176,6 +176,16 @@ builder.Services.AddRateLimiter(options =>
             QueueLimit = 0,
             AutoReplenishment = true
         }));
+    options.AddPolicy("visit", context => RateLimitPartition.GetFixedWindowLimiter(
+        partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        factory: _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 60,
+            Window = TimeSpan.FromMinutes(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit = 0,
+            AutoReplenishment = true
+        }));
 });
 
 // 配置CORS
@@ -316,6 +326,8 @@ if (app.Configuration.GetValue<bool>("ReverseProxy:HttpsRedirectEnabled"))
 
 // 启用静态文件服务（用于访问上传的附件）
 app.UseStaticFiles();
+
+app.UseRouting();
 
 // 使用CORS
 app.UseCors("AllowAll");
