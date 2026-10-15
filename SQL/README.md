@@ -30,7 +30,7 @@ cd scripts
 npm run generate-initial-sql
 ```
 
-地区数据在 `init/03_regions.sql` 维护；公告生成、离线清洗及地区格式化共用 `scripts/initialization/region-dictionary.js` 读取。修改地区后执行 `npm run generate-regions` 校验编码唯一性并统一格式，保留原插入顺序。
+地区数据在 `init/03_regions.sql` 维护；公告生成、离线清洗及地区格式化共用 `scripts/initialization/region-dictionary.js` 读取。修改地区后执行 `npm run generate-regions` 校验编码唯一性并统一格式，保留原插入顺序。省级默认按六位行政区划代码升序排列，顶层父编码为 NULL；门户与后台公告筛选按当前条件下的地区数量降序排列，相同数量沿用字典顺序。
 
 数据来自 henanhailong.com 抓取结果及海隆数据库.mdb：保留 2375 条已清洗公告，补入 151 条备份公告，共 **2526 条**，最新公告日期为 2026-09-24。
 

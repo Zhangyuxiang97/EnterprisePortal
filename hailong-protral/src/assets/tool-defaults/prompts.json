@@ -1,0 +1,30 @@
+{
+  "generator": "imagegen built-in",
+  "description": "Generated editorial photographs for the three tool cards. WebP encoded at 960×540.",
+  "images": [
+    {
+      "name": "招标代理服务费计算工具",
+      "file": "bidding-fee.webp",
+      "prompt": "Use case: photorealistic-natural. Asset: horizontal cover photo for a Chinese engineering consulting portal tool card, landscape 16:9. Subject: tender agency service fee calculation, a close editorial photograph of a tidy professional desk with a dark navy tender dossier, a few neatly arranged financial forms with faint unreadable lines, a modern small calculator and a silver pen. An anonymous hand reviewing the papers is optional, no face. Natural daylight from office window, realistic paper and wood textures, muted navy, warm gray and cream tones. Main objects centered with enough breathing room for a wide shallow card crop. Visually distinct from architectural costing: focus on tender paperwork and fee calculation. Restrained premium professional photography, realistic rather than glossy staged CGI. No readable text, numbers, company logos, watermark, neon, purple-blue gradient, holograms or UI overlay. One single photograph.",
+      "width": 960,
+      "height": 540,
+      "bytes": 41646
+    },
+    {
+      "name": "造价费用计算工具",
+      "file": "cost-fee.webp",
+      "prompt": "Use case: photorealistic-natural. Asset: horizontal cover photo for a Chinese engineering consulting portal tool card, landscape 16:9. Subject: construction cost consulting fee calculation, close editorial photograph of unrolled architectural floor plan drawings on a tidy light wood desk, a brushed metal architectural scale ruler, a compact dark calculator, mechanical pencil, and a small simple neutral building massing model in the background. Engineering drawings have subtle linework but no readable text or numbers. Natural daylight from office window, realistic matte textures, muted blue-gray, warm gray and cream palette matching calm tender consultancy photographs. Main engineering objects centered, wide shallow card crop friendly. Premium restrained realistic office photography, no faces needed. No logos, watermark, readable words, neon effects, purple-blue gradients, holograms or UI overlay. One single photograph.",
+      "width": 960,
+      "height": 540,
+      "bytes": 40034
+    },
+    {
+      "name": "司法鉴定费用计算工具",
+      "file": "judicial-fee.webp",
+      "prompt": "Use case: photorealistic-natural. Asset: horizontal cover photo for a Chinese engineering consulting portal tool card, landscape 16:9. Subject: judicial appraisal of construction cost disputes and fee calculation, restrained realistic editorial still life in a consulting office: a small elegant balanced brass justice scale as the distinctive central symbol beside a neatly stacked appraisal case dossier, architectural plan sheet, silver pen and compact dark calculator. Keep office engineering appraisal mood rather than dramatic courtroom. The scale is mechanically plausible with two equal bowls and a stable base. Soft natural side daylight, realistic brass, matte paper and light wood, muted navy and warm neutrals with subtle brass accent. Centered objects, clean composition safe for shallow wide card crop. No readable text, numbers, logos, people, watermark, judge gavel, neon, purple-blue gradient, hologram or UI overlay. One single photograph.",
+      "width": 960,
+      "height": 540,
+      "bytes": 42200
+    }
+  ]
+}

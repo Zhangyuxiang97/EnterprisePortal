@@ -332,7 +332,8 @@ public class AnnouncementService : IAnnouncementService
                 region.RegionLevel == regionLevel &&
                 (parentCode == null || region.ParentCode == parentCode) &&
                 (counts.ContainsKey(region.RegionCode) || region.RegionCode == selectedRegionCode))
-            .OrderBy(region => region.SortOrder)
+            .OrderByDescending(region => counts.GetValueOrDefault(region.RegionCode))
+            .ThenBy(region => region.SortOrder)
             .ThenBy(region => region.RegionCode)
             .Select(region => new AnnouncementRegionOptionDto
             {

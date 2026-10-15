@@ -3,17 +3,7 @@
     <!-- 导航栏 -->
 
     <!-- 页面头部 Hero Banner -->
-    <div class="relative pt-32 pb-20 text-center text-white overflow-hidden bg-[#245b85]">
-      
-      <div class="relative z-10 max-w-4xl mx-auto px-6">
-        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 font-tech tracking-tight text-white">
-          专家库
-        </h1>
-        <p class="text-base md:text-lg text-slate-300 font-medium max-w-2xl mx-auto">
-          诚邀各领域专家加入海隆咨询专家库，携手共创专业工程咨询生态
-        </p>
-      </div>
-    </div>
+    <PageBanner title="专家库" description="诚邀各领域专家加入海隆咨询专家库，携手共创专业工程咨询生态" />
 
     <!-- 主要内容区域 -->
     <div class="py-10">
@@ -196,6 +186,7 @@
 </template>
 
 <script setup>
+import PageBanner from '@/components/common/PageBanner.vue'
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { getCompanyInfo, getContactInfo } from '@/utils/config'
 import qrCodeImage from '@/assets/QR_CODE.png'

@@ -2,15 +2,7 @@
   <div class="min-h-screen bg-slate-50/50">
 
     <!-- 页面头部 Hero Banner -->
-    <div class="relative pt-32 pb-20 text-center text-white overflow-hidden bg-gradient-to-br from-hailong-dark via-slate-900 to-indigo-950">
-      
-      <div class="relative z-10 max-w-4xl mx-auto px-6">
-        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 font-tech tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-200 bg-clip-text text-transparent">
-          联系我们
-        </h1>
-        <p class="text-base md:text-lg text-slate-300 font-medium max-w-2xl mx-auto">期待与您的合作，共创美好未来</p>
-      </div>
-    </div>
+    <PageBanner title="联系我们" description="期待与您的合作，共创美好未来" />
 
     <!-- 内容区域 -->
     <div class="py-12">
@@ -241,6 +233,7 @@
 </template>
 
 <script setup>
+import PageBanner from '@/components/common/PageBanner.vue'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { getCompanyInfo, getContactInfo, getTransportation, getFAQs, loadSiteConfig } from '@/utils/config'
 

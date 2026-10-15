@@ -1,9 +1,6 @@
 <template>
   <div class="min-h-screen bg-slate-50">
-    <div class="bg-gradient-to-br from-hailong-dark via-slate-900 to-indigo-950 px-6 pt-32 pb-16 text-center text-white">
-      <h1 class="text-4xl font-bold md:text-5xl">关于海隆</h1>
-      <p class="mt-4 text-slate-300">{{ companyInfo.slogan }}</p>
-    </div>
+    <PageBanner title="关于海隆" :description="companyInfo.slogan" />
     <nav aria-label="公司信息栏目" class="sticky top-20 z-40 border-b border-slate-100 bg-white/95 backdrop-blur-md">
       <div class="container-wide flex gap-2 overflow-x-auto">
         <router-link v-for="tab in tabs" :key="tab.id" :to="{ path: '/about', query: { tab: tab.id } }" class="whitespace-nowrap border-b-2 px-5 py-4 text-sm font-medium" :class="activeTab === tab.id ? 'border-hailong-primary text-hailong-primary' : 'border-transparent text-slate-600'" :aria-current="activeTab === tab.id ? 'page' : undefined">{{ tab.name }}</router-link>
@@ -17,6 +14,7 @@
   </div>
 </template>
 <script setup>
+import PageBanner from '@/components/common/PageBanner.vue'
 import { ref, computed, reactive, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { getCompanyInfo } from '@/utils/config'

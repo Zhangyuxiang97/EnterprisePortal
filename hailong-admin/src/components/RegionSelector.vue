@@ -11,7 +11,7 @@
     >
       <el-option :label="regionOptions ? `全部省份 (${regionOptions.provinceTotalCount})` : '全部省份'" value="all" />
       <el-option
-        v-for="province in provinces"
+        v-for="province in sortedProvinces"
         :key="province.regionCode"
         :label="provinceLabel(province)"
         :value="province.regionCode"
@@ -37,7 +37,7 @@
     >
       <el-option label="全部城市" value="all" />
       <el-option
-        v-for="city in cities"
+        v-for="city in sortedCities"
         :key="city.regionCode"
         :label="city.regionName"
         :value="city.regionCode"
@@ -56,7 +56,7 @@
     >
       <el-option label="全部区县" value="all" />
       <el-option
-        v-for="district in districts"
+        v-for="district in sortedDistricts"
         :key="district.regionCode"
         :label="district.regionName"
         :value="district.regionCode"
@@ -69,7 +69,7 @@
 import { notifyError } from '@/utils/errors'
 import { ref, computed, watch, onMounted } from 'vue'
 import { systemApi } from '@/api'
-import { UNLOCATED_PROVINCE } from '@/utils/regionFilter'
+import { UNLOCATED_PROVINCE, sortRegionsByCount } from '@/utils/regionFilter'
 
 const props = defineProps({
   regionOptions: { type: Object, default: null },
@@ -129,6 +129,12 @@ const districts = ref([])
 const selectedProvince = ref('all')
 const selectedCity = ref('all')
 const selectedDistrict = ref('all')
+const sortedProvinces = computed(() => props.regionOptions
+  ? sortRegionsByCount(provinces.value, props.regionOptions.provinces) : provinces.value)
+const sortedCities = computed(() => props.regionOptions?.selectedProvinceCode === selectedProvince.value
+  ? sortRegionsByCount(cities.value, props.regionOptions.cities) : cities.value)
+const sortedDistricts = computed(() => props.regionOptions?.selectedCityCode === selectedCity.value
+  ? sortRegionsByCount(districts.value, props.regionOptions.districts) : districts.value)
 const provinceCounts = computed(() => new Map((props.regionOptions?.provinces || []).map(item => [item.regionCode, item.count])))
 const provinceLabel = province => props.regionOptions
   ? `${province.regionName} (${provinceCounts.value.get(province.regionCode) || 0})` : province.regionName

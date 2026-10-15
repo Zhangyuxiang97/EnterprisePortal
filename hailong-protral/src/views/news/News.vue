@@ -2,20 +2,7 @@
   <div class="min-h-screen bg-slate-50/50">
     
     <!-- 页面头部 Hero Banner -->
-    <div class="relative pt-32 pb-20 text-center text-white overflow-hidden bg-gradient-to-br from-hailong-dark via-slate-900 to-indigo-950">
-      <!-- 几何网格与光晕背景 -->
-      <div class="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
-      <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-hailong-primary/10 rounded-full blur-[120px] pointer-events-none animate-float"></div>
-      
-      <div class="relative z-10 max-w-4xl mx-auto px-6">
-        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 font-tech tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-200 bg-clip-text text-transparent">
-          新闻中心
-        </h1>
-        <p class="text-base md:text-lg text-slate-300 font-medium max-w-2xl mx-auto">
-          关注海隆最新动态，获取重要通知公告与企业人文发展资讯
-        </p>
-      </div>
-    </div>
+    <PageBanner title="新闻中心" description="关注海隆最新动态，获取重要通知公告与企业人文发展资讯" />
 
     <!-- 内容区域 -->
     <div class="py-10">
@@ -152,6 +139,7 @@
 </template>
 
 <script setup>
+import PageBanner from '@/components/common/PageBanner.vue'
 import { useRouter } from 'vue-router'
 import { getCompanyNewsList } from '@/api/infoPublication'
 import { usePublicationList } from '@/composables/usePublicationList'
@@ -178,9 +166,4 @@ const handleViewDetail = id => router.push(`/news/${id}`)
   overflow: hidden;
 }
 
-.bg-grid-pattern {
-  background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
 </style>

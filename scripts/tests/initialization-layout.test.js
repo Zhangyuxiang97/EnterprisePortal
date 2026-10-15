@@ -36,6 +36,24 @@ test('公开友情链接集中到基础数据，重生成不会丢失基础链�
   assert.ok(!cleared.sql.includes('https://source.example'));
 });
 
+test('省级默认按行政编码排序，保留下级排序和地区插入次序', () => {
+  const source = loadRegionDictionary();
+  const provinces = [...source.values()].filter(region => region.level === 1);
+  assert.equal(provinces.length, 34);
+  const ordered = provinces.toSorted((a, b) => a.sortOrder - b.sortOrder);
+  assert.deepEqual(ordered.map(region => region.code), provinces.map(region => region.code).sort());
+  assert.equal(ordered[0].name, '北京市');
+  assert.equal(ordered[15].name, '河南省');
+  assert.ok(provinces.every(region => region.parentCode === null));
+  const old = new Map([...source].map(([code, region]) => [code, { ...region, sortOrder: region.level === 1 ? 999 : region.sortOrder }]));
+  const restored = loadRegionDictionary(renderRegions(old));
+  assert.deepEqual([...restored.keys()], [...old.keys()]);
+  assert.deepEqual([...restored], [...source]);
+  assert.equal(old.get('410000').sortOrder, 999);
+  old.get('500000').parentCode = '0';
+  assert.equal(loadRegionDictionary(renderRegions(old)).get('500000').parentCode, null);
+});
+
 test('八份首次初始化文件职责及执行顺序完整，附件关联在资讯之后执行', () => {
   const directory = path.join(__dirname, '../../SQL/init');
   assert.deepEqual(fs.readdirSync(directory).filter(f => f.endsWith('.sql')).sort(), [

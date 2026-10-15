@@ -183,6 +183,43 @@ public class BackendCleanupTests
         Assert.Equal(500, context.Response.StatusCode); Assert.Contains("test-trace", body); Assert.DoesNotContain("internal-password-and-sql", body);
     }
 
+    [Fact]
+    public async Task RegionOptionsRankCountsAtEveryLevelAndKeepDictionaryOrderForTies()
+    {
+        await using var database = new Database(); await database.Initialize(); await using var db = database.Open();
+        db.RegionDictionaries.AddRange(
+            new RegionDictionary { RegionCode = "110000", RegionName = "北京市", RegionLevel = 1, SortOrder = 1 },
+            new RegionDictionary { RegionCode = "310000", RegionName = "上海市", RegionLevel = 1, SortOrder = 9 },
+            new RegionDictionary { RegionCode = "410000", RegionName = "河南省", RegionLevel = 1, SortOrder = 16 },
+            new RegionDictionary { RegionCode = "440000", RegionName = "广东省", RegionLevel = 1, SortOrder = 19 },
+            new RegionDictionary { RegionCode = "640000", RegionName = "宁夏回族自治区", RegionLevel = 1, SortOrder = 30 },
+            new RegionDictionary { RegionCode = "410100", RegionName = "郑州市", RegionLevel = 2, ParentCode = "410000", SortOrder = 1 },
+            new RegionDictionary { RegionCode = "410200", RegionName = "开封市", RegionLevel = 2, ParentCode = "410000", SortOrder = 2 },
+            new RegionDictionary { RegionCode = "410300", RegionName = "洛阳市", RegionLevel = 2, ParentCode = "410000", SortOrder = 3 },
+            new RegionDictionary { RegionCode = "410102", RegionName = "中原区", RegionLevel = 3, ParentCode = "410100", SortOrder = 1 },
+            new RegionDictionary { RegionCode = "410103", RegionName = "二七区", RegionLevel = 3, ParentCode = "410100", SortOrder = 2 });
+        foreach (var (province, city, district, count) in new[] {
+            ("110000", "", "", 2), ("310000", "", "", 2), ("440000", "", "", 3),
+            ("410000", "410100", "410102", 1), ("410000", "410100", "410103", 3),
+            ("410000", "410200", "", 6), ("410000", "410300", "", 2)
+        }) for (var i = 0; i < count; i++) {
+            var article = Article($"{province}-{city}-{district}-{i}"); article.Province = province;
+            article.City = city; article.District = district; db.Announcements.Add(article);
+        }
+        await db.SaveChangesAsync();
+        var service = Announcements(db);
+        var options = await service.GetRegionOptionsAsync(new() { Province = "410000", City = "410100" });
+        Assert.Equal(new[] { "410000", "440000", "110000", "310000" }, options.Provinces.Select(x => x.RegionCode));
+        Assert.Equal(new[] { 12, 3, 2, 2 }, options.Provinces.Select(x => x.Count));
+        Assert.Equal(new[] { "410200", "410100", "410300" }, options.Cities.Select(x => x.RegionCode));
+        Assert.Equal(new[] { "410103", "410102" }, options.Districts.Select(x => x.RegionCode));
+        var emptySelection = await service.GetRegionOptionsAsync(new() { Province = "640000" });
+        Assert.Equal("640000", emptySelection.Provinces.Last().RegionCode);
+        Assert.Equal(0, emptySelection.Provinces.Last().Count);
+        var provinces = await new RegionDictionaryRepository(db).GetProvincesAsync();
+        Assert.Equal(new[] { "110000", "310000", "410000", "440000", "640000" }, provinces.Select(x => x.RegionCode));
+    }
+
     private static async Task SeedProvinceCases(ApplicationDbContext db)
     {
         db.RegionDictionaries.AddRange(
